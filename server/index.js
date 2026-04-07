@@ -15,6 +15,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
+// Fail fast if required env vars are missing in production
+if (isProd) {
+  const missing = ['DATABASE_URL', 'SESSION_SECRET', 'BASE_URL'].filter(k => !process.env[k]);
+  if (missing.length) {
+    console.error('[FATAL] Missing required env vars:', missing.join(', '));
+    process.exit(1);
+  }
+}
+
 // ── Trust proxy (required behind Vercel/nginx) ─────
 if (isProd) app.set('trust proxy', 1);
 

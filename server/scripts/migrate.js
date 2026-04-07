@@ -6,6 +6,11 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Pool } = require('pg');
 
+if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
+  console.error('[FATAL] DATABASE_URL is required');
+  process.exit(1);
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/wavecrest',
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
@@ -21,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
   plan          TEXT NOT NULL DEFAULT 'free',
   provider      TEXT NOT NULL DEFAULT 'email',
   stripe_customer_id VARCHAR(255),
+  is_beta           BOOLEAN DEFAULT false,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -74,6 +80,27 @@ CREATE TABLE IF NOT EXISTS session (
   expire  TIMESTAMP(6) NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_session_expire ON session(expire);
+
+-- Safe column additions for existing databases
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN is_beta BOOLEAN DEFAULT false;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE subscriptions ADD COLUMN stripe_sub_id VARCHAR(255);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE subscriptions ADD COLUMN current_period_end TIMESTAMPTZ;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 `;
 
 (async () => {
