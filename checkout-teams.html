@@ -388,45 +388,6 @@
       gap: 12px;
     }
 
-    /* Team size selector */
-    .team-size-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-    }
-    .size-option {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 0;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: border-color .2s;
-    }
-    .size-option:hover { border-color: rgba(255,255,255,.2); }
-    .size-option.active { border-color: var(--blue); }
-    .size-option .num {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .size-option .per {
-      font-size: .68rem;
-      color: var(--muted);
-    }
-    .dynamic-price {
-      margin-top: 12px;
-      text-align: center;
-      font-size: .88rem;
-      color: var(--fg);
-    }
-    .dynamic-price strong {
-      font-weight: 600;
-    }
-
     .btn-pay {
       width: 100%;
       padding: 18px;
@@ -478,9 +439,6 @@
         gap: 8px;
       }
       .limit-label, .limit-value { width: auto; }
-      .team-size-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
     }
   
 /* Wave text hover — buttons only */
@@ -681,22 +639,6 @@
   <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
 
 </div>
-
-<script>
-  function selectSize(el) {
-    document.querySelectorAll('.size-option').forEach(function(o) { o.classList.remove('active'); });
-    el.classList.add('active');
-    var members = parseInt(el.getAttribute('data-members'), 10);
-    var total = (members * 49.99);
-    var formatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    document.getElementById('dynamic-total').textContent = '$' + formatted;
-    document.getElementById('dynamic-seats').textContent = members;
-    document.getElementById('summary-seats').textContent = members + ' members';
-    document.getElementById('summary-total').textContent = '$' + formatted;
-    document.getElementById('btn-pay').textContent = 'Start Team \u2014 $' + formatted + '/mo';
-  }
-</script>
-
 
 <script>
 function initWaveText(){
