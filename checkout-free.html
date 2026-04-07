@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavecrest Pro — Free Plan</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000;
+      --fg: #f5f5f7;
+      --muted: #86868b;
+      --blue: #0071e3;
+      --blue-hover: #0077ed;
+      --green: #30d158;
+      --card-bg: rgba(255,255,255,.03);
+      --card-border: rgba(255,255,255,.04);
+      --divider: rgba(255,255,255,.06);
+      --input-bg: rgba(255,255,255,.04);
+      --input-border: rgba(255,255,255,.12);
+      --max: 860px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    body {
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+    a:hover { color: var(--blue-hover); }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      background: rgba(0,0,0,.8);
+      border-bottom: 1px solid var(--divider);
+    }
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    nav .logo {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--fg);
+    }
+    nav .logo span {
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .back-link {
+      font-size: .8rem;
+      color: var(--muted);
+      transition: color .2s ease;
+    }
+    .back-link:hover { color: var(--fg); }
+
+    /* ── Section label (Apple-style) ── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 96px 24px 100px;
+    }
+
+    /* ── Header ── */
+    .plan-header {
+      text-align: center;
+      padding: 80px 0 88px;
+    }
+    .plan-header h1 {
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 600;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .plan-header .price {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -.03em;
+      margin: 20px 0 6px;
+    }
+    .plan-header .price span {
+      font-size: .9rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .plan-header .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--divider);
+    }
+
+    /* ── Usage Limits ── */
+    .limits {
+      padding: 80px 0 88px;
+    }
+    .limit-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .limit-row:first-of-type { border-top: 1px solid var(--card-border); }
+    .limit-label {
+      width: 140px;
+      font-size: .875rem;
+      font-weight: 500;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+    .limit-bar-wrap { flex: 1; }
+    .limit-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .limit-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(.16,1,.3,1);
+    }
+    .limit-value {
+      width: 90px;
+      text-align: right;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ── Dashboard Preview ── */
+    .preview {
+      padding: 80px 0 88px;
+    }
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .preview-dots { display: flex; gap: 6px; }
+    .preview-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: block;
+    }
+    .preview-url {
+      font-size: .75rem;
+      color: var(--muted);
+      letter-spacing: .01em;
+    }
+    .preview-body { padding: 8px 20px; }
+    .preview-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .preview-row:last-child { border-bottom: none; }
+    .preview-row .topic {
+      font-size: .875rem;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    .preview-row .tag {
+      padding: 3px 10px;
+      border-radius: 980px;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+    .tag-hot { background: rgba(255,69,58,.12); color: #ff453a; }
+    .tag-rising { background: rgba(48,209,88,.12); color: #30d158; }
+    .tag-warm { background: rgba(255,159,10,.12); color: #ff9f0a; }
+    .locked-row {
+      opacity: .18;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+    .lock-overlay {
+      text-align: center;
+      padding: 24px 20px;
+      border-top: 1px solid var(--card-border);
+    }
+    .lock-overlay p {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+    .lock-overlay a { font-weight: 600; }
+
+    /* ── Features ── */
+    .features {
+      padding: 80px 0 88px;
+    }
+    .feat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .feat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: .875rem;
+      font-weight: 400;
+      color: var(--fg);
+    }
+    .feat-item .check {
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--green);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+    .feat-item.locked {
+      color: rgba(255,255,255,.28);
+    }
+    .feat-item.locked .check {
+      color: rgba(255,255,255,.15);
+    }
+
+    /* ── Signup Form ── */
+    .signup {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 80px 0 0;
+    }
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-top: 8px;
+    }
+    .byoak-notice {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 28px;
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .byoak-notice strong {
+      color: var(--fg);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      font-size: .8rem;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: .01em;
+    }
+    .form-group input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      color: var(--fg);
+      font-size: .9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s ease;
+    }
+    .form-group input:focus {
+      border-color: var(--blue);
+    }
+    .form-group input::placeholder {
+      color: rgba(255,255,255,.2);
+    }
+    .btn-signup {
+      width: 100%;
+      height: 52px;
+      padding: 0 18px;
+      margin-top: 24px;
+      border: none;
+      border-radius: 12px;
+      background: var(--blue);
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color .2s ease;
+      letter-spacing: .01em;
+    }
+    .btn-signup:hover {
+      background: var(--blue-hover);
+    }
+    .form-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    /* ── Upsell ── */
+    .upsell {
+      text-align: center;
+      padding: 56px 0 0;
+    }
+    .upsell-inner {
+      padding-top: 48px;
+      border-top: 1px solid var(--divider);
+    }
+    .upsell p {
+      color: var(--muted);
+      font-size: .875rem;
+      margin-bottom: 10px;
+    }
+    .upsell a {
+      font-weight: 600;
+      font-size: .875rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .plan-header { padding: 48px 0 56px; }
+      .limits, .preview, .features { padding: 48px 0 56px; }
+      .signup { padding: 48px 0 0; }
+      .feat-grid { grid-template-columns: 1fr; }
+      .limit-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .limit-label, .limit-value { width: auto; }
+      .form-card { padding: 28px 20px; }
+    }
+  
+/* Wave text hover — buttons only */
+.char{display:inline-block}
+.wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
+@keyframes wave-bounce{0%{transform:translateY(0)}30%{transform:translateY(-10px)}60%{transform:translateY(2px)}100%{transform:translateY(0)}}
+
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
+    <a href="index.html#pricing" class="back-link">All Plans</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="plan-header">
+    <p class="section-label">Free Plan</p>
+    <h1>Get started for free.</h1>
+    <div class="price">$0<span> /mo</span></div>
+    <p class="subtitle">Bring your own API key. No credit card required.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Usage Limits -->
+  <div class="limits">
+    <p class="section-label">Usage Limits</p>
+    <div class="limit-row">
+      <div class="limit-label">Searches / day</div>
+      <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:5%;background:var(--blue)"></div></div></div>
+      <div class="limit-value">5 / day</div>
+    </div>
+    <div class="limit-row">
+      <div class="limit-label">Platforms</div>
+      <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:33%;background:var(--blue)"></div></div></div>
+      <div class="limit-value">1 of 3</div>
+    </div>
+    <div class="limit-row">
+      <div class="limit-label">Alert speed</div>
+      <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:10%;background:var(--blue)"></div></div></div>
+      <div class="limit-value">6h+ delay</div>
+    </div>
+    <div class="limit-row">
+      <div class="limit-label">Trend history</div>
+      <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:0%"></div></div></div>
+      <div class="limit-value">None</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Dashboard Preview -->
+  <div class="preview">
+    <p class="section-label">Dashboard Preview</p>
+    <div class="preview-card">
+      <div class="preview-toolbar">
+        <div class="preview-dots">
+          <span style="background:#ff5f57"></span>
+          <span style="background:#febc2e"></span>
+          <span style="background:#28c840"></span>
+        </div>
+        <span class="preview-url">wavecrest.pro/dashboard</span>
+      </div>
+      <div class="preview-body">
+        <div class="live-dashboard" data-rows="9" data-locked="3"></div>
+          <span class="topic">🎬 "Get Ready With Me" format</span>
+          <span class="tag tag-hot">HOT</span>
+        </div>
+        <div class="preview-row">
+          <span class="topic">🎵 "Midnight Groove" sound</span>
+          <span class="tag tag-rising">RISING</span>
+        </div>
+        <div class="preview-row">
+          <span class="topic">🐶 #DogMom lifestyle</span>
+          <span class="tag tag-warm">WARM</span>
+        </div>
+        <div class="preview-row locked-row">
+          <span class="topic">AI voiceover tutorials</span>
+          <span class="tag tag-hot">HOT</span>
+        </div>
+        <div class="preview-row locked-row">
+          <span class="topic">"Whisper ASMR" cooking</span>
+          <span class="tag tag-rising">RISING</span>
+        </div>
+      </div>
+      <div class="lock-overlay">
+        <p>Upgrade to see more trends. <a href="checkout-plus.html">View Plus plan</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Features -->
+  <div class="features">
+    <p class="section-label">What's Included</p>
+    <div class="feat-grid">
+      <div class="feat-item"><span class="check">✓</span> Web dashboard</div>
+      <div class="feat-item"><span class="check">✓</span> Basic trend list</div>
+      <div class="feat-item"><span class="check">✓</span> 1 platform</div>
+      <div class="feat-item"><span class="check">✓</span> Community support</div>
+      <div class="feat-item locked"><span class="check">—</span> Smart alerts</div>
+      <div class="feat-item locked"><span class="check">—</span> Niche filters</div>
+      <div class="feat-item locked"><span class="check">—</span> Content hooks</div>
+      <div class="feat-item locked"><span class="check">—</span> API access</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Signup -->
+  <div class="signup">
+    <p class="section-label">Create Your Account</p>
+    <div class="form-card">
+      <div class="byoak-notice">
+        <strong>Bring Your Own API Key</strong>
+        The Free plan uses your personal API quota. You'll connect your key after signing up.
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="Create a password" autocomplete="new-password">
+      </div>
+      <button class="btn-signup">Create Free Account</button>
+      <p class="form-note">No credit card required</p>
+    </div>
+  </div>
+
+  <!-- Upsell -->
+  <div class="upsell">
+    <div class="upsell-inner">
+      <p>Need more searches, platforms, and real-time alerts?</p>
+      <a href="checkout-plus.html">Upgrade to Plus — $9.99/mo</a>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+function initWaveText(){
+  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
+  document.querySelectorAll(sel).forEach(function(el){
+    if(el.classList.contains("wave-ready"))return;
+    el.classList.add("wave-ready");el.classList.add("wave-hover");
+    var orig=el.innerHTML;
+    el.addEventListener("mouseenter",function(){
+      var nodes=Array.from(el.childNodes),h="";
+      nodes.forEach(function(node){
+        if(node.nodeType===3){
+          node.textContent.split("").forEach(function(c,i){
+            h+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+          });
+        }else{
+          var cl=node.cloneNode(true);
+          if(cl.textContent&&cl.nodeType===1){
+            var inner="";cl.textContent.split("").forEach(function(c,i){
+              inner+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+            });cl.innerHTML=inner;
+          }
+          h+=cl.outerHTML||cl.textContent;
+        }
+      });
+      el.innerHTML=h;
+    });
+    el.addEventListener("mouseleave",function(){el.innerHTML=orig;});
+  });
+}
+initWaveText();
+</script>
+
+
+<script>
+// ── Trend pool ──
+var trendPool = [];
+var FALLBACK_POOL = [
+  {topic:'🎬 "Get Ready With Me" format',score:'hot'},
+  {topic:'🎵 "Midnight Groove" sound',score:'rising'},
+  {topic:'#DogMom lifestyle',score:'warm'},
+  {topic:'AI voiceover tutorials',score:'hot'},
+  {topic:'"Whisper ASMR" cooking',score:'rising'},
+  {topic:'#CozyGameplay aesthetic',score:'rising'},
+  {topic:'Morning routine speed edits',score:'hot'},
+  {topic:'#BookTok dark academia',score:'rising'},
+  {topic:'"Soft life" aesthetic vlogs',score:'warm'},
+  {topic:'#GymTok transformation',score:'hot'},
+  {topic:'Lo-fi study room setups',score:'rising'},
+  {topic:'Aesthetic meal prep reels',score:'warm'},
+  {topic:'"Day in my life" series',score:'rising'},
+  {topic:'#CleanTok deep clean',score:'hot'},
+  {topic:'Tiny house living tours',score:'warm'},
+  {topic:'Skincare layering tutorials',score:'rising'},
+  {topic:'#OOTD street style',score:'hot'},
+  {topic:'DIY room makeover timelapse',score:'rising'},
+  {topic:'Cafe hopping vlogs',score:'warm'},
+  {topic:'"What I eat in a day"',score:'hot'},
+  {topic:'#PetTok animal rescues',score:'rising'},
+  {topic:'Sunset drone cinematography',score:'warm'},
+  {topic:'AI art generation tutorials',score:'hot'},
+  {topic:'Thrift flip challenges',score:'rising'},
+  {topic:'#PlantTok propagation',score:'warm'},
+  {topic:'3D printing oddities',score:'rising'},
+  {topic:'Silent vlog trend',score:'hot'},
+  {topic:'#FitnessTok home workouts',score:'rising'},
+  {topic:'"Romanticize your life"',score:'warm'},
+  {topic:'Analog photography revival',score:'rising'},
+  {topic:'#FoodTok one-pot recipes',score:'hot'},
+  {topic:'Micro-adventure weekends',score:'warm'},
+  {topic:'Vintage tech teardowns',score:'rising'},
+  {topic:'#TravelTok hidden gems',score:'hot'},
+  {topic:'Cottagecore baking reels',score:'warm'},
+  {topic:'Speed art digital painting',score:'rising'},
+  {topic:'#StudyTube pomodoro',score:'warm'},
+  {topic:'Storytime animated shorts',score:'hot'},
+  {topic:'Aesthetic desktop setups',score:'rising'},
+  {topic:'Car detailing ASMR',score:'hot'},
+  {topic:'#NailTok chrome finish',score:'rising'},
+  {topic:'POV acting skits',score:'hot'},
+  {topic:'Street food world tours',score:'warm'},
+  {topic:'Minimalist wardrobe capsule',score:'rising'},
+  {topic:'Budget travel hacks',score:'hot'},
+  {topic:'#HairTok curtain bangs',score:'rising'},
+  {topic:'Coding speed challenges',score:'warm'},
+  {topic:'Retro gaming nostalgia',score:'rising'},
+  {topic:'"No-spend" month challenge',score:'warm'},
+  {topic:'Underwater photography trend',score:'rising'},
+];
+
+(function() {
+  fetch('trends.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject('not ok'); })
+    .then(function(data) {
+      if (data && data.trends && data.trends.length > 0) {
+        trendPool = data.trends.map(function(t) {
+          var score = t.score || 'warm';
+          return { topic: t.topic, score: score };
+        });
+        console.log('[Wavecrest] Loaded ' + trendPool.length + ' live trends for ' + data.date);
+        if (typeof populateDashboard === 'function') populateDashboard();
+        if (typeof populateDashboards === 'function') populateDashboards();
+      } else {
+        trendPool = FALLBACK_POOL;
+      }
+    })
+    .catch(function() {
+      console.log('[Wavecrest] Using fallback trends');
+      trendPool = FALLBACK_POOL;
+    });
+  trendPool = FALLBACK_POOL;
+})();
+var scoreLabels={hot:'HOT',rising:'RISING',warm:'WARM'};
+var scoreClass={hot:'tag-hot',rising:'tag-rising',warm:'tag-warm'};
+
+function shuffle(a){a=[...a];for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function populateDashboards(){
+  document.querySelectorAll('.live-dashboard').forEach(function(el){
+    var count=parseInt(el.getAttribute('data-rows'))||6;
+    var locked=parseInt(el.getAttribute('data-locked'))||0;
+    var picks=shuffle(trendPool).slice(0,count);
+    var html='';
+    picks.forEach(function(t,i){
+      var isLocked=i>=(count-locked);
+      html+='<div class="preview-row'+(isLocked?' locked-row':'')+'" style="opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease;transition-delay:'+(i*0.1)+'s">';
+      html+='<span class="topic">'+t.topic+'</span>';
+      html+='<span class="tag '+scoreClass[t.score]+'">'+scoreLabels[t.score]+'</span>';
+      html+='</div>';
+    });
+    el.innerHTML=html;
+    // Wave in
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        el.querySelectorAll('.preview-row').forEach(function(row){
+          row.style.opacity='1';row.style.transform='translateY(0)';
+        });
+      });
+    });
+  });
+}
+
+// Observe and animate on scroll
+var dashObs=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      populateDashboards();
+      dashObs.unobserve(entry.target);
+      // Cycle every 5s
+      setInterval(function(){
+        document.querySelectorAll('.live-dashboard .preview-row').forEach(function(r){
+          r.style.opacity='0';r.style.transform='translateY(16px)';
+        });
+        setTimeout(populateDashboards,350);
+      },5000);
+    }
+  });
+},{threshold:0.2});
+
+document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observe(el);});
+
+// ── Wire free signup form to backend ──
+(function(){
+  var btn = document.querySelector('.btn-signup');
+  if (!btn) return;
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    var email = document.querySelector('.signup input[type="email"]');
+    var password = document.querySelector('.signup input[type="password"]');
+    if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
+    if (!password || password.value.length < 6) { alert('Password must be at least 6 characters.'); return; }
+    btn.disabled = true; btn.textContent = 'Creating account…';
+    fetch('/api/auth/signup', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email: email.value.trim(), password: password.value, name: email.value.split('@')[0]})
+    }).then(function(r){return r.json()}).then(function(data){
+      if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = 'Create Free Account'; return; }
+      window.location.href = '/dashboard.html?subscribed=free';
+    }).catch(function(){
+      alert('Something went wrong. Please try again.');
+      btn.disabled = false; btn.textContent = 'Create Free Account';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

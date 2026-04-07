@@ -1,0 +1,136 @@
+/**
+ * Dashboard routes — saved trends, alerts, exports, BYOAK
+ */
+const express = require('express');
+const db = require('../db');
+const { requireAuth } = require('../middleware/requireAuth');
+const router = express.Router();
+
+// ── GET /api/dashboard — main dashboard data ──────
+router.get('/', requireAuth, (req, res) => {
+  const user = db.findUserById(req.session.userId);
+  if (!user) return res.status(401).json({ error: 'Not authenticated.' });
+
+  const today = new Date().toISOString().slice(0, 10);
+  let { trends, total } = db.getTrends({ date: today, limit: 30 });
+
+  // Fall back to most recent date with data if today has none
+  let displayDate = today;
+  if (total === 0 && db.trends.length > 0) {
+    const dates = [...new Set(db.trends.map(t => t.fetched_at))].sort().reverse();
+    if (dates.length > 0) {
+      displayDate = dates[0];
+      ({ trends, total } = db.getTrends({ date: displayDate, limit: 30 }));
+    }
+  }
+  const sub = db.findSubscription(user.id);
+  const { remaining, limit } = db.checkRateLimit(user.id, user.plan);
+
+  // Determine what's locked
+  const isFreePlan = user.plan === 'free';
+  const isPlusPlan = user.plan === 'plus';
+  const lockedCount = isFreePlan ? Math.floor(trends.length * 0.3) : (isPlusPlan ? Math.floor(trends.length * 0.15) : 0);
+
+  const visibleTrends = trends.map((t, i) => {
+    if (i >= trends.length - lockedCount) {
+      return { ...t, locked: true, topic: '🔒 Upgrade to unlock', score: 'locked' };
+    }
+    return { ...t, locked: false };
+  });
+
+  res.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      plan: user.plan,
+      avatar_url: user.avatar_url,
+    },
+    subscription: sub ? {
+      plan: sub.plan,
+      status: sub.status,
+      period_end: sub.current_period_end,
+      trial_end: sub.trial_end,
+    } : null,
+    usage: { remaining, limit, plan: user.plan },
+    trends: {
+      date: displayDate,
+      total,
+      items: visibleTrends,
+      locked_count: lockedCount,
+    },
+    features: {
+      niche_search: ['pro', 'max', 'teams', 'enterprise'].includes(user.plan),
+      export_csv: user.plan !== 'free',
+      api_access: ['max', 'teams', 'enterprise'].includes(user.plan),
+      alerts: user.plan !== 'free',
+      history_days: { free: 0, plus: 7, pro: 30, max: 90, teams: 90, enterprise: -1 }[user.plan] || 0,
+    },
+  });
+});
+
+// ── GET /api/dashboard/export — CSV export ─────────
+router.get('/export', requireAuth, (req, res) => {
+  const user = db.findUserById(req.session.userId);
+  if (!user || user.plan === 'free') {
+    return res.status(403).json({ error: 'CSV export requires Plus plan or higher.' });
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const { trends } = db.getTrends({ date: today, limit: 100 });
+
+  // Sanitize CSV fields to prevent formula injection
+  function csvSafe(str) {
+    let s = String(str).replace(/"/g, '""');
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return '"' + s + '"';
+  }
+
+  const csv = ['Topic,Score,Platform,Date']
+    .concat(trends.map((t) => `${csvSafe(t.topic)},${csvSafe(t.score)},${csvSafe(t.platform)},${csvSafe(t.fetched_at)}`))
+    .join('\n');
+
+  res.set('Content-Type', 'text/csv; charset=utf-8');
+  res.set('Content-Disposition', `attachment; filename="wavecrest-trends-${today}.csv"`);
+  res.send(csv);
+});
+
+// ── BYOAK routes ───────────────────────────────────
+router.get('/api-keys', requireAuth, (req, res) => {
+  const keys = db.getApiKeys(req.session.userId);
+  // Mask the actual keys
+  const masked = keys.map((k) => ({
+    id: k.id,
+    service: k.service,
+    key_preview: k.api_key.slice(0, 8) + '••••••••',
+    created_at: k.created_at,
+  }));
+  res.json({ keys: masked });
+});
+
+router.post('/api-keys', requireAuth, (req, res) => {
+  const { service, api_key } = req.body;
+  if (!service || !api_key) {
+    return res.status(400).json({ error: 'Service name and API key required.' });
+  }
+
+  const allowed = ['google_trends', 'youtube', 'tiktok'];
+  if (!allowed.includes(service)) {
+    return res.status(400).json({ error: `Service must be one of: ${allowed.join(', ')}` });
+  }
+
+  const saved = db.saveApiKey(req.session.userId, service, api_key);
+  res.json({
+    message: `API key saved for ${service}.`,
+    key_preview: api_key.slice(0, 8) + '••••••••',
+  });
+});
+
+router.delete('/api-keys/:id', requireAuth, (req, res) => {
+  const idx = db.apiKeys.findIndex((k) => k.id === req.params.id && k.user_id === req.session.userId);
+  if (idx === -1) return res.status(404).json({ error: 'Key not found.' });
+  db.apiKeys.splice(idx, 1);
+  res.json({ message: 'API key deleted.' });
+});
+
+module.exports = router;

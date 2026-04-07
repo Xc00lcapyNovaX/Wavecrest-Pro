@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavecrest Pro — See What's Next</title>
+  <style>
+    /* ── Reset & Base ──────────────────────────────── */
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#000;--fg:#f5f5f7;--muted:#86868b;--accent:#2997ff;
+      --accent2:#bf5af2;--accent3:#30d158;
+      --card:#111;--card-border:#1d1d1f;
+      --radius:20px;--max:1120px;
+      --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    }
+    html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;transition:color .2s}
+    a:hover{color:#64b5f6}
+    img{display:block;max-width:100%}
+
+    /* ── Utility ───────────────────────────────────── */
+    .container{max-width:var(--max);margin:0 auto;padding:0 24px}
+    .text-center{text-align:center}
+    .muted{color:var(--muted)}
+    .gradient-text{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .gradient-text-green{
+      background:linear-gradient(135deg,var(--accent3),var(--accent));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    /* ── Reveal animation ─────────────────────────── */
+    .reveal{opacity:0;transform:translateY(60px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-delay-1{transition-delay:.15s}
+    .reveal-delay-2{transition-delay:.3s}
+    .reveal-delay-3{transition-delay:.45s}
+    .reveal-delay-4{transition-delay:.6s}
+
+    /* ── Nav ───────────────────────────────────────── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+      background:rgba(0,0,0,.72);border-bottom:1px solid rgba(255,255,255,.08);
+      transition:background .3s;
+    }
+    nav .inner{display:flex;align-items:center;justify-content:space-between;height:52px;max-width:var(--max);margin:0 auto;padding:0 24px}
+    nav .logo{font-size:1.15rem;font-weight:700;letter-spacing:-.02em}
+    nav .logo span{font-weight:300;opacity:.6}
+    nav .links{display:flex;gap:28px;font-size:.85rem;color:var(--muted)}
+    nav .links a{color:var(--muted)}
+    nav .links a:hover{color:var(--fg)}
+    .cta-sm{
+      display:inline-block;padding:7px 18px;border-radius:980px;font-size:.85rem;font-weight:500;
+      background:var(--accent);color:#fff;transition:background .2s,transform .15s;
+    }
+    .cta-sm:hover{background:#1a8aed;color:#fff;transform:scale(1.04)}
+
+    /* ── Hero ──────────────────────────────────────── */
+    .hero{
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:140px 24px 100px;position:relative;overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;width:700px;height:700px;border-radius:50%;
+      background:radial-gradient(circle,rgba(41,151,255,.15),transparent 70%);
+      top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+      animation:pulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.6}100%{transform:translate(-50%,-50%) scale(1.25);opacity:1}}
+    .hero h1{font-size:clamp(2.8rem,7vw,5.5rem);font-weight:700;letter-spacing:-.04em;line-height:1.05;margin-bottom:20px;position:relative}
+    .hero p.sub{font-size:clamp(1rem,2.2vw,1.35rem);color:var(--muted);max-width:560px;line-height:1.5;margin-bottom:40px;position:relative}
+    .hero .buttons{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;position:relative}
+    .btn-primary{
+      display:inline-block;padding:14px 32px;border-radius:980px;font-size:1rem;font-weight:600;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+      transition:transform .2s,box-shadow .3s;
+    }
+    .btn-primary:hover{transform:scale(1.05);box-shadow:0 8px 40px rgba(41,151,255,.35);color:#fff}
+    .btn-outline{
+      display:inline-block;padding:14px 32px;border-radius:980px;font-size:1rem;font-weight:600;
+      border:1.5px solid rgba(255,255,255,.2);color:var(--fg);transition:border-color .2s,transform .2s;
+    }
+    .btn-outline:hover{border-color:var(--accent);transform:scale(1.05);color:var(--fg)}
+
+    /* ── Floating badges in hero ──────────────────── */
+    .floating-badges{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden}
+    .badge{
+      position:absolute;padding:10px 20px;border-radius:14px;font-size:.82rem;font-weight:600;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(12px);animation:float 8s ease-in-out infinite;
+    }
+    .badge:nth-child(1){top:18%;left:8%;animation-delay:0s}
+    .badge:nth-child(2){top:25%;right:7%;animation-delay:2s}
+    .badge:nth-child(3){bottom:22%;left:12%;animation-delay:4s}
+    .badge:nth-child(4){bottom:28%;right:10%;animation-delay:1s}
+    @keyframes float{
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-18px) rotate(2deg)}
+    }
+
+    /* ── Section spacing ──────────────────────────── */
+    section{padding:120px 24px}
+    section h2{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
+    section p.lead{font-size:1.15rem;color:var(--muted);max-width:600px;margin:0 auto 60px;line-height:1.6}
+
+    /* ── Platforms (logo ticker) ───────────────────── */
+    .platforms{padding:80px 24px;border-top:1px solid var(--card-border);border-bottom:1px solid var(--card-border)}
+    .platforms h3{text-align:center;font-size:.85rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:36px}
+    .platform-icons{display:flex;justify-content:center;gap:60px;flex-wrap:wrap;align-items:center}
+    .platform-icons .icon{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);transition:color .3s}
+    .platform-icons .icon:hover{color:var(--fg)}
+    .platform-icons svg{width:40px;height:40px;fill:currentColor}
+    .platform-icons span{font-size:.8rem;font-weight:500}
+
+    /* ── Features grid ────────────────────────────── */
+    .features-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;
+    }
+    .feature-card{
+      background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);
+      padding:40px 32px;transition:transform .3s,border-color .3s;
+    }
+    .feature-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.3)}
+    .feature-card .icon-wrap{
+      width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,rgba(41,151,255,.15),rgba(191,90,242,.1));margin-bottom:24px;font-size:1.5rem;
+    }
+    .feature-card h3{font-size:1.25rem;font-weight:600;margin-bottom:10px}
+    .feature-card p{color:var(--muted);line-height:1.55;font-size:.95rem}
+
+    /* ── Big showcase section ─────────────────────── */
+    .showcase{position:relative;overflow:hidden}
+    .showcase .bg-glow{
+      position:absolute;width:100%;height:100%;top:0;left:0;
+      background:radial-gradient(ellipse at center,rgba(191,90,242,.08),transparent 70%);
+      pointer-events:none;
+    }
+    .showcase-content{position:relative;max-width:var(--max);margin:0 auto}
+    .showcase-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .showcase-visual{
+      border-radius:var(--radius);overflow:hidden;border:1px solid var(--card-border);
+      background:var(--card);position:relative;
+    }
+    .mock-dashboard{padding:32px;font-size:.85rem}
+    .mock-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--card-border);
+      opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+    .mock-row.wave-in{opacity:1;transform:translateY(0)}
+    .mock-row:last-child{border-bottom:none}
+    .mock-row .topic{font-weight:600}
+    .mock-row .score{
+      padding:4px 12px;border-radius:980px;font-size:.78rem;font-weight:600;
+    }
+    .score.hot{background:rgba(255,69,58,.15);color:#ff453a}
+    .score.rising{background:rgba(48,209,88,.15);color:#30d158}
+    .score.warm{background:rgba(255,159,10,.15);color:#ff9f0a}
+    .showcase-text h2{margin-bottom:20px}
+    .showcase-text p{color:var(--muted);line-height:1.6;font-size:1.05rem;margin-bottom:28px}
+
+    /* ── Counter bar ──────────────────────────────── */
+    .counter-bar{padding:80px 24px;background:var(--card);border-top:1px solid var(--card-border);border-bottom:1px solid var(--card-border)}
+    .counter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;max-width:var(--max);margin:0 auto;text-align:center}
+    .counter-item .number{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;letter-spacing:-.03em}
+    .counter-item .label{color:var(--muted);font-size:.9rem;margin-top:6px}
+
+    /* ── Pricing ──────────────────────────────────── */
+    .pricing-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1060px;margin:0 auto;
+    }
+    .price-card{
+      background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);
+      padding:36px 28px;transition:transform .3s,border-color .3s;position:relative;overflow:hidden;
+      display:flex;flex-direction:column;
+    }
+    .price-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.25)}
+    .price-card.featured{border-color:var(--accent)}
+    .price-card.featured::before{
+      content:'MOST POPULAR';position:absolute;top:0;left:0;right:0;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+      font-size:.65rem;font-weight:700;padding:6px 0;text-align:center;letter-spacing:.1em;
+      border-radius:var(--radius) var(--radius) 0 0;
+    }
+    .price-card.featured{padding-top:56px}
+    .price-card h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
+    .price-card .price{font-size:2.4rem;font-weight:700;margin:12px 0 4px}
+    .price-card .price span{font-size:.9rem;font-weight:400;color:var(--muted)}
+    .price-card .trial{display:inline-block;padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;margin-bottom:14px;letter-spacing:.02em}
+    .trial-free{background:rgba(48,209,88,.12);color:var(--accent3)}
+    .trial-discount{background:rgba(41,151,255,.12);color:var(--accent)}
+    .price-card .original-price{text-decoration:line-through;color:var(--muted);font-size:1rem;font-weight:400;margin-right:6px}
+    .price-card .note{font-size:.82rem;color:var(--muted);margin-bottom:20px}
+    .price-card ul{list-style:none;margin-bottom:28px;flex:1}
+    .price-card li{padding:7px 0;font-size:.88rem;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04)}
+    .price-card li::before{content:'✓ ';color:var(--accent3);font-weight:700}
+    .price-card .btn-card{
+      display:block;text-align:center;padding:12px;border-radius:980px;font-size:.9rem;font-weight:600;
+      border:1.5px solid rgba(255,255,255,.15);color:var(--fg);transition:all .2s;
+    }
+    .price-card .btn-card:hover{border-color:var(--accent);color:var(--accent)}
+    .price-card.featured .btn-card{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;
+    }
+    .price-card.featured .btn-card:hover{opacity:.9;color:#fff}
+
+    /* ── CTA ───────────────────────────────────────── */
+    .final-cta{
+      text-align:center;padding:160px 24px;position:relative;overflow:hidden;
+    }
+    .final-cta::before{
+      content:'';position:absolute;width:900px;height:900px;border-radius:50%;
+      background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%);
+      top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+    }
+    .final-cta h2{font-size:clamp(2.2rem,5vw,4rem);font-weight:700;letter-spacing:-.03em;margin-bottom:16px;position:relative}
+    .final-cta p{color:var(--muted);font-size:1.1rem;margin-bottom:40px;position:relative}
+
+    /* ── Wave text hover ─────────────────────────── */
+        .char{display:inline-block}
+    .wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
+    @keyframes wave-bounce{
+      0%{transform:translateY(0)}
+      30%{transform:translateY(-10px)}
+      60%{transform:translateY(2px)}
+      100%{transform:translateY(0)}
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    footer{border-top:1px solid var(--card-border);padding:40px 24px;text-align:center}
+    footer p{color:var(--muted);font-size:.82rem}
+    footer .links{display:flex;justify-content:center;gap:24px;margin-bottom:16px;flex-wrap:wrap}
+    footer .links a{color:var(--muted);font-size:.82rem}
+
+    /* ── Responsive ────────────────────────────────── */
+    @media(max-width:768px){
+      .showcase-grid{grid-template-columns:1fr;gap:40px}
+      .pricing-grid{grid-template-columns:1fr}
+      nav .links{display:none}
+      .badge{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────── -->
+<nav>
+  <div class="inner">
+    <div class="logo">Wavecrest<span> Pro</span></div>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="signin.html">Sign In</a>
+    </div>
+    <a href="signup.html" class="cta-sm">Get Started</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────── -->
+<section class="hero">
+  <div class="floating-badges" id="floating-badges">
+    <div class="badge"></div>
+    <div class="badge"></div>
+    <div class="badge"></div>
+    <div class="badge"></div>
+  </div>
+  <h1 class="reveal">See the trend<br><span class="gradient-text">before everyone else.</span></h1>
+  <p class="sub reveal reveal-delay-1">AI-powered trend detection for YouTube, TikTok, and Instagram. Catch what's rising early. Create content that lands.</p>
+  <div class="buttons reveal reveal-delay-2">
+    <a href="#pricing" class="btn-primary">Start Free →</a>
+    <a href="#how" class="btn-outline">See How It Works</a>
+  </div>
+</section>
+
+<!-- ─── PLATFORMS ─────────────────────────────────── -->
+<div class="platforms reveal">
+  <h3>Works across the platforms you care about</h3>
+  <div class="platform-icons">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 00.5 6.19 31.6 31.6 0 000 12a31.6 31.6 0 00.5 5.81 3.02 3.02 0 002.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 002.12-2.14A31.6 31.6 0 0024 12a31.6 31.6 0 00-.5-5.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+      <span>YouTube</span>
+    </div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44.05c1.27.05 2.49.21 3.65.64a7.7 7.7 0 014.22 4.22c.43 1.16.59 2.38.64 3.65.04 1.3.05 2.6.05 3.91v.06c0 1.31-.01 2.61-.05 3.91-.05 1.27-.21 2.49-.64 3.65a7.7 7.7 0 01-4.22 4.22c-1.16.43-2.38.59-3.65.64-1.3.04-2.6.05-3.91.05h-.06c-1.31 0-2.61-.01-3.91-.05-1.27-.05-2.49-.21-3.65-.64a7.7 7.7 0 01-4.22-4.22C.26 18.98.1 17.76.05 16.49.01 15.19 0 13.89 0 12.58v-.06C0 11.21.01 9.91.05 8.61.1 7.34.26 6.12.69 4.96A7.7 7.7 0 014.91.74C6.07.31 7.29.15 8.56.1 9.86.06 11.16.05 12.47.05h.06zM12 5.84A6.16 6.16 0 1018.16 12 6.16 6.16 0 0012 5.84zM12 16a4 4 0 110-8 4 4 0 010 8zm6.41-11.85a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/></svg>
+      <span>Instagram</span>
+    </div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.36 6.36 0 00-.79-.05 6.35 6.35 0 00-6.35 6.35A6.35 6.35 0 009.49 22a6.35 6.35 0 006.35-6.35V8.72a8.2 8.2 0 004.8 1.53V6.8a4.85 4.85 0 01-1.05-.11z"/></svg>
+      <span>TikTok</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FEATURES ──────────────────────────────────── -->
+<section id="features">
+  <div class="container text-center">
+    <h2 class="reveal">Built for creators<br><span class="gradient-text">who move fast.</span></h2>
+    <p class="lead reveal reveal-delay-1">Stop guessing. Get signals backed by real-time data across the platforms that matter.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="icon-wrap">🔮</div>
+        <h3>Early Trend Signals</h3>
+        <p>Detect rising topics, hashtags, sounds, and formats hours or days before they peak. Get there first.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="icon-wrap">⚡</div>
+        <h3>Real-Time Velocity</h3>
+        <p>Track engagement acceleration in real time. See what's gaining momentum — not just what's already popular.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="icon-wrap">🎯</div>
+        <h3>Niche Filters</h3>
+        <p>Filter by your niche — fitness, tech, beauty, gaming, food, and more. Only see trends that matter to you.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="icon-wrap">✍️</div>
+        <h3>Content Ideas</h3>
+        <p>Every trend comes with AI-generated hooks, titles, captions, and hashtag sets. Ready to post in minutes.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="icon-wrap">🔔</div>
+        <h3>Smart Alerts</h3>
+        <p>Get notified instantly when a relevant trend starts rising in your niche. Never miss a wave.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="icon-wrap">📊</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Track trend lifecycles, engagement curves, and your prediction accuracy over time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS (Showcase) ───────────────────── -->
+<section id="how" class="showcase">
+  <div class="bg-glow"></div>
+  <div class="showcase-content container">
+    <div class="showcase-grid">
+      <div class="showcase-text reveal">
+        <h2>Your daily<br><span class="gradient-text-green">trend briefing.</span></h2>
+        <p>Every day, Wavecrest Pro scans millions of posts, videos, and engagement signals across platforms. Our AI scores each topic by growth velocity, momentum, and niche relevance — then delivers the top signals straight to your dashboard.</p>
+        <a href="#pricing" class="btn-primary">Try It Free →</a>
+      </div>
+        <div class="mock-dashboard" id="live-dashboard">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COUNTER BAR ───────────────────────────────── -->
+<div class="counter-bar">
+  <div class="counter-grid">
+    <div class="counter-item reveal"><div class="number gradient-text" data-target="2400000">0</div><div class="label">Trends detected</div></div>
+    <div class="counter-item reveal reveal-delay-1"><div class="number gradient-text" data-target="18000">0</div><div class="label">Active creators</div></div>
+    <div class="counter-item reveal reveal-delay-2"><div class="number gradient-text" data-target="3">0</div><div class="label">Platforms tracked</div></div>
+    <div class="counter-item reveal reveal-delay-3"><div class="number gradient-text" data-target="97">0</div><div class="label">% uptime</div></div>
+  </div>
+</div>
+
+<!-- ─── PRICING ───────────────────────────────────── -->
+<section id="pricing">
+  <div class="container text-center">
+    <h2 class="reveal">Simple pricing.<br><span class="gradient-text">Start for free.</span></h2>
+    <p class="lead reveal reveal-delay-1">Use your own API keys on the free plan, or let us handle everything on Pro and above.</p>
+
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="price-card reveal">
+        <h3>Free</h3>
+        <div class="price">$0<span>/mo</span></div>
+        <div class="note">Bring Your Own API Key</div>
+        <ul>
+          <li>Your own API quota</li>
+          <li>5 trend searches / day</li>
+          <li>Delayed results (6h+)</li>
+          <li>1 platform</li>
+          <li>Basic trend list</li>
+          <li>Community support</li>
+          <li>Web dashboard</li>
+        </ul>
+        <a href="checkout-free.html" class="btn-card">Get Started</a>
+      </div>
+      <!-- Plus -->
+      <div class="price-card reveal reveal-delay-1">
+        <h3>Plus</h3>
+        <div class="trial trial-free">Free for 7 days</div>
+        <div class="price">$9.99<span>/mo</span></div>
+        <div class="note">Then $9.99/mo after trial. Cancel anytime.</div>
+        <ul>
+          <li>50 trend searches / day</li>
+          <li>2 platforms</li>
+          <li>Faster results (1h delay)</li>
+          <li>Basic smart alerts</li>
+          <li>Content idea suggestions</li>
+          <li>Trend history (7 days)</li>
+          <li>Email support</li>
+        </ul>
+        <a href="checkout-plus.html" class="btn-card">Upgrade to Plus</a>
+      </div>
+      <!-- Pro -->
+      <div class="price-card featured reveal reveal-delay-2">
+        <h3>Pro</h3>
+        <div class="trial trial-discount">$14.99/mo for first 3 months</div>
+        <div class="price"><span class="original-price">$24.99</span>$14.99<span>/mo</span></div>
+        <div class="note">Then $24.99/mo. Save $29.97 in your first 3 months.</div>
+        <ul>
+          <li>Unlimited searches</li>
+          <li>All 3 platforms</li>
+          <li>Real-time alerts</li>
+          <li>Niche search &amp; filters</li>
+          <li>AI content hooks &amp; captions</li>
+          <li>Trend history (30 days)</li>
+          <li>Priority email support</li>
+        </ul>
+        <a href="checkout-pro.html" class="btn-card">Go Pro</a>
+      </div>
+      <!-- Max -->
+      <div class="price-card reveal reveal-delay-3">
+        <h3>Max</h3>
+        <div class="trial trial-discount">$59.99/mo for first 3 months</div>
+        <div class="price"><span class="original-price">$99.99</span>$59.99<span>/mo</span></div>
+        <div class="note">Then $99.99/mo. Save $119.97 in your first 3 months.</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Full API access</li>
+          <li>Multi-project dashboards</li>
+          <li>Advanced analytics &amp; reports</li>
+          <li>Unlimited trend history</li>
+          <li>Custom alert rules</li>
+          <li>Priority live support</li>
+        </ul>
+        <a href="checkout-max.html" class="btn-card">Go Max</a>
+      </div>
+      <!-- Teams -->
+      <div class="price-card reveal reveal-delay-1">
+        <h3>Teams</h3>
+        <div class="trial trial-free">14-day free trial</div>
+        <div class="price">$49.99<span>/person/mo</span></div>
+        <div class="note">Try with your full team free for 2 weeks.</div>
+        <ul>
+          <li>Everything in Max</li>
+          <li>Shared team workspace</li>
+          <li>Role-based permissions</li>
+          <li>Admin dashboard</li>
+          <li>Collaborative boards</li>
+          <li>Centralized billing</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="checkout-teams.html" class="btn-card">Start a Team</a>
+      </div>
+      <!-- Enterprise -->
+      <div class="price-card reveal reveal-delay-2">
+        <h3>Enterprise</h3>
+        <div class="price">Custom</div>
+        <div class="note">Custom everything</div>
+        <ul>
+          <li>Everything in Teams</li>
+          <li>SSO &amp; SAML</li>
+          <li>Custom data sources</li>
+          <li>Dedicated onboarding</li>
+          <li>SLA guarantee</li>
+          <li>Custom integrations</li>
+          <li>24/7 premium support</li>
+        </ul>
+        <a href="checkout-enterprise.html" class="btn-card">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─────────────────────────────────── -->
+<section class="final-cta">
+  <h2 class="reveal">Stop chasing trends.<br><span class="gradient-text">Start catching them.</span></h2>
+  <p class="reveal reveal-delay-1">Join thousands of creators who see what's next — before the feed does.</p>
+  <div class="reveal reveal-delay-2">
+    <a href="#pricing" class="btn-primary">Get Started Free →</a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────── -->
+<footer>
+  <div class="links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Blog</a>
+    <a href="mailto:hello@wavecrest.pro">Contact</a>
+  </div>
+  <p>© 2026 Wavecrest Pro. All rights reserved.</p>
+</footer>
+
+<!-- ─── JS ────────────────────────────────────────── -->
+<script>
+// ── Trend pool ──
+let trendPool = [];
+const FALLBACK_POOL = [
+  {topic:'🎬 "Get Ready With Me" format',score:'hot'},
+  {topic:'🎵 "Midnight Groove" sound',score:'rising'},
+  {topic:'#DogMom lifestyle',score:'warm'},
+  {topic:'AI voiceover tutorials',score:'hot'},
+  {topic:'"Whisper ASMR" cooking',score:'rising'},
+  {topic:'#CozyGameplay aesthetic',score:'rising'},
+  {topic:'Morning routine speed edits',score:'hot'},
+  {topic:'#BookTok dark academia',score:'rising'},
+  {topic:'"Soft life" aesthetic vlogs',score:'warm'},
+  {topic:'#GymTok transformation',score:'hot'},
+  {topic:'Lo-fi study room setups',score:'rising'},
+  {topic:'Aesthetic meal prep reels',score:'warm'},
+  {topic:'"Day in my life" series',score:'rising'},
+  {topic:'#CleanTok deep clean',score:'hot'},
+  {topic:'Tiny house living tours',score:'warm'},
+  {topic:'Skincare layering tutorials',score:'rising'},
+  {topic:'#OOTD street style',score:'hot'},
+  {topic:'DIY room makeover timelapse',score:'rising'},
+  {topic:'Cafe hopping vlogs',score:'warm'},
+  {topic:'"What I eat in a day"',score:'hot'},
+  {topic:'#PetTok animal rescues',score:'rising'},
+  {topic:'Sunset drone cinematography',score:'warm'},
+  {topic:'AI art generation tutorials',score:'hot'},
+  {topic:'Thrift flip challenges',score:'rising'},
+  {topic:'#PlantTok propagation',score:'warm'},
+  {topic:'3D printing oddities',score:'rising'},
+  {topic:'Silent vlog trend',score:'hot'},
+  {topic:'#FitnessTok home workouts',score:'rising'},
+  {topic:'"Romanticize your life"',score:'warm'},
+  {topic:'Analog photography revival',score:'rising'},
+  {topic:'#FoodTok one-pot recipes',score:'hot'},
+  {topic:'Micro-adventure weekends',score:'warm'},
+  {topic:'Vintage tech teardowns',score:'rising'},
+  {topic:'#TravelTok hidden gems',score:'hot'},
+  {topic:'Cottagecore baking reels',score:'warm'},
+  {topic:'Speed art digital painting',score:'rising'},
+  {topic:'#StudyTube pomodoro',score:'warm'},
+  {topic:'Storytime animated shorts',score:'hot'},
+  {topic:'Aesthetic desktop setups',score:'rising'},
+  {topic:'Car detailing ASMR',score:'hot'},
+  {topic:'#NailTok chrome finish',score:'rising'},
+  {topic:'POV acting skits',score:'hot'},
+  {topic:'Street food world tours',score:'warm'},
+  {topic:'Minimalist wardrobe capsule',score:'rising'},
+  {topic:'Budget travel hacks',score:'hot'},
+  {topic:'#HairTok curtain bangs',score:'rising'},
+  {topic:'Coding speed challenges',score:'warm'},
+  {topic:'Retro gaming nostalgia',score:'rising'},
+  {topic:'"No-spend" month challenge',score:'warm'},
+  {topic:'Underwater photography trend',score:'rising'},
+];
+
+(function() {
+  fetch('trends.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject('not ok'); })
+    .then(function(data) {
+      if (data && data.trends && data.trends.length > 0) {
+        trendPool = data.trends.map(function(t) {
+          var score = t.score || 'warm';
+          return { topic: t.topic, score: score };
+        });
+        console.log('[Wavecrest] Loaded ' + trendPool.length + ' live trends for ' + data.date);
+        if (typeof populateDashboard === 'function') populateDashboard();
+        if (typeof populateDashboards === 'function') populateDashboards();
+        if (typeof populateBadges === 'function') populateBadges();
+      } else {
+        trendPool = FALLBACK_POOL;
+      }
+    })
+    .catch(function() {
+      console.log('[Wavecrest] Using fallback trends');
+      trendPool = FALLBACK_POOL;
+    });
+  trendPool = FALLBACK_POOL;
+})();
+
+const scoreLabels = {hot:'🔥 HOT',rising:'📈 RISING',warm:'🌤 WARM'};
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function populateDashboard(){
+  const el=document.getElementById('live-dashboard');
+  if(!el)return;
+  const picks=shuffle(trendPool).slice(0,6);
+  el.innerHTML=picks.map(t=>
+    `<div class="mock-row"><span class="topic">${t.topic}</span><span class="score ${t.score}">${scoreLabels[t.score]}</span></div>`
+  ).join('');
+}
+populateDashboard();
+
+// ── Floating badges (randomized from trend pool) ──
+const badgeEmojis={hot:'🔥',rising:'📈',warm:'🌤'};
+const badgeSuffixes=['trending now','rising fast','+280%','detected 1h ago','going viral','surging','early signal','breaking out','+540%','climbing fast'];
+function populateBadges(){
+  const badges=document.querySelectorAll('#floating-badges .badge');
+  if(!badges.length||!trendPool.length)return;
+  const picks=shuffle(trendPool).slice(0,badges.length);
+  badges.forEach((b,i)=>{
+    const t=picks[i];
+    const emoji=badgeEmojis[t.score]||'🔥';
+    const suffix=badgeSuffixes[Math.floor(Math.random()*badgeSuffixes.length)];
+    b.style.opacity='0';
+    b.style.transition='opacity .5s ease';
+    setTimeout(()=>{
+      b.textContent=emoji+' '+t.topic.replace(/^[▶️♪📸🔥]\s*/,'')+' — '+suffix;
+      b.style.opacity='1';
+    },i*150);
+  });
+}
+populateBadges();
+setInterval(()=>{
+  const badges=document.querySelectorAll('#floating-badges .badge');
+  badges.forEach(b=>{b.style.opacity='0';});
+  setTimeout(populateBadges,500);
+},7000);
+
+// Wave-in rows when dashboard scrolls into view
+const dashboardEl=document.getElementById('live-dashboard');
+if(dashboardEl){
+  const dashObs=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const rows=dashboardEl.querySelectorAll('.mock-row');
+        rows.forEach((row,i)=>{
+          setTimeout(()=>row.classList.add('wave-in'),i*120);
+        });
+        dashObs.unobserve(entry.target);
+        // Cycle trends every 5s
+        setInterval(()=>{
+          const rows=dashboardEl.querySelectorAll('.mock-row');
+          rows.forEach(r=>{r.classList.remove('wave-in');r.style.opacity='0';r.style.transform='translateY(20px)';});
+          setTimeout(()=>{
+            populateDashboard();
+            const newRows=dashboardEl.querySelectorAll('.mock-row');
+            newRows.forEach((row,i)=>{setTimeout(()=>row.classList.add('wave-in'),i*120);});
+          },400);
+        },5000);
+      }
+    });
+  },{threshold:0.3});
+  dashObs.observe(dashboardEl);
+}
+
+// Reveal on scroll
+const revealElements = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+revealElements.forEach(el => observer.observe(el));
+
+// Counter animation
+function animateCounter(el, target) {
+  const duration = 2000;
+  const start = performance.now();
+  const format = (n) => {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M+';
+    if (n >= 1000) return (n / 1000).toFixed(0) + 'K+';
+    if (n === 97) return n + '%';
+    return n.toString();
+  };
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(eased * target);
+    el.textContent = format(current);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const target = parseInt(entry.target.dataset.target);
+      animateCounter(entry.target, target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+// Wave text hover effect
+function initWaveText() {
+  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
+  document.querySelectorAll(sel).forEach(el => {
+    if (el.classList.contains('wave-ready')) return;
+    el.classList.add('wave-ready');
+    const original = el.innerHTML;
+    el.addEventListener('mouseenter', () => {
+      // Only process direct text nodes, preserve child elements
+      const nodes = [...el.childNodes];
+      let html = '';
+      nodes.forEach(node => {
+        if (node.nodeType === 3) {
+          const chars = node.textContent.split('');
+          chars.forEach((c, i) => {
+            if (c === ' ') { html += ' '; }
+            else { html += `<span class="char" style="animation-delay:${i * 0.03}s">${c}</span>`; }
+          });
+        } else {
+          // Preserve child elements (like <span>, <br>)
+          const clone = node.cloneNode(true);
+          if (clone.textContent && clone.nodeType === 1) {
+            const inner = clone.textContent.split('').map((c, i) =>
+              c === ' ' ? ' ' : `<span class="char" style="animation-delay:${i * 0.03}s">${c}</span>`
+            ).join('');
+            clone.innerHTML = inner;
+          }
+          html += clone.outerHTML || clone.textContent;
+        }
+      });
+      el.innerHTML = html;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.innerHTML = original;
+    });
+  });
+}
+initWaveText();
+
+// Smooth nav background
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 60) {
+    nav.style.background = 'rgba(0,0,0,.88)';
+  } else {
+    nav.style.background = 'rgba(0,0,0,.72)';
+  }
+});
+</script>
+
+</body>
+</html>

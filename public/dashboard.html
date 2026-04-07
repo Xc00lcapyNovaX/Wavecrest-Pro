@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Wavecrest Pro</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* ── Nav ── */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);z-index:100}
+  .logo{font-size:1.2rem;font-weight:700;text-decoration:none;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .nav-right{display:flex;align-items:center;gap:16px}
+  .plan-badge{padding:4px 12px;border-radius:980px;font-size:.75rem;font-weight:600;text-transform:uppercase}
+  .plan-free{background:rgba(255,255,255,.08);color:var(--muted)}
+  .plan-plus{background:rgba(0,113,227,.15);color:var(--blue)}
+  .plan-pro{background:rgba(48,209,88,.15);color:var(--green)}
+  .plan-max{background:rgba(255,159,10,.15);color:var(--orange)}
+  .plan-teams,.plan-enterprise{background:rgba(175,130,255,.15);color:#af82ff}
+  .user-name{font-size:.9rem;color:var(--muted)}
+  .btn-sm{padding:8px 16px;border-radius:980px;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:.82rem;cursor:pointer;transition:background .2s}
+  .btn-sm:hover{background:rgba(255,255,255,.06)}
+
+  /* ── Layout ── */
+  .container{max-width:1100px;margin:0 auto;padding:40px 24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:32px}
+  @media(max-width:768px){.grid{grid-template-columns:1fr}}
+
+  /* ── Cards ── */
+  .stat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px}
+  .stat-card .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .stat-card .value{font-size:1.8rem;font-weight:700}
+  .stat-card .sub{font-size:.82rem;color:var(--muted);margin-top:4px}
+
+  /* ── Search ── */
+  .search-section{margin-bottom:32px}
+  .search-bar{display:flex;gap:12px;margin-bottom:16px}
+  .search-bar input{flex:1;padding:14px 18px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:1rem;outline:none}
+  .search-bar input:focus{border-color:var(--blue)}
+  .search-bar select{padding:14px 16px;border-radius:12px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.9rem;outline:none;cursor:pointer}
+  .search-bar button{padding:14px 28px;border-radius:12px;border:none;background:var(--blue);color:#fff;font-weight:600;cursor:pointer;white-space:nowrap}
+  .search-bar button:hover{opacity:.85}
+  .search-bar button:disabled{opacity:.4;cursor:not-allowed}
+  .search-locked{color:var(--muted);font-size:.9rem;padding:16px;text-align:center;background:var(--surface);border-radius:12px;border:1px solid var(--card-border)}
+  .search-locked a{color:var(--blue);text-decoration:none}
+
+  /* ── Trends table ── */
+  .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
+  .trend-list{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
+  .trend-row{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s}
+  .trend-row:last-child{border-bottom:none}
+  .trend-row:hover{background:rgba(255,255,255,.03)}
+  .trend-row.locked{opacity:.4;filter:blur(2px);pointer-events:none}
+  .trend-topic{font-weight:500;flex:1}
+  .trend-platform{font-size:.78rem;color:var(--muted);margin:0 16px;min-width:80px}
+  .tag{padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;text-transform:uppercase}
+  .tag-hot{background:rgba(255,69,58,.15);color:var(--red)}
+  .tag-rising{background:rgba(48,209,88,.15);color:var(--green)}
+  .tag-warm{background:rgba(255,159,10,.15);color:var(--orange)}
+  .tag-locked{background:rgba(255,255,255,.06);color:var(--muted)}
+
+  /* ── Actions bar ── */
+  .actions{display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+
+  /* ── Search results ── */
+  .search-results{margin-top:16px}
+  .search-results .trend-row{background:rgba(0,113,227,.04)}
+
+  /* ── Loading ── */
+  .loading{text-align:center;padding:60px;color:var(--muted)}
+  .error-banner{background:rgba(255,69,58,.12);color:var(--red);padding:16px 24px;border-radius:12px;margin-bottom:24px;display:none}
+
+  /* ── Upgrade banner ── */
+  .upgrade-banner{background:linear-gradient(135deg,rgba(0,113,227,.12),rgba(48,209,88,.08));border:1px solid rgba(0,113,227,.2);border-radius:16px;padding:24px 32px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .upgrade-banner p{color:var(--muted);font-size:.95rem}
+  .upgrade-banner strong{color:var(--text)}
+  .upgrade-banner a{padding:12px 24px;background:var(--blue);color:#fff;border-radius:980px;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-right">
+    <span id="planBadge" class="plan-badge plan-free">Free</span>
+    <span id="userName" class="user-name"></span>
+    <button class="btn-sm" onclick="exportCSV()">Export CSV</button>
+    <button class="btn-sm" onclick="manageBilling()">Billing</button>
+    <button class="btn-sm" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="error" class="error-banner"></div>
+
+  <div id="upgradeBanner" class="upgrade-banner" style="display:none">
+    <div>
+      <strong>Unlock more trends & niche search</strong>
+      <p>Upgrade to Pro for unlimited searches, real-time alerts, and AI content hooks.</p>
+    </div>
+    <a href="checkout-pro.html">Upgrade →</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid">
+    <div class="stat-card">
+      <div class="label">Today's Trends</div>
+      <div class="value" id="statTotal">—</div>
+      <div class="sub" id="statDate"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">API Calls Remaining</div>
+      <div class="value" id="statRemaining">—</div>
+      <div class="sub" id="statLimit"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Your Plan</div>
+      <div class="value" id="statPlan">—</div>
+      <div class="sub" id="statPlanSub"></div>
+    </div>
+  </div>
+
+  <!-- Niche Search (Pro+) -->
+  <div class="search-section">
+    <div class="section-title">Niche Search</div>
+    <div id="searchArea"></div>
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <!-- Today's Trends -->
+  <div class="section-title">Today's Trending Topics</div>
+  <div class="actions">
+    <button class="btn-sm" onclick="filterPlatform('')" id="filterAll">All Platforms</button>
+    <button class="btn-sm" onclick="filterPlatform('youtube')">YouTube</button>
+    <button class="btn-sm" onclick="filterPlatform('tiktok')">TikTok</button>
+    <button class="btn-sm" onclick="filterPlatform('instagram')">Instagram</button>
+  </div>
+  <div id="trendList" class="trend-list">
+    <div class="loading">Loading trends...</div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let dashboardData = null;
+let currentFilter = '';
+
+// HTML escaping to prevent XSS
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = String(str || '');
+  return d.innerHTML;
+}
+
+async function loadDashboard() {
+  try {
+    const res = await fetch(API + '/api/dashboard', { credentials: 'include' });
+    if (res.status === 401) {
+      window.location.href = '/signin.html';
+      return;
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load');
+    dashboardData = data;
+    render();
+    checkSubscriptionToast();
+  } catch (err) {
+    showError(err.message || 'Failed to load dashboard. Is the server running?');
+  }
+}
+
+function checkSubscriptionToast() {
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get('subscribed');
+  if (plan) {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(48,209,88,.15);color:#30d158;padding:16px 32px;border-radius:12px;border:1px solid rgba(48,209,88,.3);font-weight:600;z-index:200;backdrop-filter:blur(12px);animation:fadeIn .3s';
+    toast.textContent = '🎉 Welcome to ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '!';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 600); }, 4000);
+    window.history.replaceState({}, '', '/dashboard.html');
+  }
+}
+
+function render() {
+  const d = dashboardData;
+  if (!d) return;
+
+  // Nav
+  document.getElementById('userName').textContent = d.user.name || d.user.email;
+  const badge = document.getElementById('planBadge');
+  badge.textContent = d.user.plan.charAt(0).toUpperCase() + d.user.plan.slice(1);
+  badge.className = 'plan-badge plan-' + d.user.plan;
+
+  // Stats
+  document.getElementById('statTotal').textContent = d.trends.total;
+  document.getElementById('statDate').textContent = d.trends.date;
+  document.getElementById('statRemaining').textContent = d.usage.limit === 'unlimited' ? '∞' : d.usage.remaining;
+  document.getElementById('statLimit').textContent = d.usage.limit === 'unlimited' ? 'Unlimited' : d.usage.limit + '/day';
+  document.getElementById('statPlan').textContent = d.user.plan.charAt(0).toUpperCase() + d.user.plan.slice(1);
+  document.getElementById('statPlanSub').textContent = d.subscription ? ('Status: ' + d.subscription.status) : 'No active subscription';
+
+  // Upgrade banner for free/plus
+  if (['free', 'plus'].includes(d.user.plan)) {
+    document.getElementById('upgradeBanner').style.display = 'flex';
+  }
+
+  // Niche search
+  renderSearch();
+
+  // Trends
+  renderTrends();
+}
+
+function renderSearch() {
+  const area = document.getElementById('searchArea');
+  if (dashboardData.features.niche_search) {
+    area.innerHTML = '<div class="search-bar">' +
+      '<input type="text" id="searchInput" placeholder="Search any niche… e.g. fitness, cooking, AI art" onkeydown="if(event.key===\'Enter\')doSearch()">' +
+      '<select id="searchPlatform"><option value="">All Platforms</option><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select>' +
+      '<button onclick="doSearch()" id="searchBtn">Search</button></div>';
+  } else {
+    area.innerHTML = '<div class="search-locked">🔒 Niche search is available on <strong>Pro</strong> and above. <a href="checkout-pro.html">Upgrade now →</a></div>';
+  }
+}
+
+async function doSearch() {
+  const input = document.getElementById('searchInput');
+  const btn = document.getElementById('searchBtn');
+  const q = input.value.trim();
+  if (!q) return;
+  const platform = document.getElementById('searchPlatform').value;
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.innerHTML = '<div class="loading">Searching…</div>';
+  btn.disabled = true; btn.textContent = 'Searching…';
+
+  try {
+    const url = API + '/api/trends/search?q=' + encodeURIComponent(q) + (platform ? '&platform=' + platform : '');
+    const res = await fetch(url, { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Search failed');
+
+    if (!data.results.length) {
+      resultsDiv.innerHTML = '<div class="loading">No results found for "' + esc(q) + '"</div>';
+      return;
+    }
+
+    resultsDiv.innerHTML = '<div class="section-title" style="padding:16px 24px 0">Search Results — ' + esc(data.count) + ' found</div><div class="trend-list">' +
+      data.results.map(function(t) {
+        var scoreClass = ['hot','rising','warm'].includes(t.score) ? t.score : 'warm';
+        return '<div class="trend-row"><span class="trend-topic">' + esc(t.topic) + '</span><span class="trend-platform">' + esc(t.platform) + '</span><span class="tag tag-' + scoreClass + '">' + esc(t.score).toUpperCase() + '</span></div>';
+      }).join('') + '</div>';
+  } catch (err) {
+    resultsDiv.innerHTML = '<div class="loading" style="color:var(--red)">' + esc(err.message) + '</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Search';
+  }
+}
+
+function renderTrends(filter) {
+  const list = document.getElementById('trendList');
+  let items = dashboardData.trends.items;
+  if (filter) items = items.filter(function(t) { return t.platform === filter; });
+
+  if (!items.length) {
+    list.innerHTML = '<div class="loading">No trends for this filter.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(function(t) {
+    var scoreClass = ['hot','rising','warm','locked'].includes(t.score) ? t.score : 'warm';
+    return '<div class="trend-row ' + (t.locked ? 'locked' : '') + '"><span class="trend-topic">' + esc(t.topic) + '</span><span class="trend-platform">' + esc(t.platform || '') + '</span><span class="tag tag-' + scoreClass + '">' + esc(t.score).toUpperCase() + '</span></div>';
+  }).join('');
+}
+
+function filterPlatform(p) {
+  currentFilter = p;
+  // Highlight active filter
+  document.querySelectorAll('.actions .btn-sm').forEach(function(b) { b.style.borderColor = ''; b.style.color = ''; });
+  var activeBtn = p ? document.querySelector('.actions .btn-sm[onclick*="' + p + '"]') : document.getElementById('filterAll');
+  if (activeBtn) { activeBtn.style.borderColor = 'var(--blue)'; activeBtn.style.color = 'var(--blue)'; }
+  renderTrends(p);
+}
+
+async function exportCSV() {
+  if (dashboardData && dashboardData.user.plan === 'free') {
+    alert('CSV export requires Plus plan or higher.');
+    return;
+  }
+  try {
+    const res = await fetch(API + '/api/dashboard/export', { credentials: 'include' });
+    if (!res.ok) {
+      try { const d = await res.json(); alert(d.error || 'Export failed.'); } catch(e) { alert('Export failed.'); }
+      return;
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'wavecrest-trends.csv'; a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) { alert('Export failed — check your connection.'); }
+}
+
+async function manageBilling() {
+  try {
+    const res = await fetch(API + '/api/stripe/portal', { method: 'POST', credentials: 'include' });
+    const data = await res.json();
+    if (data.portal_url) window.location.href = data.portal_url;
+    else alert('Billing portal is not available yet.');
+  } catch (err) { alert('Could not open billing portal.'); }
+}
+
+async function logout() {
+  try {
+    await fetch(API + '/api/auth/logout', { method: 'POST', credentials: 'include' });
+  } catch (e) { /* proceed anyway */ }
+  window.location.href = '/signin.html';
+}
+
+function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+
+// Boot
+filterPlatform('');
+loadDashboard();
+</script>
+</body>
+</html>

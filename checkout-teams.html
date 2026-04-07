@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavecrest Pro — Teams Plan</title>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+    :root {
+      --bg: #000;
+      --fg: #f5f5f7;
+      --muted: #86868b;
+      --blue: #0071e3;
+      --blue-hover: #0077ED;
+      --green: #30d158;
+      --purple: #bf5af2;
+      --orange: #ff9f0a;
+      --card-bg: rgba(255,255,255,.03);
+      --card-border: rgba(255,255,255,.04);
+      --divider: rgba(255,255,255,.08);
+      --input-bg: rgba(255,255,255,.04);
+      --input-border: rgba(255,255,255,.12);
+      --radius: 12px;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+    }
+
+    body {
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    a:hover { color: var(--blue-hover); }
+
+    /* ─── Nav ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      background: rgba(0,0,0,.72);
+      border-bottom: 1px solid var(--divider);
+    }
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    nav .logo {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--fg);
+    }
+    .logo span { font-weight: 400; opacity: .5; }
+    .back-link {
+      font-size: .82rem;
+      color: var(--muted);
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--fg); }
+
+    /* ─── Page ─── */
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+    }
+
+    /* ─── Section Label ─── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* ─── Header ─── */
+    .plan-header {
+      text-align: center;
+      padding-bottom: 80px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .plan-header h1 {
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 600;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .price-display {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -.04em;
+      margin: 20px 0 8px;
+    }
+    .price-display span {
+      font-size: .95rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+    .plan-header .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+
+    /* ─── Limits ─── */
+    .limits {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .limits-grid {
+      display: grid;
+      gap: 14px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .limit-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 14px 0;
+    }
+    .limit-label {
+      width: 140px;
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+    .limit-bar-wrap { flex: 1; }
+    .limit-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .limit-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(.16,1,.3,1);
+    }
+    .limit-value {
+      width: 100px;
+      text-align: right;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .limit-value.full { color: var(--green); }
+
+    /* ─── Preview ─── */
+    .preview {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .preview-card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .preview-dots { display: flex; gap: 6px; }
+    .preview-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .preview-url {
+      font-size: .75rem;
+      color: var(--muted);
+    }
+    .preview-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .preview-tab {
+      flex: 1;
+      padding: 11px 0;
+      text-align: center;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: color .2s;
+    }
+    .preview-tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .preview-body { padding: 20px; }
+    .team-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .team-row:last-child { border-bottom: none; }
+    .team-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .78rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .team-info { flex: 1; }
+    .team-info .name { font-size: .85rem; font-weight: 600; }
+    .team-info .role { font-size: .75rem; color: var(--muted); margin-top: 1px; }
+    .team-status {
+      padding: 3px 10px;
+      border-radius: 980px;
+      font-size: .7rem;
+      font-weight: 600;
+    }
+    .status-active { background: rgba(48,209,88,.1); color: var(--green); }
+    .status-invited { background: rgba(0,113,227,.1); color: var(--blue); }
+
+    /* ─── Features ─── */
+    .features {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .feat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .feat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      font-size: .88rem;
+      color: var(--fg);
+    }
+    .feat-check {
+      color: var(--green);
+      font-size: .9rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* ─── Payment Area (two-column) ─── */
+    .payment-area {
+      padding: 80px 0 0;
+    }
+    .payment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    /* Order summary (left) */
+    .order-summary h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      margin-bottom: 32px;
+    }
+    .summary-block {
+      padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 0;
+      font-size: .88rem;
+      color: var(--fg);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .summary-line:last-child {
+      border-bottom: none;
+    }
+    .summary-line .label { color: var(--muted); }
+    .summary-line.total {
+      padding-top: 16px;
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 1rem;
+      border-top: 1px solid var(--divider);
+      border-bottom: none;
+    }
+    .summary-line.total .label { color: var(--fg); }
+    .price-per-seat {
+      margin-top: 20px;
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Payment form (right) */
+    .payment-form h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      margin-bottom: 32px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius);
+      color: var(--fg);
+      font-size: .92rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2386868b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--blue);
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,.18); }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Team size selector */
+    .team-size-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .size-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 0;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .size-option:hover { border-color: rgba(255,255,255,.2); }
+    .size-option.active { border-color: var(--blue); }
+    .size-option .num {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .size-option .per {
+      font-size: .68rem;
+      color: var(--muted);
+    }
+    .dynamic-price {
+      margin-top: 12px;
+      text-align: center;
+      font-size: .88rem;
+      color: var(--fg);
+    }
+    .dynamic-price strong {
+      font-weight: 600;
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      background: var(--blue);
+      color: #fff;
+      transition: background .2s;
+      margin-top: 8px;
+    }
+    .btn-pay:hover { background: var(--blue-hover); }
+
+    .secure-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    /* ─── Upsell ─── */
+    .upsell {
+      text-align: center;
+      margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid var(--divider);
+    }
+    .upsell p {
+      color: var(--muted);
+      font-size: .88rem;
+      margin-bottom: 10px;
+    }
+    .upsell a { font-weight: 600; font-size: .88rem; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 720px) {
+      .payment-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .feat-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .limit-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .limit-label, .limit-value { width: auto; }
+      .team-size-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  
+/* Wave text hover — buttons only */
+.char{display:inline-block}
+.wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
+@keyframes wave-bounce{0%{transform:translateY(0)}30%{transform:translateY(-10px)}60%{transform:translateY(2px)}100%{transform:translateY(0)}}
+
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="inner">
+    <a href="index.html" class="logo">Wavecrest<span> Pro</span></a>
+    <a href="index.html#pricing" class="back-link">All Plans</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="plan-header">
+    <p class="section-label">Teams Plan</p>
+    <h1>Trend intel, together.</h1>
+    <div class="price-display">$49.99 <span>/person/mo</span></div>
+    <p class="subtitle">Shared workspace. Role permissions. Collaborative trend boards.</p>
+  </div>
+
+  <!-- Usage Limits -->
+  <div class="limits">
+    <p class="section-label">Usage</p>
+    <div class="limits-grid">
+      <div class="limit-row">
+        <div class="limit-label">Searches / day</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%;background:var(--blue)"></div></div></div>
+        <div class="limit-value full">Unlimited</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Platforms</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%;background:var(--purple)"></div></div></div>
+        <div class="limit-value full">All 3</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Alert speed</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%;background:var(--green)"></div></div></div>
+        <div class="limit-value full">Real-time</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Trend history</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%;background:var(--orange)"></div></div></div>
+        <div class="limit-value full">Unlimited</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Team members</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:60%;background:var(--blue)"></div></div></div>
+        <div class="limit-value">Up to 25</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Projects</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:70%;background:var(--purple)"></div></div></div>
+        <div class="limit-value">25</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Workspace Preview -->
+  <div class="preview">
+    <p class="section-label">Workspace Preview</p>
+    <div class="preview-card">
+      <div class="preview-toolbar">
+        <div class="preview-dots">
+          <span style="background:#ff453a"></span>
+          <span style="background:#ff9f0a"></span>
+          <span style="background:#30d158"></span>
+        </div>
+        <span class="preview-url">wavecrest.pro/team/acme</span>
+        <span></span>
+      </div>
+      <div class="preview-tabs">
+        <div class="preview-tab active">Members</div>
+        <div class="preview-tab">Trends</div>
+        <div class="preview-tab">Boards</div>
+        <div class="preview-tab">Admin</div>
+      </div>
+      <div class="preview-body">
+        <div class="team-row">
+          <div class="team-avatar" style="background:rgba(0,113,227,.12);color:var(--blue)">JS</div>
+          <div class="team-info">
+            <div class="name">Jordan Smith</div>
+            <div class="role">Admin · Content Lead</div>
+          </div>
+          <span class="team-status status-active">Active</span>
+        </div>
+        <div class="team-row">
+          <div class="team-avatar" style="background:rgba(191,90,242,.12);color:var(--purple)">ML</div>
+          <div class="team-info">
+            <div class="name">Maria Lopez</div>
+            <div class="role">Editor · Social Manager</div>
+          </div>
+          <span class="team-status status-active">Active</span>
+        </div>
+        <div class="team-row">
+          <div class="team-avatar" style="background:rgba(48,209,88,.12);color:var(--green)">AK</div>
+          <div class="team-info">
+            <div class="name">Alex Kim</div>
+            <div class="role">Viewer · Analyst</div>
+          </div>
+          <span class="team-status status-active">Active</span>
+        </div>
+        <div class="team-row">
+          <div class="team-avatar" style="background:rgba(255,159,10,.12);color:var(--orange)">TP</div>
+          <div class="team-info">
+            <div class="name">Taylor Park</div>
+            <div class="role">Editor · Video Creator</div>
+          </div>
+          <span class="team-status status-invited">Invited</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <p class="section-label">What's Included</p>
+    <div class="feat-grid">
+      <div class="feat-item"><span class="feat-check">✓</span> Everything in Max</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Niche search &amp; filters</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Shared team workspace</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Role-based permissions</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Admin dashboard</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Collaborative trend boards</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Centralized billing</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Dedicated account manager</div>
+      <div class="feat-item"><span class="feat-check">✓</span> Team activity feed</div>
+    </div>
+  </div>
+
+  <!-- Payment Area (two-column) -->
+  <div class="payment-area">
+    <div class="payment-grid">
+
+      <!-- Left: Order Summary -->
+      <div class="order-summary">
+        <p class="section-label" style="text-align:left">Order Summary</p>
+        <h3>Wavecrest Pro — Teams</h3>
+        <div class="summary-block">
+          <div class="summary-line">
+            <span class="label">Plan</span>
+            <span>Teams</span>
+          </div>
+          <div class="summary-line">
+            <span class="label">Price per seat</span>
+            <span>$49.99/mo</span>
+          </div>
+          <div class="summary-line">
+            <span class="label">Team size</span>
+            <span id="summary-seats">3 members</span>
+          </div>
+          <div class="summary-line">
+            <span class="label">Billing</span>
+            <span>Monthly</span>
+          </div>
+          <div class="summary-line total">
+            <span class="label">Total today</span>
+            <span id="summary-total">$149.97</span>
+          </div>
+        </div>
+        <p class="price-per-seat">$49.99 per person per month. Cancel anytime.<br>All prices in USD.</p>
+      </div>
+
+      <!-- Right: Payment Form -->
+      <div class="payment-form">
+        <p class="section-label" style="text-align:left">Payment Details</p>
+        <h3>Start your team</h3>
+
+        <div class="form-group">
+          <label>Team name</label>
+          <input type="text" placeholder="Your agency or team name">
+        </div>
+        <div class="form-group">
+          <label>Admin email</label>
+          <input type="email" placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label>Team size</label>
+          <div class="team-size-grid">
+            <div class="size-option active" data-members="3" onclick="selectSize(this)">
+              <span class="num">3</span>
+              <span class="per">$149.97/mo</span>
+            </div>
+            <div class="size-option" data-members="5" onclick="selectSize(this)">
+              <span class="num">5</span>
+              <span class="per">$249.95/mo</span>
+            </div>
+            <div class="size-option" data-members="10" onclick="selectSize(this)">
+              <span class="num">10</span>
+              <span class="per">$499.90/mo</span>
+            </div>
+            <div class="size-option" data-members="15" onclick="selectSize(this)">
+              <span class="num">15</span>
+              <span class="per">$749.85/mo</span>
+            </div>
+            <div class="size-option" data-members="25" onclick="selectSize(this)">
+              <span class="num">25</span>
+              <span class="per">$1,249.75/mo</span>
+            </div>
+          </div>
+          <div class="dynamic-price"><strong id="dynamic-total">$149.97</strong>/mo for <span id="dynamic-seats">3</span> members</div>
+        </div>
+
+        <div class="form-group">
+          <label>Card number</label>
+          <input type="text" placeholder="1234 5678 9012 3456">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry</label>
+            <input type="text" placeholder="MM / YY">
+          </div>
+          <div class="form-group">
+            <label>CVC</label>
+            <input type="text" placeholder="123">
+          </div>
+        </div>
+
+        <button class="btn-pay" id="btn-pay">Start Team — $149.97/mo</button>
+        <p class="secure-note">Encrypted with industry-standard technology. Cancel anytime.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upsell -->
+  <div class="upsell">
+    <p>Need SSO, SLA, and custom integrations?</p>
+    <a href="checkout-enterprise.html">Talk to us about Enterprise &#8594;</a>
+  </div>
+
+</div>
+
+<script>
+  function selectSize(el) {
+    document.querySelectorAll('.size-option').forEach(function(o) { o.classList.remove('active'); });
+    el.classList.add('active');
+    var members = parseInt(el.getAttribute('data-members'), 10);
+    var total = (members * 49.99);
+    var formatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    document.getElementById('dynamic-total').textContent = '$' + formatted;
+    document.getElementById('dynamic-seats').textContent = members;
+    document.getElementById('summary-seats').textContent = members + ' members';
+    document.getElementById('summary-total').textContent = '$' + formatted;
+    document.getElementById('btn-pay').textContent = 'Start Team \u2014 $' + formatted + '/mo';
+  }
+</script>
+
+
+<script>
+function initWaveText(){
+  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
+  document.querySelectorAll(sel).forEach(function(el){
+    if(el.classList.contains("wave-ready"))return;
+    el.classList.add("wave-ready");el.classList.add("wave-hover");
+    var orig=el.innerHTML;
+    el.addEventListener("mouseenter",function(){
+      var nodes=Array.from(el.childNodes),h="";
+      nodes.forEach(function(node){
+        if(node.nodeType===3){
+          node.textContent.split("").forEach(function(c,i){
+            h+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+          });
+        }else{
+          var cl=node.cloneNode(true);
+          if(cl.textContent&&cl.nodeType===1){
+            var inner="";cl.textContent.split("").forEach(function(c,i){
+              inner+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+            });cl.innerHTML=inner;
+          }
+          h+=cl.outerHTML||cl.textContent;
+        }
+      });
+      el.innerHTML=h;
+    });
+    el.addEventListener("mouseleave",function(){el.innerHTML=orig;});
+  });
+}
+initWaveText();
+
+// ── Wire checkout form to backend ──
+(function(){
+  var btn = document.getElementById('btn-pay');
+  if (!btn) return;
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    var email = document.querySelector('.payment-form input[type="email"]');
+    if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
+    var activeSize = document.querySelector('.size-option.active');
+    var teamSize = activeSize ? parseInt(activeSize.getAttribute('data-members'), 10) : 3;
+    btn.disabled = true; var origText = btn.textContent; btn.textContent = 'Processing…';
+    fetch('/api/auth/signup', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email: email.value.trim(), password: 'temp_' + Date.now(), name: email.value.split('@')[0]})
+    }).then(function(r){return r.json()}).then(function(){
+      return fetch('/api/stripe/create-checkout', {
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({plan:'teams', team_size: teamSize})
+      });
+    }).then(function(r){return r.json()}).then(function(data){
+      if (data.checkout_url) window.location.href = data.checkout_url;
+      else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = origText; }
+    }).catch(function(){
+      alert('Something went wrong. Please try again.');
+      btn.disabled = false; btn.textContent = origText;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

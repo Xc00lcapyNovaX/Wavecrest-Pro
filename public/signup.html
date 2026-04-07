@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — Wavecrest Pro</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+  .logo{font-size:1.4rem;font-weight:700;margin-bottom:40px;text-decoration:none;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .card{background:var(--surface);border:1px solid var(--card-border);border-radius:20px;padding:48px;width:100%;max-width:420px}
+  h1{font-size:1.6rem;font-weight:700;margin-bottom:8px;text-align:center}
+  .subtitle{color:var(--muted);text-align:center;margin-bottom:32px;font-size:.95rem}
+  .oauth-buttons{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+  .oauth-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-radius:12px;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,border-color .2s}
+  .oauth-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15)}
+  .oauth-btn svg{width:20px;height:20px;flex-shrink:0}
+  .divider{display:flex;align-items:center;gap:16px;margin-bottom:24px;color:var(--muted);font-size:.82rem}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--card-border)}
+  .form-group{margin-bottom:16px}
+  .form-group label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+  .form-group input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
+  .form-group input:focus{border-color:var(--blue)}
+  .btn-primary{width:100%;padding:16px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s}
+  .btn-primary:hover{opacity:.85}
+  .footer-link{text-align:center;margin-top:24px;color:var(--muted);font-size:.9rem}
+  .footer-link a{color:var(--blue);text-decoration:none}
+  .footer-link a:hover{text-decoration:underline}
+  .error-msg{background:rgba(255,69,58,.12);color:#ff453a;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
+  .success-msg{background:rgba(48,209,88,.12);color:#30d158;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
+
+<div class="card">
+  <h1>Create your account</h1>
+  <p class="subtitle">Start predicting trends for free</p>
+
+  <div id="error" class="error-msg"></div>
+  <div id="success" class="success-msg"></div>
+
+  <div class="oauth-buttons">
+    <button class="oauth-btn" onclick="oauthSignup('google')">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign up with Google
+    </button>
+    <button class="oauth-btn" onclick="oauthSignup('apple')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-2.11 4.45-3.74 4.25z"/></svg>
+      Sign up with Apple
+    </button>
+    <button class="oauth-btn" onclick="oauthSignup('github')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      Sign up with GitHub
+    </button>
+    <button class="oauth-btn" onclick="oauthSignup('microsoft')">
+      <svg viewBox="0 0 24 24"><rect fill="#F25022" x="1" y="1" width="10" height="10"/><rect fill="#7FBA00" x="13" y="1" width="10" height="10"/><rect fill="#00A4EF" x="1" y="13" width="10" height="10"/><rect fill="#FFB900" x="13" y="13" width="10" height="10"/></svg>
+      Sign up with Microsoft
+    </button>
+  </div>
+
+  <div class="divider">or sign up with email</div>
+
+  <form onsubmit="emailSignup(event)">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Your name" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
+    </div>
+    <button type="submit" class="btn-primary">Create Account</button>
+  </form>
+
+  <p class="footer-link">Already have an account? <a href="signin.html">Sign in</a></p>
+</div>
+
+<script>
+const API = window.location.origin;
+
+async function emailSignup(e) {
+  e.preventDefault();
+  hideMessages();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    const res = await fetch(API + '/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ name, email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) return showError(data.error);
+    showSuccess('Account created! Redirecting...');
+    setTimeout(() => window.location.href = '/dashboard.html', 800);
+  } catch (err) {
+    showError('Network error. Is the server running?');
+  }
+}
+
+async function oauthSignup(provider) {
+  hideMessages();
+  const email = prompt('Mock ' + provider + ' OAuth\n\nEnter the email to sign up with:');
+  if (!email) return;
+
+  try {
+    const res = await fetch(API + '/api/auth/' + provider + '/callback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, name: email.split('@')[0] }),
+    });
+    const data = await res.json();
+    if (!res.ok) return showError(data.error);
+    showSuccess('Signed up with ' + provider + '! Redirecting...');
+    setTimeout(() => window.location.href = '/dashboard.html', 800);
+  } catch (err) {
+    showError('Network error. Is the server running?');
+  }
+}
+
+function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+function showSuccess(msg) { const el = document.getElementById('success'); el.textContent = msg; el.style.display = 'block'; }
+function hideMessages() { document.getElementById('error').style.display = 'none'; document.getElementById('success').style.display = 'none'; }
+</script>
+</body>
+</html>

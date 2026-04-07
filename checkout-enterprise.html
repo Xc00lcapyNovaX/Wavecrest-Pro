@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavecrest Pro — Enterprise</title>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+    :root{
+      --bg:#000;
+      --fg:#f5f5f7;
+      --muted:#86868b;
+      --blue:#0071e3;
+      --blue-hover:#0077ed;
+      --card-bg:rgba(255,255,255,.03);
+      --card-border:rgba(255,255,255,.04);
+      --divider:rgba(255,255,255,.06);
+      --input-bg:rgba(255,255,255,.04);
+      --input-border:rgba(255,255,255,.1);
+      --max:980px;
+      --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;
+    }
+
+    html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    a{color:var(--blue);text-decoration:none;transition:color .2s}
+    a:hover{color:var(--blue-hover)}
+
+    /* Nav */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:rgba(0,0,0,.8);border-bottom:1px solid var(--divider)}
+    nav .inner{display:flex;align-items:center;justify-content:space-between;height:48px;max-width:var(--max);margin:0 auto;padding:0 24px}
+    nav .logo{font-size:1.05rem;font-weight:600;letter-spacing:-.01em;color:var(--fg);transition:opacity .2s}
+    nav .logo:hover{opacity:.8}
+    .logo span{font-weight:400;opacity:.5}
+    .back-link{font-size:.82rem;color:var(--muted);transition:color .2s}
+    .back-link:hover{color:var(--fg)}
+
+    /* Page */
+    .page{max-width:var(--max);margin:0 auto;padding:120px 24px 100px}
+
+    /* Section label (small uppercase) */
+    .section-label{
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--muted);
+      text-align:center;
+      margin-bottom:16px;
+    }
+
+    /* Divider */
+    .divider{
+      border:none;
+      height:1px;
+      background:var(--divider);
+      margin:0;
+    }
+
+    /* Header */
+    .plan-header{text-align:center;padding-bottom:80px}
+    .plan-header .section-label{margin-bottom:20px}
+    .plan-header h1{
+      font-size:clamp(2.2rem,5vw,3.5rem);
+      font-weight:600;
+      letter-spacing:-.03em;
+      line-height:1.1;
+      margin-bottom:16px;
+    }
+    .plan-header .subtitle{
+      color:var(--muted);
+      font-size:1.1rem;
+      line-height:1.55;
+      max-width:540px;
+      margin:0 auto 32px;
+      font-weight:400;
+    }
+    .plan-header .pricing-note{
+      font-size:1.5rem;
+      font-weight:600;
+      letter-spacing:-.01em;
+      color:var(--fg);
+    }
+
+    /* Limits */
+    .limits{padding:80px 0}
+    .limits .section-label{margin-bottom:32px}
+    .limit-list{max-width:680px;margin:0 auto}
+    .limit-row{
+      display:flex;
+      align-items:center;
+      gap:20px;
+      padding:18px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .limit-row:first-child{border-top:1px solid var(--divider)}
+    .limit-label{
+      width:160px;
+      font-size:.9rem;
+      font-weight:500;
+      color:var(--fg);
+      flex-shrink:0;
+    }
+    .limit-bar-wrap{flex:1}
+    .limit-bar-bg{
+      width:100%;
+      height:6px;
+      background:rgba(255,255,255,.06);
+      border-radius:3px;
+      overflow:hidden;
+    }
+    .limit-bar-fill{
+      height:100%;
+      border-radius:3px;
+      background:var(--blue);
+    }
+    .limit-value{
+      width:100px;
+      text-align:right;
+      font-size:.85rem;
+      font-weight:600;
+      flex-shrink:0;
+      color:var(--fg);
+    }
+
+    /* Features */
+    .features{padding:80px 0}
+    .features .section-label{margin-bottom:40px}
+    .feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--divider);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
+    .feat-card{
+      background:var(--card-bg);
+      padding:36px 32px;
+    }
+    .feat-card h3{
+      font-size:.95rem;
+      font-weight:600;
+      margin-bottom:8px;
+      letter-spacing:-.01em;
+    }
+    .feat-card p{
+      color:var(--muted);
+      font-size:.85rem;
+      line-height:1.55;
+      font-weight:400;
+    }
+
+    /* Trusted by */
+    .trusted{padding:80px 0;text-align:center}
+    .trusted .section-label{margin-bottom:40px}
+    .logo-row{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:48px;
+      flex-wrap:wrap;
+    }
+    .logo-row span{
+      font-size:.95rem;
+      font-weight:600;
+      letter-spacing:.02em;
+      color:rgba(255,255,255,.25);
+      padding:0;
+    }
+
+    /* Contact */
+    .contact{padding:80px 0}
+    .contact .section-label{margin-bottom:12px}
+    .contact-heading{
+      font-size:1.8rem;
+      font-weight:600;
+      letter-spacing:-.02em;
+      text-align:center;
+      margin-bottom:48px;
+    }
+    .form-card{
+      max-width:560px;
+      margin:0 auto;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:16px;
+      padding:40px;
+    }
+    .form-group{margin-bottom:20px}
+    .form-group label{
+      display:block;
+      font-size:.82rem;
+      font-weight:500;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select{
+      width:100%;
+      height:48px;
+      padding:0 16px;
+      background:var(--input-bg);
+      border:1px solid var(--input-border);
+      border-radius:12px;
+      color:var(--fg);
+      font-size:.95rem;
+      font-family:inherit;
+      outline:none;
+      transition:border-color .2s;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+    .form-group textarea{
+      height:auto;
+      padding:14px 16px;
+      resize:vertical;
+    }
+    .form-group select{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2386868b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 16px center;
+      padding-right:40px;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus{
+      border-color:var(--blue);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder{
+      color:rgba(255,255,255,.18);
+    }
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+    .btn-submit{
+      width:100%;
+      height:52px;
+      border:none;
+      border-radius:12px;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      font-family:inherit;
+      background:var(--blue);
+      color:#fff;
+      transition:background-color .2s;
+      margin-top:8px;
+    }
+    .btn-submit:hover{background:var(--blue-hover)}
+    .form-note{
+      text-align:center;
+      margin-top:16px;
+      font-size:.8rem;
+      color:var(--muted);
+    }
+
+    /* Compare link */
+    .compare{
+      text-align:center;
+      padding:60px 0 0;
+    }
+    .compare p{
+      color:var(--muted);
+      font-size:.9rem;
+      margin-bottom:8px;
+    }
+    .compare a{
+      font-size:.9rem;
+      font-weight:600;
+    }
+
+    /* Responsive */
+    @media(max-width:640px){
+      .feat-grid{grid-template-columns:1fr}
+      .form-row{grid-template-columns:1fr}
+      .limit-row{flex-direction:column;align-items:flex-start;gap:10px}
+      .limit-label,.limit-value{width:auto}
+      .limit-value{text-align:left}
+      .form-card{padding:28px 20px}
+      .logo-row{gap:28px}
+    }
+  
+/* Wave text hover — buttons only */
+.char{display:inline-block}
+.wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
+@keyframes wave-bounce{0%{transform:translateY(0)}30%{transform:translateY(-10px)}60%{transform:translateY(2px)}100%{transform:translateY(0)}}
+
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index.html" class="logo">Wavecrest<span> Pro</span></a>
+    <a href="index.html#pricing" class="back-link">All Plans</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="plan-header">
+    <p class="section-label">Enterprise</p>
+    <h1>Built for your scale.</h1>
+    <p class="subtitle">Custom limits, dedicated infrastructure, SSO, and white-glove onboarding for organizations that need trend intelligence at scale.</p>
+    <p class="pricing-note">Custom pricing</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Usage Limits -->
+  <div class="limits">
+    <p class="section-label">Usage Limits</p>
+    <div class="limit-list">
+      <div class="limit-row">
+        <div class="limit-label">Searches / day</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Custom</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Platforms</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">All + custom</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Alert speed</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Real-time</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Trend history</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Unlimited</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Team members</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Unlimited</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">API calls / day</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Custom</div>
+      </div>
+      <div class="limit-row">
+        <div class="limit-label">Projects</div>
+        <div class="limit-bar-wrap"><div class="limit-bar-bg"><div class="limit-bar-fill" style="width:100%"></div></div></div>
+        <div class="limit-value">Unlimited</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Enterprise Features -->
+  <div class="features">
+    <p class="section-label">Enterprise Features</p>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <h3>SSO &amp; SAML</h3>
+        <p>Single sign-on with your identity provider. SAML 2.0, OIDC, and SCIM provisioning included.</p>
+      </div>
+      <div class="feat-card">
+        <h3>Niche Search &amp; Filters</h3>
+        <p>Search any niche across all platforms with advanced filtering. Unlimited queries, real-time results.</p>
+      </div>
+      <div class="feat-card">
+        <h3>Custom Data Sources</h3>
+        <p>Connect your own data sources alongside our pipeline. Custom scrapers, private APIs, and more.</p>
+      </div>
+      <div class="feat-card">
+        <h3>Dedicated Onboarding</h3>
+        <p>A personal onboarding specialist to get your team up and running in days, not weeks.</p>
+      </div>
+      <div class="feat-card">
+        <h3>SLA Guarantee</h3>
+        <p>99.9% uptime SLA with priority incident response and a dedicated support channel.</p>
+      </div>
+      <div class="feat-card">
+        <h3>Custom Integrations</h3>
+        <p>Webhooks, Slack, Notion, Zapier, and custom API integrations built for your workflow.</p>
+      </div>
+      <div class="feat-card">
+        <h3>24/7 Premium Support</h3>
+        <p>Round-the-clock support from a dedicated team via Slack channel or email.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Trusted By -->
+  <div class="trusted">
+    <p class="section-label">Trusted By</p>
+    <div class="logo-row">
+      <span>AgencyCo</span>
+      <span>MediaHQ</span>
+      <span>BrandLab</span>
+      <span>CreativeX</span>
+      <span>Storyline</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Contact Form -->
+  <div class="contact">
+    <p class="section-label">Contact Sales</p>
+    <h2 class="contact-heading">Get started with Enterprise.</h2>
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First name</label>
+          <input type="text" placeholder="Jordan">
+        </div>
+        <div class="form-group">
+          <label>Last name</label>
+          <input type="text" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Work email</label>
+        <input type="email" placeholder="jordan@company.com">
+      </div>
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" placeholder="Your company name">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Team size</label>
+          <select>
+            <option value="" disabled selected>Select</option>
+            <option>10 - 25</option>
+            <option>25 - 50</option>
+            <option>50 - 100</option>
+            <option>100+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Industry</label>
+          <select>
+            <option value="" disabled selected>Select</option>
+            <option>Marketing Agency</option>
+            <option>Media &amp; Publishing</option>
+            <option>E-commerce</option>
+            <option>Entertainment</option>
+            <option>Technology</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea rows="4" placeholder="Tell us about your use case, requirements, or questions..."></textarea>
+      </div>
+      <button class="btn-submit">Request a Demo</button>
+      <p class="form-note">We'll get back to you within 24 hours.</p>
+    </div>
+  </div>
+
+  <!-- Compare -->
+  <div class="compare">
+    <p>Not sure which plan is right?</p>
+    <a href="index.html#pricing">Compare all plans</a>
+  </div>
+
+</div>
+
+
+<script>
+function initWaveText(){
+  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
+  document.querySelectorAll(sel).forEach(function(el){
+    if(el.classList.contains("wave-ready"))return;
+    el.classList.add("wave-ready");el.classList.add("wave-hover");
+    var orig=el.innerHTML;
+    el.addEventListener("mouseenter",function(){
+      var nodes=Array.from(el.childNodes),h="";
+      nodes.forEach(function(node){
+        if(node.nodeType===3){
+          node.textContent.split("").forEach(function(c,i){
+            h+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+          });
+        }else{
+          var cl=node.cloneNode(true);
+          if(cl.textContent&&cl.nodeType===1){
+            var inner="";cl.textContent.split("").forEach(function(c,i){
+              inner+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
+            });cl.innerHTML=inner;
+          }
+          h+=cl.outerHTML||cl.textContent;
+        }
+      });
+      el.innerHTML=h;
+    });
+    el.addEventListener("mouseleave",function(){el.innerHTML=orig;});
+  });
+}
+initWaveText();
+</script>
+
+</body>
+</html>
