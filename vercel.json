@@ -4,32 +4,10 @@
     {
       "src": "server/index.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "checkout-*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "trends.json",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "server/index.js" },
-    { "src": "/public/(.*)", "dest": "/public/$1" },
-    { "src": "/(.*\\.html)", "dest": "/$1" },
-    { "src": "/(.*\\.json)", "dest": "/$1" },
-    { "src": "/(.*\\.css)", "dest": "/$1" },
-    { "src": "/(.*\\.js)", "dest": "/$1" },
-    { "src": "/(.*\\.png|.*\\.jpg|.*\\.svg|.*\\.ico)", "dest": "/$1" },
-    { "src": "/", "dest": "/index.html" }
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "server/index.js" }
   ]
 }
