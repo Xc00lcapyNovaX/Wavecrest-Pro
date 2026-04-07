@@ -1,22 +1,5 @@
 {
-  "version": 2,
-  "outputDirectory": ".",
-  "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "checkout-*.html", "use": "@vercel/static" },
-    { "src": "public/**", "use": "@vercel/static" },
-    { "src": "trends.json", "use": "@vercel/static" }
-  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "handle": "filesystem" },
-    { "src": "/dashboard.html", "dest": "/public/dashboard.html" },
-    { "src": "/signin.html", "dest": "/public/signin.html" },
-    { "src": "/signup.html", "dest": "/public/signup.html" },
-    { "src": "/analytics.html", "dest": "/public/analytics.html" },
-    { "src": "/api-docs.html", "dest": "/public/api-docs.html" },
-    { "src": "/api-docs.json", "dest": "/public/api-docs.json" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/(.*)", "dest": "/server/index.js" }
   ]
 }
