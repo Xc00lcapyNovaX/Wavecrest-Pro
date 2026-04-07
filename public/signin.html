@@ -106,7 +106,8 @@ async function emailLogin(e) {
     const data = await res.json();
     if (!res.ok) return showError(data.error);
     showSuccess('Signed in! Redirecting...');
-    setTimeout(() => window.location.href = '/dashboard.html', 800);
+    const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    setTimeout(() => window.location.href = dest, 800);
   } catch (err) {
     showError('Network error. Is the server running?');
   }
@@ -128,7 +129,8 @@ async function oauthLogin(provider) {
     const data = await res.json();
     if (!res.ok) return showError(data.error);
     showSuccess(`Signed in with ${provider}! Redirecting...`);
-    setTimeout(() => window.location.href = '/dashboard.html', 800);
+    const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    setTimeout(() => window.location.href = dest, 800);
   } catch (err) {
     showError('Network error. Is the server running?');
   }

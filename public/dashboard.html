@@ -317,12 +317,15 @@ function checkSubscriptionToast() {
   const params = new URLSearchParams(window.location.search);
   const plan = params.get('subscribed');
   const isBeta = params.get('beta');
-  if (plan) {
+  const betaLogin = params.get('beta_login');
+  if (plan || betaLogin) {
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(48,209,88,.15);color:#30d158;padding:16px 32px;border-radius:12px;border:1px solid rgba(48,209,88,.3);font-weight:600;z-index:200;backdrop-filter:blur(12px);animation:fadeIn .3s';
-    toast.textContent = isBeta
-      ? '🧪 Welcome to the beta! You have free Pro access.'
-      : '🎉 Welcome to ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '!';
+    toast.textContent = betaLogin
+      ? '🧪 Thanks for beta testing!'
+      : isBeta
+        ? '🧪 Welcome to the beta! You have free Pro access.'
+        : '🎉 Welcome to ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '!';
     document.body.appendChild(toast);
     setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 600); }, 5000);
     window.history.replaceState({}, '', '/dashboard.html');
