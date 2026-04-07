@@ -34,7 +34,11 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      position: relative;
     }
+    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
+    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(0,113,227,.12),transparent 70%)}
+    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%)}
 
     a {
       color: var(--blue);
@@ -266,9 +270,11 @@
       padding: 16px 20px;
       font-size: .875rem;
       font-weight: 400;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 12px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
     .feat-item .icon {
       font-size: .875rem;
@@ -300,9 +306,11 @@
     /* Order Summary */
     .order-summary {
       padding: 36px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .order-summary .section-label { margin-bottom: 28px; }
     .summary-line {
@@ -330,9 +338,11 @@
     /* Payment Form */
     .payment-form {
       padding: 36px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .payment-form .section-label { margin-bottom: 28px; }
 

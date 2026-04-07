@@ -36,7 +36,11 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      position: relative;
     }
+    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
+    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(48,209,88,.1),transparent 70%)}
+    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(0,113,227,.08),transparent 70%)}
 
     a {
       color: var(--blue);
@@ -181,11 +185,13 @@
       padding: 80px 0 88px;
     }
     .preview-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
       overflow: hidden;
       margin-top: 8px;
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .preview-toolbar {
       display: flex;
@@ -260,12 +266,14 @@
       align-items: center;
       gap: 12px;
       padding: 16px 18px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 12px;
       font-size: .875rem;
       font-weight: 400;
       color: var(--fg);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .feat-item .check {
       font-size: .875rem;
@@ -289,11 +297,13 @@
       padding: 80px 0 0;
     }
     .form-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
       padding: 36px 32px;
       margin-top: 8px;
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .byoak-notice {
       background: rgba(255,255,255,.03);

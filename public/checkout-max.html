@@ -22,7 +22,10 @@
       --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;
     }
     html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
-    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
+    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
+    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(255,159,10,.1),transparent 70%)}
+    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%)}
     a{color:var(--blue);text-decoration:none;transition:color .2s}
     a:hover{color:var(--blue-hover)}
 
@@ -252,10 +255,11 @@
 
     /* Order summary (left column) */
     .order-summary{
-      background:var(--card-bg);
-      border:1px solid var(--card-border);
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
       border-radius:16px;
       padding:36px;
+      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
     .order-summary .section-label{text-align:left;margin-bottom:24px}
     .summary-line{
@@ -297,10 +301,11 @@
 
     /* Payment form (right column) */
     .payment-form{
-      background:var(--card-bg);
-      border:1px solid var(--card-border);
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
       border-radius:16px;
       padding:36px;
+      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
     .payment-form .section-label{text-align:left;margin-bottom:24px}
     .form-group{margin-bottom:18px}

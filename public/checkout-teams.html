@@ -37,7 +37,11 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      position: relative;
     }
+    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
+    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(175,130,255,.1),transparent 70%)}
+    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(0,113,227,.1),transparent 70%)}
 
     a {
       color: var(--blue);
@@ -306,9 +310,11 @@
     }
     .summary-block {
       padding: 24px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: var(--radius);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .summary-line {
       display: flex;

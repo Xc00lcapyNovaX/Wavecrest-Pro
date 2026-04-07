@@ -13,7 +13,10 @@
       --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif
     }
     html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
-    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
+    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
+    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(0,113,227,.12),transparent 70%)}
+    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%)}
     a{color:var(--blue);text-decoration:none;transition:color .2s}
     a:hover{color:var(--blue-hover)}
 
@@ -84,7 +87,7 @@
     .checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
 
     /* Order summary (left) */
-    .order-summary{padding:32px;background:rgba(255,255,255,.02);border:1px solid var(--card-border);border-radius:16px}
+    .order-summary{padding:32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px)}
     .summary-heading{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin-bottom:24px}
     .summary-line{display:flex;justify-content:space-between;padding:11px 0;font-size:.88rem;border-bottom:1px solid var(--card-border);color:var(--fg)}
     .summary-line:last-child{border-bottom:none}
@@ -92,7 +95,7 @@
     .summary-muted{color:var(--muted);font-weight:400}
 
     /* Payment form (right) */
-    .payment-form{padding:32px;background:rgba(255,255,255,.02);border:1px solid var(--card-border);border-radius:16px}
+    .payment-form{padding:32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px)}
     .form-heading{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin-bottom:24px}
     .form-group{margin-bottom:18px}
     .form-group label{display:block;font-size:.78rem;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:.01em}
