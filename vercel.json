@@ -1,5 +1,11 @@
 {
-  "routes": [
-    { "src": "/(.*)", "dest": "/server/index.js" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/server/index.js" },
+    { "source": "/dashboard.html", "destination": "/public/dashboard.html" },
+    { "source": "/signin.html", "destination": "/public/signin.html" },
+    { "source": "/signup.html", "destination": "/public/signup.html" },
+    { "source": "/analytics.html", "destination": "/public/analytics.html" },
+    { "source": "/api-docs.html", "destination": "/public/api-docs.html" },
+    { "source": "/api-docs.json", "destination": "/public/api-docs.json" }
   ]
 }
