@@ -11,7 +11,7 @@ from html import unescape
 import random, ssl, os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT = os.path.join(SCRIPT_DIR, "trends.json")
+OUTPUT = os.path.join(SCRIPT_DIR, "public", "trends.json")
 
 # Platform emoji prefixes for display
 PLATFORM_EMOJI = {"youtube": "▶️", "tiktok": "♪", "instagram": "📸", "general": "🔥"}
