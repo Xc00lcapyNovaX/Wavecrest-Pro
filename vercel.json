@@ -21,6 +21,7 @@
     { "src": "/analytics.html", "dest": "/public/analytics.html" },
     { "src": "/api-docs.html", "dest": "/public/api-docs.html" },
     { "src": "/api-docs.json", "dest": "/public/api-docs.json" },
-    { "src": "/trends.json", "dest": "/public/trends.json" }
+    { "src": "/trends.json", "dest": "/public/trends.json" },
+    { "src": "/css/(.*)", "dest": "/public/css/$1" }
   ]
 }
