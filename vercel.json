@@ -1,17 +1,25 @@
 {
-  "buildCommand": "cd server && npm install",
-  "functions": {
-    "server/index.js": {
-      "runtime": "@vercel/node@3"
-    }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server/index.js" },
-    { "source": "/dashboard.html", "destination": "/public/dashboard.html" },
-    { "source": "/signin.html", "destination": "/public/signin.html" },
-    { "source": "/signup.html", "destination": "/public/signup.html" },
-    { "source": "/analytics.html", "destination": "/public/analytics.html" },
-    { "source": "/api-docs.html", "destination": "/public/api-docs.html" },
-    { "source": "/api-docs.json", "destination": "/public/api-docs.json" }
+  "version": 2,
+  "builds": [
+    { "src": "server/index.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server/index.js" },
+    { "handle": "filesystem" },
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/index.html", "dest": "/public/index.html" },
+    { "src": "/checkout-free.html", "dest": "/public/checkout-free.html" },
+    { "src": "/checkout-plus.html", "dest": "/public/checkout-plus.html" },
+    { "src": "/checkout-pro.html", "dest": "/public/checkout-pro.html" },
+    { "src": "/checkout-max.html", "dest": "/public/checkout-max.html" },
+    { "src": "/checkout-teams.html", "dest": "/public/checkout-teams.html" },
+    { "src": "/checkout-enterprise.html", "dest": "/public/checkout-enterprise.html" },
+    { "src": "/dashboard.html", "dest": "/public/dashboard.html" },
+    { "src": "/signin.html", "dest": "/public/signin.html" },
+    { "src": "/signup.html", "dest": "/public/signup.html" },
+    { "src": "/analytics.html", "dest": "/public/analytics.html" },
+    { "src": "/api-docs.html", "dest": "/public/api-docs.html" },
+    { "src": "/api-docs.json", "dest": "/public/api-docs.json" },
+    { "src": "/trends.json", "dest": "/public/trends.json" }
   ]
 }

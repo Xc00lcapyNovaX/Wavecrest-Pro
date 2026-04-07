@@ -54,9 +54,8 @@ app.use(session({
   },
 }));
 
-// ── Static files (landing page, checkout pages, public assets) ──
-app.use(express.static(path.join(__dirname, '..')));       // serves index.html, checkout-*.html, trends.json
-app.use(express.static(path.join(__dirname, '..', 'public'))); // serves signin.html, dashboard.html, etc.
+// ── Static files — everything lives in public/ ──
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ── API Routes ─────────────────────────────────────
 const trendsRouter = require('./routes/trends');

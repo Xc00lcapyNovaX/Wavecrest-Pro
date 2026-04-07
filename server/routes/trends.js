@@ -371,7 +371,7 @@ function daysBetween(dateA, dateB) {
 
 // ── Seed trends from trends.json — call explicitly from index.js ──
 async function seedTrendsFromFile() {
-  const trendsPath = path.join(__dirname, '..', '..', 'trends.json');
+  const trendsPath = path.join(__dirname, '..', '..', 'public', 'trends.json');
   try {
     const data = JSON.parse(fs.readFileSync(trendsPath, 'utf-8'));
     if (data && data.trends && data.trends.length) {
