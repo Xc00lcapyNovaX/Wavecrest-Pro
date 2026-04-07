@@ -12,7 +12,7 @@ const router = express.Router();
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 // ── Passport setup ─────────────────────────────────
-// Only wire real strategies when credentials are present
+// Strategies activate when env vars are set (GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID)
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
