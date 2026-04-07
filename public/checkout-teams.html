@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wavecrest Pro — Teams Plan</title>
+  <link rel="stylesheet" href="/css/glass.css">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
@@ -37,11 +38,9 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      position: relative;
+      --mesh-1: rgba(175,130,255,.1);
+      --mesh-2: rgba(0,113,227,.1);
     }
-    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
-    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(175,130,255,.1),transparent 70%)}
-    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(0,113,227,.1),transparent 70%)}
 
     a {
       color: var(--blue);
@@ -57,9 +56,9 @@
       left: 0;
       right: 0;
       z-index: 100;
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--glass-nav-bg);
       border-bottom: 1px solid var(--divider);
     }
     nav .inner {
@@ -310,11 +309,6 @@
     }
     .summary-block {
       padding: 24px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: var(--radius);
-      backdrop-filter: saturate(180%) blur(40px);
-      -webkit-backdrop-filter: saturate(180%) blur(40px);
     }
     .summary-line {
       display: flex;
@@ -454,7 +448,7 @@
 
   </style>
 </head>
-<body>
+<body class="ambient-mesh">
 
 <!-- Nav -->
 <nav>
@@ -592,7 +586,7 @@
       <div class="order-summary">
         <p class="section-label" style="text-align:left">Beta Offer</p>
         <h3>Wavecrest Pro — Teams</h3>
-        <div class="summary-block">
+        <div class="summary-block glass">
           <div class="summary-line">
             <span class="label">Plan</span>
             <span>Teams (Pro access)</span>

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wavecrest Pro — See What's Next</title>
+  <link rel="stylesheet" href="/css/glass.css">
   <style>
     /* ── Reset & Base ──────────────────────────────── */
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -15,21 +16,8 @@
       --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     }
     html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
-    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;position:relative}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;--mesh-1:rgba(41,151,255,.12);--mesh-2:rgba(191,90,242,.1)}
 
-    /* ── Ambient gradient mesh (gives glass something to blur) ── */
-    body::before,body::after{
-      content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;
-      filter:blur(120px);opacity:.5;
-    }
-    body::before{
-      width:600px;height:600px;top:-10%;left:-5%;
-      background:radial-gradient(circle,rgba(41,151,255,.12),transparent 70%);
-    }
-    body::after{
-      width:500px;height:500px;bottom:10%;right:-5%;
-      background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%);
-    }
     a{color:var(--accent);text-decoration:none;transition:color .2s}
     a:hover{color:#64b5f6}
     img{display:block;max-width:100%}
@@ -60,8 +48,8 @@
     /* ── Nav ───────────────────────────────────────── */
     nav{
       position:fixed;top:0;left:0;right:0;z-index:100;
-      backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
-      background:rgba(0,0,0,.72);border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      background:var(--glass-nav-bg);border-bottom:1px solid rgba(255,255,255,.08);
       transition:background .3s;
     }
     nav .inner{display:flex;align-items:center;justify-content:space-between;height:52px;max-width:var(--max);margin:0 auto;padding:0 24px}
@@ -108,7 +96,7 @@
     .badge{
       position:absolute;padding:10px 20px;border-radius:14px;font-size:.82rem;font-weight:600;
       background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
-      backdrop-filter:blur(12px);animation:float 8s ease-in-out infinite;
+      animation:float 8s ease-in-out infinite;
     }
     .badge:nth-child(1){top:18%;left:8%;animation-delay:0s}
     .badge:nth-child(2){top:25%;right:7%;animation-delay:2s}
@@ -138,11 +126,9 @@
       display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;
     }
     .feature-card{
-      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);
       padding:40px 32px;transition:transform .3s,border-color .3s,background .3s;
-      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
-    .feature-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.2);background:rgba(255,255,255,.05)}
+    .feature-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.2);background:rgba(255,255,255,.06)}
     .feature-card .icon-wrap{
       width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
       background:linear-gradient(135deg,rgba(41,151,255,.15),rgba(191,90,242,.1));margin-bottom:24px;font-size:1.5rem;
@@ -160,9 +146,7 @@
     .showcase-content{position:relative;max-width:var(--max);margin:0 auto}
     .showcase-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
     .showcase-visual{
-      border-radius:var(--radius);overflow:hidden;border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);position:relative;
-      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
+      overflow:hidden;position:relative;
     }
     .mock-dashboard{padding:32px;font-size:.85rem}
     .mock-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--card-border);
@@ -180,7 +164,7 @@
     .showcase-text p{color:var(--muted);line-height:1.6;font-size:1.05rem;margin-bottom:28px}
 
     /* ── Counter bar ──────────────────────────────── */
-    .counter-bar{padding:80px 24px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:saturate(150%) blur(30px);-webkit-backdrop-filter:saturate(150%) blur(30px)}
+    .counter-bar{padding:80px 24px;background:var(--card);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
     .counter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;max-width:var(--max);margin:0 auto;text-align:center}
     .counter-item .number{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;letter-spacing:-.03em}
     .counter-item .label{color:var(--muted);font-size:.9rem;margin-top:6px}
@@ -190,12 +174,10 @@
       display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1060px;margin:0 auto;
     }
     .price-card{
-      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);
       padding:36px 28px;transition:transform .3s,border-color .3s,background .3s;position:relative;overflow:hidden;
       display:flex;flex-direction:column;
-      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
-    .price-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.2);background:rgba(255,255,255,.05)}
+    .price-card:hover{transform:translateY(-10px);border-color:rgba(41,151,255,.2);background:rgba(255,255,255,.06)}
     .price-card.featured{border-color:var(--accent)}
     .price-card.featured::before{
       content:'MOST POPULAR';position:absolute;top:0;left:0;right:0;
@@ -262,7 +244,7 @@
     }
   </style>
 </head>
-<body>
+<body class="ambient-mesh">
 
 <!-- ─── NAV ──────────────────────────────────────── -->
 <nav>
@@ -319,32 +301,32 @@
     <h2 class="reveal">Built for creators<br><span class="gradient-text">who move fast.</span></h2>
     <p class="lead reveal reveal-delay-1">Stop guessing. Get signals backed by real-time data across the platforms that matter.</p>
     <div class="features-grid">
-      <div class="feature-card reveal">
+      <div class="feature-card glass reveal">
         <div class="icon-wrap">🔮</div>
         <h3>Early Trend Signals</h3>
         <p>Detect rising topics, hashtags, sounds, and formats hours or days before they peak. Get there first.</p>
       </div>
-      <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-card glass reveal reveal-delay-1">
         <div class="icon-wrap">⚡</div>
         <h3>Real-Time Velocity</h3>
         <p>Track engagement acceleration in real time. See what's gaining momentum — not just what's already popular.</p>
       </div>
-      <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-card glass reveal reveal-delay-2">
         <div class="icon-wrap">🎯</div>
         <h3>Niche Filters</h3>
         <p>Filter by your niche — fitness, tech, beauty, gaming, food, and more. Only see trends that matter to you.</p>
       </div>
-      <div class="feature-card reveal reveal-delay-3">
+      <div class="feature-card glass reveal reveal-delay-3">
         <div class="icon-wrap">✍️</div>
         <h3>Content Ideas</h3>
         <p>Every trend comes with AI-generated hooks, titles, captions, and hashtag sets. Ready to post in minutes.</p>
       </div>
-      <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-card glass reveal reveal-delay-1">
         <div class="icon-wrap">🔔</div>
         <h3>Smart Alerts</h3>
         <p>Get notified instantly when a relevant trend starts rising in your niche. Never miss a wave.</p>
       </div>
-      <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-card glass reveal reveal-delay-2">
         <div class="icon-wrap">📊</div>
         <h3>Analytics Dashboard</h3>
         <p>Track trend lifecycles, engagement curves, and your prediction accuracy over time.</p>
@@ -389,7 +371,7 @@
 
     <div class="pricing-grid">
       <!-- Free -->
-      <div class="price-card reveal">
+      <div class="price-card glass-strong reveal">
         <h3>Free</h3>
         <div class="price">$0<span>/mo</span></div>
         <div class="note">Bring Your Own API Key</div>
@@ -405,7 +387,7 @@
         <a href="checkout-free.html" class="btn-card">Get Started</a>
       </div>
       <!-- Plus -->
-      <div class="price-card reveal reveal-delay-1">
+      <div class="price-card glass-strong reveal reveal-delay-1">
         <h3>Plus</h3>
         <div class="trial trial-free" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$9.99</span>$0<span>/mo</span></div>
@@ -422,7 +404,7 @@
         <a href="checkout-plus.html" class="btn-card">Get Free Access</a>
       </div>
       <!-- Pro -->
-      <div class="price-card featured reveal reveal-delay-2">
+      <div class="price-card glass-strong featured reveal reveal-delay-2">
         <h3>Pro <span style="font-size:.6em;background:linear-gradient(135deg,#30d158,#0071e3);color:#fff;padding:2px 8px;border-radius:8px;vertical-align:middle;margin-left:4px">POPULAR</span></h3>
         <div class="trial trial-discount" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$24.99</span>$0<span>/mo</span></div>
@@ -440,7 +422,7 @@
         <a href="checkout-pro.html" class="btn-card" style="background:linear-gradient(135deg,#30d158,#0071e3);border:none;color:#fff">Get Free Pro Access</a>
       </div>
       <!-- Max -->
-      <div class="price-card reveal reveal-delay-3">
+      <div class="price-card glass-strong reveal reveal-delay-3">
         <h3>Max</h3>
         <div class="trial trial-discount" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$99.99</span>$0<span>/mo</span></div>
@@ -458,7 +440,7 @@
         <a href="checkout-max.html" class="btn-card">Get Free Max Access</a>
       </div>
       <!-- Teams -->
-      <div class="price-card reveal reveal-delay-1">
+      <div class="price-card glass-strong reveal reveal-delay-1">
         <h3>Teams</h3>
         <div class="trial trial-free" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$49.99</span>$0<span>/person/mo</span></div>
@@ -475,7 +457,7 @@
         <a href="checkout-teams.html" class="btn-card">Get Free Team Access</a>
       </div>
       <!-- Enterprise -->
-      <div class="price-card reveal reveal-delay-2">
+      <div class="price-card glass-strong reveal reveal-delay-2">
         <h3>Enterprise</h3>
         <div class="price">Custom</div>
         <div class="note">Custom everything</div>

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wavecrest Pro — Max Plan</title>
+  <link rel="stylesheet" href="/css/glass.css">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
@@ -22,15 +23,12 @@
       --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;
     }
     html{scroll-behavior:smooth;background:var(--bg);color:var(--fg);font-family:var(--font)}
-    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
-    body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4}
-    body::before{width:500px;height:500px;top:-5%;left:-8%;background:radial-gradient(circle,rgba(255,159,10,.1),transparent 70%)}
-    body::after{width:400px;height:400px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%)}
+    body{overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;--mesh-1:rgba(255,159,10,.1);--mesh-2:rgba(191,90,242,.1)}
     a{color:var(--blue);text-decoration:none;transition:color .2s}
     a:hover{color:var(--blue-hover)}
 
     /* Nav */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:rgba(0,0,0,.8);border-bottom:1px solid var(--divider)}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:var(--glass-nav-bg);border-bottom:1px solid var(--divider)}
     nav .inner{display:flex;align-items:center;justify-content:space-between;height:48px;max-width:var(--max);margin:0 auto;padding:0 24px}
     nav .logo{font-size:1.05rem;font-weight:600;letter-spacing:-.01em;color:var(--fg)}
     .logo span{font-weight:400;color:var(--muted)}
@@ -255,11 +253,7 @@
 
     /* Order summary (left column) */
     .order-summary{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:16px;
       padding:36px;
-      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
     .order-summary .section-label{text-align:left;margin-bottom:24px}
     .summary-line{
@@ -301,11 +295,7 @@
 
     /* Payment form (right column) */
     .payment-form{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:16px;
       padding:36px;
-      backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);
     }
     .payment-form .section-label{text-align:left;margin-bottom:24px}
     .form-group{margin-bottom:18px}
@@ -382,7 +372,7 @@
 
   </style>
 </head>
-<body>
+<body class="ambient-mesh">
 
 <!-- Nav -->
 <nav>
@@ -505,7 +495,7 @@
     <div class="checkout-grid">
 
       <!-- Left — Beta Offer -->
-      <div class="order-summary">
+      <div class="order-summary glass-strong">
         <p class="section-label">Beta Offer</p>
         <div class="summary-line">
           <span class="label">Wavecrest Pro — Max</span>
@@ -529,7 +519,7 @@
       </div>
 
       <!-- Right — Beta Form -->
-      <div class="payment-form">
+      <div class="payment-form glass-strong">
         <p class="section-label">Join the Beta</p>
         <div class="form-group">
           <label>Email address</label>

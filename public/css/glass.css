@@ -1,0 +1,94 @@
+/* ═══════════════════════════════════════════════════════
+   Wavecrest Pro — Glass Design System
+   Minimal, intentional Apple-style glassmorphism
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Design Tokens ── */
+:root {
+  /* Blur — two levels only */
+  --glass-blur: 16px;
+  --glass-blur-lg: 24px;
+
+  /* Surface backgrounds */
+  --glass-bg:        rgba(255, 255, 255, 0.05);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.03);
+
+  /* Borders */
+  --glass-border:        rgba(255, 255, 255, 0.08);
+  --glass-border-strong: rgba(255, 255, 255, 0.10);
+  --glass-border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* Radii */
+  --glass-radius-sm: 12px;
+  --glass-radius:    16px;
+  --glass-radius-lg: 20px;
+
+  /* Nav surface */
+  --glass-nav-bg: rgba(0, 0, 0, 0.72);
+}
+
+/* ── Ambient Mesh ──
+   Subtle colored background blobs.
+   Add class="ambient-mesh" to <body>.
+   Override --mesh-1 / --mesh-2 per page for unique tints. */
+
+.ambient-mesh { position: relative; }
+
+.ambient-mesh::before,
+.ambient-mesh::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(100px);
+  opacity: 0.35;
+}
+
+.ambient-mesh::before {
+  width: 450px;
+  height: 450px;
+  top: -5%;
+  left: -8%;
+  background: radial-gradient(circle,
+    var(--mesh-1, rgba(0, 113, 227, 0.10)), transparent 70%);
+}
+
+.ambient-mesh::after {
+  width: 350px;
+  height: 350px;
+  bottom: 10%;
+  right: -5%;
+  background: radial-gradient(circle,
+    var(--mesh-2, rgba(191, 90, 242, 0.08)), transparent 70%);
+}
+
+/* ── Glass Surfaces ── */
+
+/* Default — feature cards, pricing tiers, preview panels */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Primary — checkout panels, auth cards, modals */
+.glass-strong {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--glass-blur-lg));
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg));
+}
+
+/* Lightweight — badges, secondary elements */
+.glass-subtle {
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--glass-radius-sm);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}

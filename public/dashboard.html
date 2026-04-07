@@ -4,18 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Wavecrest Pro</title>
+<link rel="stylesheet" href="/css/glass.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;position:relative}
-  body::before,body::after{
-    content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.4;
-  }
-  body::before{width:500px;height:500px;top:5%;left:-10%;background:radial-gradient(circle,rgba(0,113,227,.15),transparent 70%)}
-  body::after{width:400px;height:400px;bottom:5%;right:-8%;background:radial-gradient(circle,rgba(48,209,88,.1),transparent 70%)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;--mesh-1:rgba(0,113,227,.12);--mesh-2:rgba(48,209,88,.08)}
 
   /* ── Nav ── */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);z-index:100}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:var(--glass-nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:100}
   .logo{font-size:1.2rem;font-weight:700;text-decoration:none;color:var(--text)}
   .logo span{color:var(--blue)}
   .nav-right{display:flex;align-items:center;gap:16px}
@@ -35,8 +31,8 @@
   @media(max-width:768px){.grid{grid-template-columns:1fr}}
 
   /* ── Cards ── */
-  .stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px);transition:border-color .3s,background .3s}
-  .stat-card:hover{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
+  .stat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px;transition:border-color .3s,background .3s}
+  .stat-card:hover{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
   .stat-card .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
   .stat-card .value{font-size:1.8rem;font-weight:700}
   .stat-card .sub{font-size:.82rem;color:var(--muted);margin-top:4px}
@@ -50,12 +46,12 @@
   .search-bar button{padding:14px 28px;border-radius:12px;border:none;background:var(--blue);color:#fff;font-weight:600;cursor:pointer;white-space:nowrap}
   .search-bar button:hover{opacity:.85}
   .search-bar button:disabled{opacity:.4;cursor:not-allowed}
-  .search-locked{color:var(--muted);font-size:.9rem;padding:16px;text-align:center;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .search-locked{color:var(--muted);font-size:.9rem;padding:16px;text-align:center;background:var(--surface);border-radius:12px;border:1px solid var(--card-border)}
   .search-locked a{color:var(--blue);text-decoration:none}
 
   /* ── Trends table ── */
   .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
-  .trend-list{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;backdrop-filter:saturate(150%) blur(30px);-webkit-backdrop-filter:saturate(150%) blur(30px)}
+  .trend-list{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
   .trend-row{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s}
   .trend-row:last-child{border-bottom:none}
   .trend-row:hover{background:rgba(255,255,255,.03)}
@@ -105,7 +101,7 @@
 
   /* ── Content Hooks (Pro+) ── */
   .hooks-section{margin-bottom:32px}
-  .hook-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:border-color .2s;backdrop-filter:saturate(180%) blur(30px);-webkit-backdrop-filter:saturate(180%) blur(30px)}
+  .hook-card{background:var(--surface);border:1px solid var(--card-border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:border-color .2s}
   .hook-card:hover{border-color:rgba(0,113,227,.3)}
   .hook-type{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:6px}
   .hook-text{font-size:.95rem;font-weight:500;margin-bottom:6px;line-height:1.4}
@@ -114,7 +110,7 @@
 
   /* ── Cross-Platform (Max) ── */
   .crossplat-section{margin-bottom:32px}
-  .crossplat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px 20px;margin-bottom:12px;backdrop-filter:saturate(180%) blur(30px);-webkit-backdrop-filter:saturate(180%) blur(30px)}
+  .crossplat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:12px;padding:18px 20px;margin-bottom:12px}
   .spread-path{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
   .spread-node{padding:4px 12px;border-radius:980px;font-size:.78rem;font-weight:600}
   .spread-node.youtube{background:rgba(255,69,58,.12);color:#ff453a}
@@ -125,7 +121,7 @@
   .crossplat-insight{font-size:.82rem;color:var(--muted);font-style:italic;margin-top:6px}
 
   /* ── Locked feature card ── */
-  .locked-feature{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:40px 32px;text-align:center;position:relative;overflow:hidden;backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px)}
+  .locked-feature{padding:40px 32px;text-align:center;position:relative;overflow:hidden}
   .locked-feature::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,113,227,.04),rgba(175,130,255,.04));pointer-events:none}
   .locked-feature .lock-icon{font-size:2rem;margin-bottom:12px}
   .locked-feature h3{font-size:1.1rem;margin-bottom:8px}
@@ -166,7 +162,7 @@
   }
 </style>
 </head>
-<body>
+<body class="ambient-mesh">
 
 <nav>
   <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
@@ -492,7 +488,7 @@ async function loadPredictions() {
   var area = document.getElementById('predictionsArea');
   var plan = dashboardData.user.plan;
   if (!['pro','max','teams','enterprise'].includes(plan)) {
-    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🔮</div><h3>AI Trend Predictions</h3><p>See which trends are about to explode, which are fading, and where to focus your content — powered by momentum analysis.</p><div class="preview-items"><span class="preview-pill">AI Art — EXPLODING</span><span class="preview-pill">Fitness Hacks — Rising</span><span class="preview-pill">React 20 — Building</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
+    area.innerHTML = '<div class="locked-feature glass-strong"><div class="lock-icon">🔮</div><h3>AI Trend Predictions</h3><p>See which trends are about to explode, which are fading, and where to focus your content — powered by momentum analysis.</p><div class="preview-items"><span class="preview-pill">AI Art — EXPLODING</span><span class="preview-pill">Fitness Hacks — Rising</span><span class="preview-pill">React 20 — Building</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
     return;
   }
   area.innerHTML = '<div class="loading">Analyzing trends...</div>';
@@ -526,7 +522,7 @@ function renderHooksUI() {
   var area = document.getElementById('hooksArea');
   var plan = dashboardData.user.plan;
   if (!['pro','max','teams','enterprise'].includes(plan)) {
-    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🎯</div><h3>AI Content Hooks</h3><p>Get platform-specific video ideas, thumbnail tips, hashtag strategies, and content angles for any trending topic — designed to maximize engagement.</p><div class="preview-items"><span class="preview-pill">"I Tried ███ For 7 Days"</span><span class="preview-pill">POV: You discovered ███</span><span class="preview-pill">Carousel: 5 Things About ███</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
+    area.innerHTML = '<div class="locked-feature glass-strong"><div class="lock-icon">🎯</div><h3>AI Content Hooks</h3><p>Get platform-specific video ideas, thumbnail tips, hashtag strategies, and content angles for any trending topic — designed to maximize engagement.</p><div class="preview-items"><span class="preview-pill">"I Tried ███ For 7 Days"</span><span class="preview-pill">POV: You discovered ███</span><span class="preview-pill">Carousel: 5 Things About ███</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
     return;
   }
   area.innerHTML = '<div class="hooks-trigger">' +
@@ -571,7 +567,7 @@ async function loadCrossPlatform() {
   var area = document.getElementById('crossPlatArea');
   var plan = dashboardData.user.plan;
   if (!['max','teams','enterprise'].includes(plan)) {
-    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🌐</div><h3>Cross-Platform Tracking</h3><p>See which trends are jumping between YouTube, TikTok, and Instagram — catch cross-platform waves before your competitors do.</p><div class="preview-items"><span class="preview-pill">███ → YouTube → TikTok</span><span class="preview-pill">███ → TikTok → Instagram</span></div><a href="checkout-max.html">Upgrade to Max — $59.99/mo →</a></div>';
+    area.innerHTML = '<div class="locked-feature glass-strong"><div class="lock-icon">🌐</div><h3>Cross-Platform Tracking</h3><p>See which trends are jumping between YouTube, TikTok, and Instagram — catch cross-platform waves before your competitors do.</p><div class="preview-items"><span class="preview-pill">███ → YouTube → TikTok</span><span class="preview-pill">███ → TikTok → Instagram</span></div><a href="checkout-max.html">Upgrade to Max — $59.99/mo →</a></div>';
     return;
   }
   area.innerHTML = '<div class="loading">Analyzing cross-platform data...</div>';

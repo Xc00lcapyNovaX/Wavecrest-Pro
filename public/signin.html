@@ -4,16 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In — Wavecrest Pro</title>
+<link rel="stylesheet" href="/css/glass.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative}
-  body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(120px);opacity:.5}
-  body::before{width:500px;height:500px;top:10%;left:-10%;background:radial-gradient(circle,rgba(0,113,227,.12),transparent 70%)}
-  body::after{width:400px;height:400px;bottom:5%;right:-8%;background:radial-gradient(circle,rgba(191,90,242,.1),transparent 70%)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;--mesh-1:rgba(0,113,227,.12);--mesh-2:rgba(191,90,242,.1)}
+
   .logo{font-size:1.4rem;font-weight:700;margin-bottom:40px;text-decoration:none;color:var(--text)}
   .logo span{color:var(--blue)}
-  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:48px;width:100%;max-width:420px;backdrop-filter:saturate(180%) blur(40px);-webkit-backdrop-filter:saturate(180%) blur(40px)}
+  .card{padding:48px;width:100%;max-width:420px}
   h1{font-size:1.6rem;font-weight:700;margin-bottom:8px;text-align:center}
   .subtitle{color:var(--muted);text-align:center;margin-bottom:32px;font-size:.95rem}
 
@@ -43,11 +42,11 @@
   .success-msg{background:rgba(48,209,88,.12);color:#30d158;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
 </style>
 </head>
-<body>
+<body class="ambient-mesh">
 
 <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
 
-<div class="card">
+<div class="card glass-strong">
   <h1>Welcome back</h1>
   <p class="subtitle">Sign in to your Wavecrest Pro account</p>
 
