@@ -1,10 +1,75 @@
 /**
- * Auth routes — email/password + mock OAuth
+ * Auth routes — email/password + real Google/GitHub OAuth + mock Apple/Microsoft
  */
 const express = require('express');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 const db = require('../db');
 const router = express.Router();
+
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
+// ── Passport setup ─────────────────────────────────
+// Only wire real strategies when credentials are present
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: `${BASE_URL}/api/auth/google/callback`,
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      const email = profile.emails?.[0]?.value;
+      if (!email) return done(new Error('No email from Google'));
+      let user = await db.findUserByEmail(email);
+      if (!user) {
+        user = await db.createUser({
+          email,
+          name: profile.displayName || email.split('@')[0],
+          provider: 'google',
+          providerId: profile.id,
+          avatarUrl: profile.photos?.[0]?.value,
+        });
+      }
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  }));
+}
+
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+  passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: `${BASE_URL}/api/auth/github/callback`,
+    scope: ['user:email'],
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      const email = profile.emails?.[0]?.value || `${profile.username}@github.local`;
+      let user = await db.findUserByEmail(email);
+      if (!user) {
+        user = await db.createUser({
+          email,
+          name: profile.displayName || profile.username,
+          provider: 'github',
+          providerId: String(profile.id),
+          avatarUrl: profile.photos?.[0]?.value,
+        });
+      }
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  }));
+}
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try { done(null, await db.findUserById(id)); }
+  catch (err) { done(err); }
+});
 
 // ── Email signup ───────────────────────────────────
 router.post('/signup', async (req, res) => {
@@ -89,24 +154,55 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// ── Mock OAuth routes ──────────────────────────────
-// These simulate OAuth login. In production, replace with real Passport strategies.
-const OAUTH_PROVIDERS = ['google', 'apple', 'github', 'microsoft'];
+// ── Google OAuth ────────────────────────────────────
+if (process.env.GOOGLE_CLIENT_ID) {
+  router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-OAUTH_PROVIDERS.forEach((provider) => {
-  // Redirect to "OAuth" (mock: just show a form)
+  router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/signin.html?error=oauth_failed' }),
+    (req, res) => {
+      req.session.userId = req.user.id;
+      const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+      res.redirect(dest);
+    }
+  );
+} else {
+  // Fallback when env vars not set — redirect to signin with notice
+  router.get('/google', (req, res) => {
+    res.redirect('/signin.html?error=oauth_not_configured');
+  });
+  router.get('/google/callback', (req, res) => res.redirect('/signin.html'));
+}
+
+// ── GitHub OAuth ────────────────────────────────────
+if (process.env.GITHUB_CLIENT_ID) {
+  router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+  router.get('/github/callback',
+    passport.authenticate('github', { failureRedirect: '/signin.html?error=oauth_failed' }),
+    (req, res) => {
+      req.session.userId = req.user.id;
+      const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+      res.redirect(dest);
+    }
+  );
+} else {
+  router.get('/github', (req, res) => {
+    res.redirect('/signin.html?error=oauth_not_configured');
+  });
+  router.get('/github/callback', (req, res) => res.redirect('/signin.html'));
+}
+
+// ── Apple + Microsoft — mock (require paid dev accounts) ──
+['apple', 'microsoft'].forEach((provider) => {
   router.get(`/${provider}`, (req, res) => {
-    res.redirect(`${process.env.BASE_URL || ''}/signin.html?oauth=${provider}`);
+    res.redirect(`/signin.html?oauth=${provider}`);
   });
 
-  // Callback (mock: create/find user by email)
   router.post(`/${provider}/callback`, async (req, res) => {
     try {
       const { email, name } = req.body;
-      if (!email) {
-        return res.status(400).json({ error: 'Email required for OAuth.' });
-      }
-
+      if (!email) return res.status(400).json({ error: 'Email required for OAuth.' });
       let user = await db.findUserByEmail(email);
       if (!user) {
         user = await db.createUser({
@@ -116,12 +212,8 @@ OAUTH_PROVIDERS.forEach((provider) => {
           providerId: `${provider}_${Date.now()}`,
         });
       }
-
       req.session.userId = user.id;
-      res.json({
-        message: `Signed in with ${provider}.`,
-        user: sanitize(user),
-      });
+      res.json({ message: `Signed in with ${provider}.`, user: sanitize(user) });
     } catch (err) {
       res.status(500).json({ error: 'Server error.' });
     }

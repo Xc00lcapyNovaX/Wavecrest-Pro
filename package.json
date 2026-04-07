@@ -6,5 +6,10 @@
     "start": "cd server && node index.js",
     "migrate": "cd server && node scripts/migrate.js",
     "seed": "cd server && node scripts/seed.js"
+  },
+  "dependencies": {
+    "express-session": "^1.19.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   }
 }

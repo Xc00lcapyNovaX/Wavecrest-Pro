@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In — Wavecrest Pro</title>
-<link rel="stylesheet" href="/css/glass.css">
+<link rel="preload" href="/css/glass.css" as="style">
+  <link rel="stylesheet" href="/css/glass.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3}
@@ -92,6 +93,19 @@
 <script>
 const API = window.location.origin;
 
+// Handle error/oauth params from OAuth redirects
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const err = p.get('error');
+  const oauthProvider = p.get('oauth');
+  if (err === 'oauth_failed') showError('OAuth sign-in failed. Please try again or use email.');
+  if (err === 'oauth_not_configured') showError('This sign-in method isn\'t enabled yet. Please use email.');
+  if (oauthProvider) {
+    document.getElementById('success').textContent = `Signing in with ${oauthProvider}...`;
+    document.getElementById('success').style.display = 'block';
+  }
+})();
+
 async function emailLogin(e) {
   e.preventDefault();
   hideMessages();
@@ -115,27 +129,27 @@ async function emailLogin(e) {
   }
 }
 
-async function oauthLogin(provider) {
+function oauthLogin(provider) {
   hideMessages();
-  // Mock: prompt for email, then call the mock callback
-  const email = prompt(`Mock ${provider} OAuth\n\nEnter the email to sign in with:`);
+  // Google and GitHub use real Passport OAuth redirect
+  if (provider === 'google' || provider === 'github') {
+    window.location.href = `/api/auth/${provider}`;
+    return;
+  }
+  // Apple + Microsoft: still mock (requires paid dev accounts)
+  const email = prompt(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in\n\nEnter your email:`);
   if (!email) return;
-
-  try {
-    const res = await fetch(API + `/api/auth/${provider}/callback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, name: email.split('@')[0] }),
-    });
-    const data = await res.json();
-    if (!res.ok) return showError(data.error);
-    showSuccess(`Signed in with ${provider}! Redirecting...`);
+  fetch(API + `/api/auth/${provider}/callback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, name: email.split('@')[0] }),
+  }).then(r => r.json()).then(data => {
+    if (data.error) return showError(data.error);
+    showSuccess(`Signed in! Redirecting...`);
     const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
     setTimeout(() => window.location.href = dest, 800);
-  } catch (err) {
-    showError('Network error. Is the server running?');
-  }
+  }).catch(() => showError('Network error.'));
 }
 
 function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }

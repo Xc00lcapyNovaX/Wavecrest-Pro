@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 const db = require('./db');
+const passport = require('passport');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,9 +58,15 @@ app.use(session({
 // ── Static files — everything lives in public/ ──
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// ── API Routes ─────────────────────────────────────
+// ── Passport (OAuth) ───────────────────────────────
+// Auth module registers Passport strategies when required
+const authRouter = require('./routes/auth');
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 const trendsRouter = require('./routes/trends');
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', authRouter);
 app.use('/api/trends', trendsRouter);
 app.use('/api/stripe', require('./routes/stripe'));
 app.use('/api/dashboard', require('./routes/dashboard'));

@@ -37,6 +37,7 @@ router.get('/', requireAuth, rateLimiter, async (req, res) => {
       }
     }
 
+    res.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
     res.json({ date: targetDate, ...result, user_plan: req.user.plan });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
