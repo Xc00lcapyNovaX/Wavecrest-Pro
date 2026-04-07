@@ -1,5 +1,10 @@
 {
   "buildCommand": "cd server && npm install",
+  "functions": {
+    "server/index.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server/index.js" },
     { "source": "/dashboard.html", "destination": "/public/dashboard.html" },
