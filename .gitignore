@@ -14,5 +14,6 @@ build/
 *~
 .cache/
 plan.md
+context_reference.md
 cron.log
 
