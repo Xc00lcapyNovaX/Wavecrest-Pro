@@ -334,12 +334,12 @@ router.get('/plans', (req, res) => {
 
 function getPlanFeatures(plan) {
   const features = {
-    free:       ['10 trends/day', 'BYOAK (bring your own key)', '1 platform', 'Basic dashboard'],
-    plus:       ['50 trends/day', 'All 3 platforms', 'Daily alerts', 'Export CSV', '7-day free trial'],
-    pro:        ['500 trends/day', 'All 3 platforms', 'Real-time alerts', 'Niche search', 'AI content hooks', '30-day history', '$14.99/mo for first 3 months'],
-    max:        ['Unlimited trends', 'All 3 platforms', 'API access', 'Niche search', 'White-label reports', '90-day history', 'Priority support', '$59.99/mo for first 3 months'],
-    teams:      ['Unlimited trends', 'All 3 platforms', 'Team dashboard', 'Niche search', 'Shared workspaces', 'Admin controls', '14-day free trial'],
-    enterprise: ['Everything in Max', 'Dedicated account manager', 'Custom integrations', 'SLA guarantee', 'SSO/SAML', 'Unlimited history'],
+    free:       ['10 trends/day', '1 platform only', 'Basic dashboard', 'BYOAK (bring your own API key)'],
+    plus:       ['50 trends/day', 'All 3 platforms', 'CSV export', 'Daily email digest', '7-day trend history', '7-day free trial'],
+    pro:        ['500 trends/day', 'All 3 platforms', '🔥 AI Trend Predictions — see what\'s about to blow up', '🎯 Content Hooks — AI-generated video/post ideas per trend', 'Niche keyword search', 'Real-time velocity alerts', '30-day history', '$14.99/mo for first 3 months'],
+    max:        ['Unlimited trends', 'All 3 platforms', 'Everything in Pro, plus:', '🌐 Cross-Platform Tracking — see trends jump between platforms', '📊 Full API access for your tools', 'Predictive confidence scoring', 'White-label PDF reports', '90-day history', 'Priority support', '$59.99/mo for first 3 months'],
+    teams:      ['Unlimited trends', 'All 3 platforms', 'Everything in Max, plus:', 'Team dashboard & shared workspaces', 'Admin controls & permissions', 'Team activity feed', '14-day free trial'],
+    enterprise: ['Everything in Teams', 'Dedicated account manager', 'Custom integrations & webhooks', 'SLA guarantee', 'SSO/SAML', 'Unlimited history', 'Custom trend sources'],
   };
   return features[plan] || [];
 }

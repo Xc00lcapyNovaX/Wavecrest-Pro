@@ -79,7 +79,68 @@
   .upgrade-banner strong{color:var(--text)}
   .upgrade-banner a{padding:12px 24px;background:var(--blue);color:#fff;border-radius:980px;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
 
-  /* ── Mobile responsive ── */
+  /* ── Predictions (Pro+) ── */
+  .predictions-section{margin-bottom:32px}
+  .prediction-card{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s;cursor:pointer}
+  .prediction-card:last-child{border-bottom:none}
+  .prediction-card:hover{background:rgba(255,255,255,.03)}
+  .momentum-bar{width:80px;height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden;margin:0 16px;flex-shrink:0}
+  .momentum-fill{height:100%;border-radius:4px;transition:width .6s ease}
+  .momentum-high{background:var(--red)}
+  .momentum-med{background:var(--orange)}
+  .momentum-low{background:var(--green)}
+  .prediction-tag{font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:980px;white-space:nowrap}
+  .pred-exploding{background:rgba(255,69,58,.15);color:var(--red)}
+  .pred-rising{background:rgba(48,209,88,.15);color:var(--green)}
+  .pred-building{background:rgba(255,159,10,.15);color:var(--orange)}
+  .pred-early{background:rgba(0,113,227,.15);color:var(--blue)}
+  .pred-cooling{background:rgba(255,255,255,.06);color:var(--muted)}
+  .prediction-meta{font-size:.78rem;color:var(--muted);margin-top:4px}
+
+  /* ── Content Hooks (Pro+) ── */
+  .hooks-section{margin-bottom:32px}
+  .hook-card{background:var(--surface);border:1px solid var(--card-border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:border-color .2s}
+  .hook-card:hover{border-color:rgba(0,113,227,.3)}
+  .hook-type{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:6px}
+  .hook-text{font-size:.95rem;font-weight:500;margin-bottom:6px;line-height:1.4}
+  .hook-format{font-size:.78rem;color:var(--green);margin-bottom:4px}
+  .hook-why{font-size:.78rem;color:var(--muted);line-height:1.4}
+
+  /* ── Cross-Platform (Max) ── */
+  .crossplat-section{margin-bottom:32px}
+  .crossplat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:12px;padding:18px 20px;margin-bottom:12px}
+  .spread-path{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+  .spread-node{padding:4px 12px;border-radius:980px;font-size:.78rem;font-weight:600}
+  .spread-node.youtube{background:rgba(255,69,58,.12);color:#ff453a}
+  .spread-node.tiktok{background:rgba(0,113,227,.12);color:#0071e3}
+  .spread-node.instagram{background:rgba(175,130,255,.12);color:#af82ff}
+  .spread-node.general{background:rgba(255,255,255,.08);color:var(--muted)}
+  .spread-arrow{color:var(--muted);font-size:.8rem}
+  .crossplat-insight{font-size:.82rem;color:var(--muted);font-style:italic;margin-top:6px}
+
+  /* ── Locked feature card ── */
+  .locked-feature{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:40px 32px;text-align:center;position:relative;overflow:hidden}
+  .locked-feature::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,113,227,.04),rgba(175,130,255,.04));pointer-events:none}
+  .locked-feature .lock-icon{font-size:2rem;margin-bottom:12px}
+  .locked-feature h3{font-size:1.1rem;margin-bottom:8px}
+  .locked-feature p{color:var(--muted);font-size:.9rem;margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.5}
+  .locked-feature a{display:inline-block;padding:12px 28px;background:var(--blue);color:#fff;border-radius:980px;text-decoration:none;font-weight:600;font-size:.9rem}
+  .locked-feature .preview-items{display:flex;gap:12px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+  .locked-feature .preview-pill{padding:6px 14px;border-radius:980px;font-size:.78rem;background:rgba(255,255,255,.06);color:var(--muted);filter:blur(3px)}
+
+  /* ── Hooks topic selector ── */
+  .hooks-trigger{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .hooks-trigger select,.hooks-trigger button{padding:10px 16px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.88rem;cursor:pointer}
+  .hooks-trigger button{background:var(--blue);color:#fff;border:none;font-weight:600}
+
+  /* ── Section headers with badge ── */
+  .section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .section-header .section-title{margin-bottom:0}
+  .tier-badge{padding:3px 10px;border-radius:980px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .tier-pro{background:rgba(48,209,88,.12);color:var(--green)}
+  .tier-max{background:rgba(255,159,10,.12);color:var(--orange)}
+
+  /* ── Mobile ── */
   @media(max-width:768px){
     nav{padding:12px 16px;flex-wrap:wrap;gap:8px}
     .nav-right{gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -117,10 +178,10 @@
 
   <div id="upgradeBanner" class="upgrade-banner" style="display:none">
     <div>
-      <strong>Unlock more trends & niche search</strong>
-      <p>Upgrade to Pro for unlimited searches, real-time alerts, and AI content hooks.</p>
+      <strong>You're missing the best features</strong>
+      <p>Pro unlocks AI predictions, content hooks, niche search, and velocity alerts — the tools that actually make you money.</p>
     </div>
-    <a href="checkout-pro.html">Upgrade →</a>
+    <a href="checkout-pro.html">Upgrade to Pro →</a>
   </div>
 
   <!-- Stats -->
@@ -144,9 +205,39 @@
 
   <!-- Niche Search (Pro+) -->
   <div class="search-section">
-    <div class="section-title">Niche Search</div>
+    <div class="section-header">
+      <div class="section-title">Niche Search</div>
+      <span class="tier-badge tier-pro">Pro+</span>
+    </div>
     <div id="searchArea"></div>
     <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <!-- AI Predictions (Pro+) -->
+  <div class="predictions-section">
+    <div class="section-header">
+      <div class="section-title">🔥 AI Trend Predictions</div>
+      <span class="tier-badge tier-pro">Pro+</span>
+    </div>
+    <div id="predictionsArea"></div>
+  </div>
+
+  <!-- Content Hooks (Pro+) -->
+  <div class="hooks-section">
+    <div class="section-header">
+      <div class="section-title">🎯 Content Hooks</div>
+      <span class="tier-badge tier-pro">Pro+</span>
+    </div>
+    <div id="hooksArea"></div>
+  </div>
+
+  <!-- Cross-Platform (Max) -->
+  <div class="crossplat-section">
+    <div class="section-header">
+      <div class="section-title">🌐 Cross-Platform Insights</div>
+      <span class="tier-badge tier-max">Max</span>
+    </div>
+    <div id="crossPlatArea"></div>
   </div>
 
   <!-- Today's Trends -->
@@ -252,6 +343,13 @@ function render() {
 
   // Niche search
   renderSearch();
+
+  // Pro+ features
+  loadPredictions();
+  renderHooksUI();
+
+  // Max features
+  loadCrossPlatform();
 
   // Trends
   renderTrends();
@@ -363,6 +461,118 @@ async function logout() {
 }
 
 function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+
+// ── AI Predictions (Pro+) ──
+async function loadPredictions() {
+  var area = document.getElementById('predictionsArea');
+  var plan = dashboardData.user.plan;
+  if (!['pro','max','teams','enterprise'].includes(plan)) {
+    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🔮</div><h3>AI Trend Predictions</h3><p>See which trends are about to explode, which are fading, and where to focus your content — powered by momentum analysis.</p><div class="preview-items"><span class="preview-pill">AI Art — EXPLODING</span><span class="preview-pill">Fitness Hacks — Rising</span><span class="preview-pill">React 20 — Building</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
+    return;
+  }
+  area.innerHTML = '<div class="loading">Analyzing trends...</div>';
+  try {
+    var res = await fetch(API + '/api/trends/predictions', { credentials: 'include' });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!data.predictions || !data.predictions.length) {
+      area.innerHTML = '<div class="loading">Not enough data yet — predictions improve with more trend history.</div>';
+      return;
+    }
+    area.innerHTML = '<div class="trend-list">' + data.predictions.slice(0, 10).map(function(p) {
+      var maxMomentum = 100;
+      var pct = Math.min(100, Math.round((p.momentum / maxMomentum) * 100));
+      var barClass = pct >= 70 ? 'momentum-high' : pct >= 40 ? 'momentum-med' : 'momentum-low';
+      var tagClass = p.prediction.includes('EXPLODING') ? 'pred-exploding' : p.prediction.includes('Rising') ? 'pred-rising' : p.prediction.includes('Building') ? 'pred-building' : p.prediction.includes('Early') ? 'pred-early' : 'pred-cooling';
+      return '<div class="prediction-card" onclick="getHooks(\'' + esc(p.topic).replace(/'/g,'\\&#39;') + '\')">' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:500">' + esc(p.topic) + '</div>' +
+        '<div class="prediction-meta">' + p.platforms.join(', ') + ' · ' + p.days_trending + 'd trending · ' + p.confidence + ' confidence</div></div>' +
+        '<div class="momentum-bar"><div class="momentum-fill ' + barClass + '" style="width:' + pct + '%"></div></div>' +
+        '<span class="prediction-tag ' + tagClass + '">' + esc(p.prediction.split('—')[0].trim()) + '</span></div>';
+    }).join('') + '</div>';
+  } catch (err) {
+    area.innerHTML = '<div class="loading" style="color:var(--red)">' + esc(err.message) + '</div>';
+  }
+}
+
+// ── Content Hooks (Pro+) ──
+var currentHookTopic = '';
+function renderHooksUI() {
+  var area = document.getElementById('hooksArea');
+  var plan = dashboardData.user.plan;
+  if (!['pro','max','teams','enterprise'].includes(plan)) {
+    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🎯</div><h3>AI Content Hooks</h3><p>Get platform-specific video ideas, thumbnail tips, hashtag strategies, and content angles for any trending topic — designed to maximize engagement.</p><div class="preview-items"><span class="preview-pill">"I Tried ███ For 7 Days"</span><span class="preview-pill">POV: You discovered ███</span><span class="preview-pill">Carousel: 5 Things About ███</span></div><a href="checkout-pro.html">Upgrade to Pro — $14.99/mo →</a></div>';
+    return;
+  }
+  area.innerHTML = '<div class="hooks-trigger">' +
+    '<select id="hookPlatform"><option value="all">All Platforms</option><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select>' +
+    '<input type="text" id="hookTopic" placeholder="Enter a trending topic…" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:.88rem;min-width:180px" onkeydown="if(event.key===\'Enter\')fetchHooks()">' +
+    '<button onclick="fetchHooks()">Get Hooks</button></div>' +
+    '<div id="hooksResults"></div>' +
+    '<p style="color:var(--muted);font-size:.82rem;margin-top:4px">💡 Click any prediction above to auto-fill the topic</p>';
+}
+
+async function getHooks(topic) {
+  var input = document.getElementById('hookTopic');
+  if (input) { input.value = topic; fetchHooks(); }
+}
+
+async function fetchHooks() {
+  var topic = document.getElementById('hookTopic').value.trim();
+  if (!topic) return;
+  var platform = document.getElementById('hookPlatform').value;
+  var results = document.getElementById('hooksResults');
+  results.innerHTML = '<div class="loading">Generating hooks...</div>';
+  try {
+    var url = API + '/api/trends/hooks?topic=' + encodeURIComponent(topic) + '&platform=' + platform;
+    var res = await fetch(url, { credentials: 'include' });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    results.innerHTML = data.hooks.map(function(h) {
+      var platLabel = h.platform ? ' <span style="color:var(--muted);font-size:.72rem;text-transform:uppercase">' + esc(h.platform) + '</span>' : '';
+      return '<div class="hook-card">' +
+        '<div class="hook-type">' + esc(h.type.replace(/_/g, ' ')) + platLabel + '</div>' +
+        '<div class="hook-text">' + esc(h.hook) + '</div>' +
+        '<div class="hook-format">📐 ' + esc(h.format) + '</div>' +
+        '<div class="hook-why">💡 ' + esc(h.why) + '</div></div>';
+    }).join('');
+  } catch (err) {
+    results.innerHTML = '<div class="loading" style="color:var(--red)">' + esc(err.message) + '</div>';
+  }
+}
+
+// ── Cross-Platform Insights (Max) ──
+async function loadCrossPlatform() {
+  var area = document.getElementById('crossPlatArea');
+  var plan = dashboardData.user.plan;
+  if (!['max','teams','enterprise'].includes(plan)) {
+    area.innerHTML = '<div class="locked-feature"><div class="lock-icon">🌐</div><h3>Cross-Platform Tracking</h3><p>See which trends are jumping between YouTube, TikTok, and Instagram — catch cross-platform waves before your competitors do.</p><div class="preview-items"><span class="preview-pill">███ → YouTube → TikTok</span><span class="preview-pill">███ → TikTok → Instagram</span></div><a href="checkout-max.html">Upgrade to Max — $59.99/mo →</a></div>';
+    return;
+  }
+  area.innerHTML = '<div class="loading">Analyzing cross-platform data...</div>';
+  try {
+    var res = await fetch(API + '/api/trends/cross-platform', { credentials: 'include' });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!data.trends || !data.trends.length) {
+      area.innerHTML = '<div style="padding:24px;background:var(--surface);border-radius:16px;border:1px solid var(--card-border);text-align:center;color:var(--muted)">No cross-platform trends detected in the last 14 days. This improves as more data is collected across platforms.</div>';
+      return;
+    }
+    area.innerHTML = data.trends.map(function(t) {
+      var pathHtml = t.spread_path.split(' → ').map(function(p, i, arr) {
+        var html = '<span class="spread-node ' + p + '">' + esc(p.charAt(0).toUpperCase() + p.slice(1)) + '</span>';
+        if (i < arr.length - 1) html += '<span class="spread-arrow">→</span>';
+        return html;
+      }).join('');
+      return '<div class="crossplat-card">' +
+        '<div style="font-weight:600;font-size:1.05rem;margin-bottom:4px">' + esc(t.topic) + '</div>' +
+        '<div class="spread-path">' + pathHtml + '</div>' +
+        '<div class="crossplat-insight">' + esc(t.insight) + '</div></div>';
+    }).join('');
+  } catch (err) {
+    area.innerHTML = '<div class="loading" style="color:var(--red)">' + esc(err.message) + '</div>';
+  }
+}
 
 // ── BYOAK ──
 function renderByoak() {
