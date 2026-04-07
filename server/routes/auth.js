@@ -16,12 +16,12 @@ router.post('/signup', async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
-    if (db.findUserByEmail(email)) {
+    if (await db.findUserByEmail(email)) {
       return res.status(409).json({ error: 'Email already registered.' });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = db.createUser({ email, passwordHash, name });
+    const user = await db.createUser({ email, passwordHash, name });
     req.session.userId = user.id;
 
     res.status(201).json({
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password required.' });
     }
 
-    const user = db.findUserByEmail(email);
+    const user = await db.findUserByEmail(email);
     if (!user || !user.password_hash) {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
@@ -68,21 +68,25 @@ router.post('/logout', (req, res) => {
 });
 
 // ── Current user ───────────────────────────────────
-router.get('/me', (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: 'Not authenticated.' });
+router.get('/me', async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated.' });
+    }
+    const user = await db.findUserById(req.session.userId);
+    if (!user) return res.status(401).json({ error: 'User not found.' });
+
+    const sub = await db.findSubscription(user.id);
+    const { remaining, limit } = await db.checkRateLimit(user.id, user.plan);
+
+    res.json({
+      user: sanitize(user),
+      subscription: sub ? { plan: sub.plan, status: sub.status, period_end: sub.current_period_end, trial_end: sub.trial_end } : null,
+      usage: { remaining, limit },
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
   }
-  const user = db.findUserById(req.session.userId);
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-
-  const sub = db.findSubscription(user.id);
-  const { remaining, limit } = db.checkRateLimit(user.id, user.plan);
-
-  res.json({
-    user: sanitize(user),
-    subscription: sub ? { plan: sub.plan, status: sub.status, period_end: sub.current_period_end, trial_end: sub.trial_end } : null,
-    usage: { remaining, limit },
-  });
 });
 
 // ── Mock OAuth routes ──────────────────────────────
@@ -96,27 +100,31 @@ OAUTH_PROVIDERS.forEach((provider) => {
   });
 
   // Callback (mock: create/find user by email)
-  router.post(`/${provider}/callback`, (req, res) => {
-    const { email, name } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Email required for OAuth.' });
-    }
+  router.post(`/${provider}/callback`, async (req, res) => {
+    try {
+      const { email, name } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: 'Email required for OAuth.' });
+      }
 
-    let user = db.findUserByEmail(email);
-    if (!user) {
-      user = db.createUser({
-        email,
-        name: name || email.split('@')[0],
-        provider,
-        providerId: `${provider}_${Date.now()}`,
+      let user = await db.findUserByEmail(email);
+      if (!user) {
+        user = await db.createUser({
+          email,
+          name: name || email.split('@')[0],
+          provider,
+          providerId: `${provider}_${Date.now()}`,
+        });
+      }
+
+      req.session.userId = user.id;
+      res.json({
+        message: `Signed in with ${provider}.`,
+        user: sanitize(user),
       });
+    } catch (err) {
+      res.status(500).json({ error: 'Server error.' });
     }
-
-    req.session.userId = user.id;
-    res.json({
-      message: `Signed in with ${provider}.`,
-      user: sanitize(user),
-    });
   });
 });
 

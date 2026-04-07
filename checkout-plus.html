@@ -565,6 +565,8 @@
     <a href="checkout-pro.html">Upgrade to Pro — $24.99 /mo</a>
   </div>
 
+  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
+
 </div>
 
 <script>
@@ -747,7 +749,8 @@ document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observ
         body: JSON.stringify({plan:'plus'})
       });
     }).then(function(r){return r.json()}).then(function(data){
-      if (data.checkout_url) window.location.href = data.checkout_url;
+      if (data.url) window.location.href = data.url;
+      else if (data.checkout_url) window.location.href = data.checkout_url;
       else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = 'Subscribe — $9.99 /mo'; }
     }).catch(function(){
       alert('Something went wrong. Please try again.');

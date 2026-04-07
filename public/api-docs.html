@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wavecrest Pro API Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#000;--surface:#1d1d1f;--surface2:#161618;--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a;--purple:#bf5af2;--border:rgba(255,255,255,.08)}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;line-height:1.6;display:flex;flex-direction:column;min-height:100vh}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:18px;font-weight:600;color:var(--text)}
+.nav-logo b{color:var(--blue)}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-links a{color:var(--muted);font-size:14px;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);text-decoration:none}
+.version-badge{background:var(--surface);color:var(--muted);padding:2px 10px;border-radius:980px;font-size:12px;border:1px solid var(--border)}
+/* Layout */
+.layout{display:flex;flex:1}
+/* Sidebar */
+.sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;overflow-y:auto;position:sticky;top:52px;height:calc(100vh - 52px)}
+.sb-group{margin-bottom:8px}
+.sb-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:12px 20px 6px}
+.sb-link{display:flex;align-items:center;gap:8px;padding:6px 20px;font-size:13px;color:var(--text);transition:background .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-link:hover{background:rgba(255,255,255,.04);text-decoration:none}
+.sb-link.active{background:rgba(0,113,227,.15);color:var(--blue)}
+.method-sm{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;min-width:36px;text-align:center;display:inline-block}
+.method-sm.get{background:rgba(48,209,88,.15);color:var(--green)}
+.method-sm.post{background:rgba(0,113,227,.15);color:var(--blue)}
+.method-sm.delete{background:rgba(255,69,58,.15);color:var(--red)}
+/* Hamburger */
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer}
+/* Main */
+.main{flex:1;padding:32px 40px;max-width:900px}
+/* Intro */
+.intro{margin-bottom:40px}
+.intro h1{font-size:32px;font-weight:700;margin-bottom:8px}
+.intro p{color:var(--muted);font-size:16px;max-width:600px}
+/* Getting Started */
+.gs-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+.gs-card h3{font-size:16px;margin-bottom:12px}
+.gs-card code{background:var(--surface2);padding:2px 6px;border-radius:6px;font-size:13px}
+.gs-card table{width:100%;border-collapse:collapse;margin:12px 0}
+.gs-card th,.gs-card td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.gs-card th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+/* Tag sections */
+.tag-heading{font-size:24px;font-weight:700;margin:40px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+/* Endpoint cards */
+.endpoint{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.ep-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.method-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;text-transform:uppercase}
+.method-badge.get{background:rgba(48,209,88,.15);color:var(--green)}
+.method-badge.post{background:rgba(0,113,227,.15);color:var(--blue)}
+.method-badge.delete{background:rgba(255,69,58,.15);color:var(--red)}
+.ep-path{font-size:15px;color:var(--text);background:var(--surface2);padding:4px 10px;border-radius:6px}
+.badge{font-size:11px;padding:2px 8px;border-radius:980px;font-weight:600}
+.badge.auth{background:rgba(255,159,10,.12);color:var(--orange)}
+.badge.plan{background:rgba(48,209,88,.12);color:var(--green)}
+.ep-desc{color:var(--muted);font-size:14px;margin-bottom:16px}
+/* Params */
+.params{margin-bottom:16px}
+.params h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--muted)}
+.params table{width:100%;border-collapse:collapse}
+.params th,.params td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);font-size:13px}
+.params th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.params code{background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:12px}
+/* Code tabs */
+.code-tabs{margin-bottom:16px}
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:0}
+.tab{background:none;border:none;color:var(--muted);padding:8px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-content{display:none;position:relative}
+.tab-content.active{display:block}
+.tab-content pre{background:var(--surface2);padding:16px;border-radius:0 0 12px 12px;overflow-x:auto;font-size:13px;line-height:1.5}
+.tab-content code{color:var(--text);font-family:"SF Mono",Monaco,Consolas,monospace}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:12px;transition:color .15s}
+.copy-btn:hover{color:var(--text)}
+/* Responses */
+.response{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:13px}
+.response.ok{background:rgba(48,209,88,.06);border:1px solid rgba(48,209,88,.15)}
+.response.err{background:rgba(255,69,58,.06);border:1px solid rgba(255,69,58,.15)}
+.resp-code{font-weight:700;font-size:12px;margin-right:6px}
+.response pre{margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;font-size:12px}
+.response code{font-family:"SF Mono",Monaco,Consolas,monospace;color:var(--text)}
+/* Footer */
+.footer{text-align:center;padding:32px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+/* Mobile */
+@media(max-width:768px){
+  .sidebar{display:none;position:fixed;top:52px;left:0;width:280px;height:calc(100vh - 52px);z-index:99;box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .sidebar.open{display:block}
+  .hamburger{display:block}
+  .main{padding:20px 16px}
+  .intro h1{font-size:24px}
+  .ep-header{flex-direction:column;align-items:flex-start;gap:6px}
+  .params table{font-size:12px}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:16px">
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <a href="/index.html" class="nav-logo">Wavecrest <b>Pro</b> API</a>
+  </div>
+  <div class="nav-links">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/analytics.html">Analytics</a>
+    <span class="version-badge">v1.0</span>
+  </div>
+</nav>
+
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sb-group">
+    <div class="sb-title">Getting Started</div>
+    <a class="sb-link" href="#getting-started">Overview</a>
+    <a class="sb-link" href="#auth-info">Authentication</a>
+    <a class="sb-link" href="#rate-limits">Rate Limits</a>
+    <a class="sb-link" href="#errors">Error Handling</a>
+  </div>
+  <div class="sb-group"><div class="sb-title">Auth API</div>
+  <a class="sb-link" href="#post-api_auth_signup" data-method="POST"><span class="method-sm post">POST</span> /api/auth/signup</a>
+  <a class="sb-link" href="#post-api_auth_login" data-method="POST"><span class="method-sm post">POST</span> /api/auth/login</a>
+  <a class="sb-link" href="#post-api_auth_logout" data-method="POST"><span class="method-sm post">POST</span> /api/auth/logout</a>
+  <a class="sb-link" href="#get-api_auth_me" data-method="GET"><span class="method-sm get">GET</span> /api/auth/me</a>
+  <a class="sb-link" href="#post-api_auth_provider_callback" data-method="POST"><span class="method-sm post">POST</span> /api/auth/{provider}/callback</a>
+</div>
+<div class="sb-group"><div class="sb-title">Trends API</div>
+  <a class="sb-link" href="#get-api_trends" data-method="GET"><span class="method-sm get">GET</span> /api/trends</a>
+  <a class="sb-link" href="#get-api_trends_search" data-method="GET"><span class="method-sm get">GET</span> /api/trends/search</a>
+  <a class="sb-link" href="#get-api_trends_history" data-method="GET"><span class="method-sm get">GET</span> /api/trends/history</a>
+  <a class="sb-link" href="#get-api_trends_platforms" data-method="GET"><span class="method-sm get">GET</span> /api/trends/platforms</a>
+</div>
+<div class="sb-group"><div class="sb-title">Dashboard API</div>
+  <a class="sb-link" href="#get-api_dashboard" data-method="GET"><span class="method-sm get">GET</span> /api/dashboard</a>
+  <a class="sb-link" href="#get-api_dashboard_export" data-method="GET"><span class="method-sm get">GET</span> /api/dashboard/export</a>
+  <a class="sb-link" href="#get-api_dashboard_api-keys" data-method="GET"><span class="method-sm get">GET</span> /api/dashboard/api-keys</a>
+  <a class="sb-link" href="#post-api_dashboard_api-keys" data-method="POST"><span class="method-sm post">POST</span> /api/dashboard/api-keys</a>
+  <a class="sb-link" href="#delete-api_dashboard_api-keys_id" data-method="DELETE"><span class="method-sm delete">DELETE</span> /api/dashboard/api-keys/{id}</a>
+</div>
+<div class="sb-group"><div class="sb-title">Billing API</div>
+  <a class="sb-link" href="#get-api_stripe_plans" data-method="GET"><span class="method-sm get">GET</span> /api/stripe/plans</a>
+  <a class="sb-link" href="#post-api_stripe_create-checkout" data-method="POST"><span class="method-sm post">POST</span> /api/stripe/create-checkout</a>
+  <a class="sb-link" href="#post-api_stripe_portal" data-method="POST"><span class="method-sm post">POST</span> /api/stripe/portal</a>
+  <a class="sb-link" href="#post-api_stripe_cancel" data-method="POST"><span class="method-sm post">POST</span> /api/stripe/cancel</a>
+</div>
+<div class="sb-group"><div class="sb-title">Analytics API</div>
+  <a class="sb-link" href="#get-api_analytics_velocity" data-method="GET"><span class="method-sm get">GET</span> /api/analytics/velocity</a>
+  <a class="sb-link" href="#get-api_analytics_platforms" data-method="GET"><span class="method-sm get">GET</span> /api/analytics/platforms</a>
+  <a class="sb-link" href="#get-api_analytics_top-trends" data-method="GET"><span class="method-sm get">GET</span> /api/analytics/top-trends</a>
+  <a class="sb-link" href="#get-api_analytics_stats" data-method="GET"><span class="method-sm get">GET</span> /api/analytics/stats</a>
+</div>
+
+</aside>
+
+<main class="main">
+  <div class="intro">
+    <h1>API Documentation</h1>
+    <p>Complete reference for the Wavecrest Pro REST API. Integrate trend intelligence into your own tools and workflows.</p>
+  </div>
+
+  <!-- Getting Started -->
+  <section id="getting-started">
+    <div class="gs-card">
+      <h3>Base URL</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:8px">All endpoints are relative to:</p>
+      <pre style="background:var(--surface2);padding:12px;border-radius:8px;font-size:14px"><code>http://localhost:3000</code>  <span style="color:var(--muted)">← development</span>
+<code>https://wavecrest.pro</code>  <span style="color:var(--muted)">← production</span></pre>
+    </div>
+
+    <div class="gs-card" id="auth-info">
+      <h3>Authentication</h3>
+      <p style="color:var(--muted);font-size:14px">Session-based authentication using HTTP cookies. Sign up or log in first, then include <code>credentials: 'include'</code> in fetch requests or <code>-b cookies.txt</code> with cURL.</p>
+    </div>
+
+    <div class="gs-card" id="rate-limits">
+      <h3>Rate Limits</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:12px">Daily request limits vary by plan. Check headers <code>X-RateLimit-Limit</code> and <code>X-RateLimit-Remaining</code>.</p>
+      <table>
+        <thead><tr><th>Plan</th><th>Daily Limit</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td>Free</td><td>10</td><td>$0</td></tr>
+          <tr><td>Plus</td><td>50</td><td>$9.99/mo</td></tr>
+          <tr><td>Pro</td><td>500</td><td>$24.99/mo</td></tr>
+          <tr><td>Max</td><td>Unlimited</td><td>$99.99/mo</td></tr>
+          <tr><td>Teams</td><td>Unlimited</td><td>$49.99/person/mo</td></tr>
+          <tr><td>Enterprise</td><td>Unlimited</td><td>Custom</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="gs-card" id="errors">
+      <h3>Error Handling</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:12px">All errors return JSON with an <code>error</code> field:</p>
+      <pre style="background:var(--surface2);padding:12px;border-radius:8px;font-size:13px"><code>{"error": "Description of what went wrong"}</code></pre>
+      <table style="margin-top:12px">
+        <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>400</code></td><td>Bad request — missing or invalid parameters</td></tr>
+          <tr><td><code>401</code></td><td>Not authenticated — sign in first</td></tr>
+          <tr><td><code>403</code></td><td>Plan upgrade required</td></tr>
+          <tr><td><code>404</code></td><td>Resource not found</td></tr>
+          <tr><td><code>429</code></td><td>Rate limit exceeded</td></tr>
+          <tr><td><code>500</code></td><td>Internal server error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Endpoint Sections -->
+  <section class="tag-section" id="tag-auth"><h2 class="tag-heading">Auth API</h2>
+<div class="endpoint" id="post-api_auth_signup">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/auth/signup</code>
+    
+  </div>
+  <p class="ep-desc">Register a new user account with email and password. A session cookie is automatically set on success.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/auth/signup \
+  -H 'Content-Type: application/json' \
+  -d '{}'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/auth/signup', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/auth/signup', json={})
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">201</span> Account created successfully<pre><code>{
+  "message": "Account created successfully",
+  "user": {
+    "id": 1,
+    "email": "you@example.com",
+    "name": "Efe",
+    "plan": "free",
+    "provider": "local",
+    "created_at": "2025-01-15T10:30:00.000Z"
+  }
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> Validation error (missing fields or email already exists)<pre><code>{
+  "error": "Email already registered"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_auth_login">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/auth/login</code>
+    
+  </div>
+  <p class="ep-desc">Authenticate with email and password. A session cookie is set on success.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{}'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/auth/login', json={})
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Login successful<pre><code>{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "email": "you@example.com",
+    "name": "Efe",
+    "plan": "pro",
+    "provider": "local",
+    "created_at": "2025-01-15T10:30:00.000Z"
+  }
+}</code></pre></div><div class="response err"><span class="resp-code">401</span> Invalid credentials<pre><code>{
+  "error": "Invalid email or password"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_auth_logout">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/auth/logout</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Destroy the current session and clear the session cookie.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/auth/logout \
+  -H 'Content-Type: application/json'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/auth/logout', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/auth/logout')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Logged out successfully<pre><code>{
+  "message": "Logged out successfully"
+}</code></pre></div><div class="response err"><span class="resp-code">401</span> Not authenticated<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_auth_me">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/auth/me</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Returns the currently authenticated user's profile and plan information.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/auth/me</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/auth/me', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/auth/me')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Current user info<pre><code>{
+  "id": 1,
+  "email": "you@example.com",
+  "name": "Efe",
+  "plan": "pro",
+  "provider": "local",
+  "created_at": "2025-01-15T10:30:00.000Z"
+}</code></pre></div><div class="response err"><span class="resp-code">401</span> Not authenticated<pre><code>{
+  "error": "Not authenticated"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_auth_provider_callback">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/auth/{provider}/callback</code>
+    
+  </div>
+  <p class="ep-desc">Handle OAuth callback from a third-party provider (e.g., Google, GitHub). Exchanges the authorization code for a session.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>provider</code></td><td>string</td><td>path</td><td>✓</td><td>OAuth provider name</td></tr></tbody></table></div>
+  <div class="params"><h4>Request Body</h4><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>code</code></td><td>string</td><td>✓</td><td>Authorization code from OAuth provider</td></tr></tbody></table></div>
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/auth/{provider}/callback \
+  -H 'Content-Type: application/json' \
+  -d '{"code": "example_code"}'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/auth/{provider}/callback', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({"code": "..."})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/auth/{provider}/callback', json={"code": "..."})
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> OAuth login successful<pre><code>{
+  "message": "Login successful",
+  "user": {
+    "id": 2,
+    "email": "you@gmail.com",
+    "name": "Efe",
+    "plan": "free",
+    "provider": "google",
+    "created_at": "2025-01-16T08:00:00.000Z"
+  }
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> Invalid or expired authorization code<pre><code>{
+  "error": "Invalid authorization code"
+}</code></pre></div>
+</div>
+</section>
+<section class="tag-section" id="tag-trends"><h2 class="tag-heading">Trends API</h2>
+<div class="endpoint" id="get-api_trends">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/trends</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Retrieve the latest trending topics across all platforms. Free users see a limited subset; paid plans unlock full results.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>date</code></td><td>string</td><td>query</td><td>—</td><td>Filter trends by date (YYYY-MM-DD). Defaults to today.</td></tr><tr><td><code>platform</code></td><td>string</td><td>query</td><td>—</td><td>Filter by platform name</td></tr><tr><td><code>score</code></td><td>integer</td><td>query</td><td>—</td><td>Minimum trend score (0-100)</td></tr><tr><td><code>limit</code></td><td>integer</td><td>query</td><td>—</td><td>Number of results to return (default 20, max 100)</td></tr><tr><td><code>offset</code></td><td>integer</td><td>query</td><td>—</td><td>Pagination offset</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/trends</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/trends', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/trends')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> List of trending topics<pre><code>{
+  "date": "2025-01-15",
+  "trends": [
+    {
+      "id": 142,
+      "topic": "Apple Vision Pro 2",
+      "score": 94,
+      "platform": "twitter",
+      "category": "technology",
+      "fetched_at": "2025-01-15T14:30:00.000Z"
+    },
+    {
+      "id": 143,
+      "topic": "Super Bowl LIX",
+      "score": 91,
+      "platform": "google",
+      "category": "sports",
+      "fetched_at": "2025-01-15T14:30:00.000Z"
+    }
+  ],
+  "total": 248,
+  "user_plan": "pro"
+}</code></pre></div><div class="response err"><span class="resp-code">401</span> Not authenticated<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_trends_search">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/trends/search</code>
+    <span class="badge auth">Auth Required</span><span class="badge plan">Pro+</span>
+  </div>
+  <p class="ep-desc">Full-text search across all trending topics. Requires Pro plan or higher.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>q</code></td><td>string</td><td>query</td><td>✓</td><td>Search query string</td></tr><tr><td><code>platform</code></td><td>string</td><td>query</td><td>—</td><td>Filter results by platform</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/trends/search</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/trends/search', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/trends/search')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Search results<pre><code>{
+  "query": "AI",
+  "platform": null,
+  "count": 12,
+  "results": [
+    {
+      "topic": "OpenAI GPT-5 Launch",
+      "score": 97,
+      "platform": "twitter",
+      "fetched_at": "2025-01-15T14:30:00.000Z"
+    },
+    {
+      "topic": "AI Video Generation",
+      "score": 85,
+      "platform": "youtube",
+      "fetched_at": "2025-01-15T12:00:00.000Z"
+    }
+  ]
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> Missing search query<pre><code>{
+  "error": "Query parameter 'q' is required"
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan upgrade required (Pro+ only)<pre><code>{
+  "error": "Search requires a Pro plan or higher"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_trends_history">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/trends/history</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Retrieve trend data for a specific topic over a date range. Useful for tracking how a topic's popularity changes over time.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>topic</code></td><td>string</td><td>query</td><td>✓</td><td>Topic name to look up</td></tr><tr><td><code>days</code></td><td>integer</td><td>query</td><td>—</td><td>Number of days of history (default 7, max 90)</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/trends/history</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/trends/history', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/trends/history')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Historical data for the topic<pre><code>{
+  "topic": "Apple Vision Pro 2",
+  "days": 7,
+  "history": [
+    {
+      "date": "2025-01-09",
+      "score": 42,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-10",
+      "score": 55,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-11",
+      "score": 68,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-12",
+      "score": 74,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-13",
+      "score": 82,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-14",
+      "score": 89,
+      "platform": "twitter"
+    },
+    {
+      "date": "2025-01-15",
+      "score": 94,
+      "platform": "twitter"
+    }
+  ]
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> Missing topic parameter<pre><code>{
+  "error": "Query parameter 'topic' is required"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_trends_platforms">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/trends/platforms</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Returns a list of all platforms from which Wavecrest aggregates trending data, along with their current status.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/trends/platforms</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/trends/platforms', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/trends/platforms')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> List of platforms<pre><code>{
+  "platforms": [
+    {
+      "id": "twitter",
+      "name": "Twitter / X",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:30:00.000Z"
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:28:00.000Z"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:25:00.000Z"
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:20:00.000Z"
+    },
+    {
+      "id": "google",
+      "name": "Google Trends",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:15:00.000Z"
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "status": "active",
+      "last_fetch": "2025-01-15T14:10:00.000Z"
+    }
+  ]
+}</code></pre></div>
+</div>
+</section>
+<section class="tag-section" id="tag-dashboard"><h2 class="tag-heading">Dashboard API</h2>
+<div class="endpoint" id="get-api_dashboard">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/dashboard</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Returns a comprehensive dashboard view including user info, subscription status, API usage, today's trends, and available features for the current plan.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/dashboard</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/dashboard', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/dashboard')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Dashboard data<pre><code>{
+  "user": {
+    "id": 1,
+    "email": "you@example.com",
+    "name": "Efe",
+    "plan": "pro"
+  },
+  "subscription": {
+    "plan": "pro",
+    "status": "active",
+    "current_period_end": "2025-02-15T00:00:00.000Z"
+  },
+  "usage": {
+    "today": 23,
+    "limit": 500,
+    "remaining": 477
+  },
+  "trends": {
+    "date": "2025-01-15",
+    "total": 248,
+    "items": [
+      {
+        "topic": "Apple Vision Pro 2",
+        "score": 94,
+        "platform": "twitter"
+      },
+      {
+        "topic": "Super Bowl LIX",
+        "score": 91,
+        "platform": "google"
+      }
+    ],
+    "locked_count": 0
+  },
+  "features": {
+    "search": true,
+    "export": true,
+    "analytics": true,
+    "api_keys": true,
+    "history_days": 90
+  }
+}</code></pre></div><div class="response err"><span class="resp-code">401</span> Not authenticated<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_dashboard_export">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/dashboard/export</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Export the current day's trending topics as a downloadable CSV file. Requires Plus plan or higher.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>date</code></td><td>string</td><td>query</td><td>—</td><td>Date to export (YYYY-MM-DD). Defaults to today.</td></tr><tr><td><code>platform</code></td><td>string</td><td>query</td><td>—</td><td>Filter export by platform</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/dashboard/export</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/dashboard/export', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/dashboard/export')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> CSV file download</div><div class="response err"><span class="resp-code">403</span> Plan upgrade required (Plus+ only)<pre><code>{
+  "error": "Export requires a Plus plan or higher"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_dashboard_api-keys">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/dashboard/api-keys</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Retrieve all API keys associated with your account. Keys are partially masked for security.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/dashboard/api-keys</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/dashboard/api-keys', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/dashboard/api-keys')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> List of API keys<pre><code>{
+  "keys": [
+    {
+      "id": 1,
+      "name": "Production App",
+      "key": "wc_pro_****...a3f2",
+      "created_at": "2025-01-10T09:00:00.000Z",
+      "last_used": "2025-01-15T13:45:00.000Z"
+    }
+  ]
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_dashboard_api-keys">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/dashboard/api-keys</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Generate a new API key for programmatic access. The full key is only shown once on creation.</p>
+  
+  <div class="params"><h4>Request Body</h4><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>name</code></td><td>string</td><td>✓</td><td>A descriptive name for this API key</td></tr></tbody></table></div>
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/dashboard/api-keys \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "example_name"}'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/dashboard/api-keys', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({"name": "..."})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/dashboard/api-keys', json={"name": "..."})
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">201</span> API key created<pre><code>{
+  "message": "API key created",
+  "key": {
+    "id": 2,
+    "name": "Production App",
+    "key": "wc_pro_sk_live_abc123def456ghi789jkl012mno345",
+    "created_at": "2025-01-15T15:00:00.000Z"
+  }
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan does not support API keys<pre><code>{
+  "error": "API keys require a Pro plan or higher"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="delete-api_dashboard_api-keys_id">
+  <div class="ep-header">
+    <span class="method-badge delete">DELETE</span>
+    <code class="ep-path">/api/dashboard/api-keys/{id}</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Permanently revoke and delete an API key. This action cannot be undone.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>id</code></td><td>integer</td><td>path</td><td>✓</td><td>API key ID to delete</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X DELETE http://localhost:3000/api/dashboard/api-keys/{id}</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/dashboard/api-keys/{id}', {
+  method: 'DELETE',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.delete('http://localhost:3000/api/dashboard/api-keys/{id}')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> API key deleted<pre><code>{
+  "message": "API key deleted"
+}</code></pre></div><div class="response err"><span class="resp-code">404</span> API key not found<pre><code>{
+  "error": "API key not found"
+}</code></pre></div>
+</div>
+</section>
+<section class="tag-section" id="tag-billing"><h2 class="tag-heading">Billing API</h2>
+<div class="endpoint" id="get-api_stripe_plans">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/stripe/plans</code>
+    
+  </div>
+  <p class="ep-desc">Returns all available subscription plans with their features and pricing.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/stripe/plans</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/stripe/plans', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/stripe/plans')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Available plans<pre><code>{
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free",
+      "price": 0,
+      "interval": null,
+      "daily_limit": 10,
+      "features": [
+        "5 trends per day",
+        "Basic platforms"
+      ]
+    },
+    {
+      "id": "plus",
+      "name": "Plus",
+      "price": 9,
+      "interval": "month",
+      "daily_limit": 50,
+      "features": [
+        "50 requests/day",
+        "All platforms",
+        "CSV export"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price": 29,
+      "interval": "month",
+      "daily_limit": 500,
+      "features": [
+        "500 requests/day",
+        "Search",
+        "Analytics",
+        "API keys",
+        "90-day history"
+      ]
+    },
+    {
+      "id": "max",
+      "name": "Max",
+      "price": 79,
+      "interval": "month",
+      "daily_limit": null,
+      "features": [
+        "Unlimited requests",
+        "Priority support",
+        "Custom alerts",
+        "Webhooks"
+      ]
+    }
+  ]
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_stripe_create-checkout">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/stripe/create-checkout</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Initiate a Stripe Checkout session for subscribing to a paid plan. Returns a URL to redirect the user to Stripe's hosted checkout page.</p>
+  
+  <div class="params"><h4>Request Body</h4><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>plan</code></td><td>string</td><td>✓</td><td>Plan ID to subscribe to</td></tr></tbody></table></div>
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/stripe/create-checkout \
+  -H 'Content-Type: application/json' \
+  -d '{"plan": "example_plan"}'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/stripe/create-checkout', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({"plan": "..."})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/stripe/create-checkout', json={"plan": "..."})
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Checkout session created<pre><code>{
+  "url": "https://checkout.stripe.com/c/pay/cs_live_abc123..."
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> Invalid plan<pre><code>{
+  "error": "Invalid plan selected"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_stripe_portal">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/stripe/portal</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Create a Stripe Customer Portal session. The portal allows users to manage their subscription, update payment methods, and view invoices.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/stripe/portal \
+  -H 'Content-Type: application/json'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/stripe/portal', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/stripe/portal')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Portal session created<pre><code>{
+  "url": "https://billing.stripe.com/p/session/abc123..."
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> No active subscription<pre><code>{
+  "error": "No active subscription found"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="post-api_stripe_cancel">
+  <div class="ep-header">
+    <span class="method-badge post">POST</span>
+    <code class="ep-path">/api/stripe/cancel</code>
+    <span class="badge auth">Auth Required</span>
+  </div>
+  <p class="ep-desc">Cancel the current subscription. The subscription remains active until the end of the current billing period, then downgrades to the Free plan.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt -X POST http://localhost:3000/api/stripe/cancel \
+  -H 'Content-Type: application/json'</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/stripe/cancel', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({})
+});
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.post('http://localhost:3000/api/stripe/cancel')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Subscription cancelled<pre><code>{
+  "message": "Subscription cancelled. Active until end of billing period.",
+  "effective_date": "2025-02-15T00:00:00.000Z"
+}</code></pre></div><div class="response err"><span class="resp-code">400</span> No active subscription to cancel<pre><code>{
+  "error": "No active subscription to cancel"
+}</code></pre></div>
+</div>
+</section>
+<section class="tag-section" id="tag-analytics"><h2 class="tag-heading">Analytics API</h2>
+<div class="endpoint" id="get-api_analytics_velocity">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/analytics/velocity</code>
+    <span class="badge auth">Auth Required</span><span class="badge plan">Pro+</span>
+  </div>
+  <p class="ep-desc">Returns the number of new trends detected per day over a given period, along with the daily average. Requires Pro plan or higher.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>days</code></td><td>integer</td><td>query</td><td>—</td><td>Number of days to analyze (default 7, max 90)</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/analytics/velocity</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/analytics/velocity', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/analytics/velocity')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Velocity data<pre><code>{
+  "days": 7,
+  "dates": [
+    "2025-01-09",
+    "2025-01-10",
+    "2025-01-11",
+    "2025-01-12",
+    "2025-01-13",
+    "2025-01-14",
+    "2025-01-15"
+  ],
+  "counts": [
+    180,
+    210,
+    195,
+    220,
+    248,
+    232,
+    248
+  ],
+  "avg": 219
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan upgrade required (Pro+ only)<pre><code>{
+  "error": "Analytics requires a Pro plan or higher"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_analytics_platforms">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/analytics/platforms</code>
+    <span class="badge auth">Auth Required</span><span class="badge plan">Pro+</span>
+  </div>
+  <p class="ep-desc">Returns the distribution of trending topics across platforms for the current day. Requires Pro plan or higher.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/analytics/platforms</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/analytics/platforms', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/analytics/platforms')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Platform distribution<pre><code>{
+  "date": "2025-01-15",
+  "total": 248,
+  "platforms": [
+    {
+      "platform": "twitter",
+      "count": 62,
+      "percentage": 25.0
+    },
+    {
+      "platform": "reddit",
+      "count": 48,
+      "percentage": 19.4
+    },
+    {
+      "platform": "tiktok",
+      "count": 45,
+      "percentage": 18.1
+    },
+    {
+      "platform": "youtube",
+      "count": 38,
+      "percentage": 15.3
+    },
+    {
+      "platform": "google",
+      "count": 35,
+      "percentage": 14.1
+    },
+    {
+      "platform": "github",
+      "count": 20,
+      "percentage": 8.1
+    }
+  ]
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan upgrade required<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_analytics_top-trends">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/analytics/top-trends</code>
+    <span class="badge auth">Auth Required</span><span class="badge plan">Pro+</span>
+  </div>
+  <p class="ep-desc">Returns the highest-scoring trending topics across all platforms, optionally filtered by time range. Requires Pro plan or higher.</p>
+  <div class="params"><h4>Parameters</h4><table><thead><tr><th>Name</th><th>Type</th><th>In</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td><code>days</code></td><td>integer</td><td>query</td><td>—</td><td>Look-back period in days (default 1, max 30)</td></tr><tr><td><code>limit</code></td><td>integer</td><td>query</td><td>—</td><td>Number of top trends to return (default 10, max 50)</td></tr></tbody></table></div>
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/analytics/top-trends</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/analytics/top-trends', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/analytics/top-trends')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Top trending topics<pre><code>{
+  "days": 1,
+  "count": 10,
+  "trends": [
+    {
+      "topic": "OpenAI GPT-5 Launch",
+      "score": 97,
+      "platform": "twitter",
+      "category": "technology"
+    },
+    {
+      "topic": "Apple Vision Pro 2",
+      "score": 94,
+      "platform": "twitter",
+      "category": "technology"
+    },
+    {
+      "topic": "Super Bowl LIX",
+      "score": 91,
+      "platform": "google",
+      "category": "sports"
+    },
+    {
+      "topic": "Bitcoin ATH",
+      "score": 89,
+      "platform": "reddit",
+      "category": "finance"
+    },
+    {
+      "topic": "GTA VI Trailer 2",
+      "score": 88,
+      "platform": "youtube",
+      "category": "gaming"
+    }
+  ]
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan upgrade required<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+<div class="endpoint" id="get-api_analytics_stats">
+  <div class="ep-header">
+    <span class="method-badge get">GET</span>
+    <code class="ep-path">/api/analytics/stats</code>
+    <span class="badge auth">Auth Required</span><span class="badge plan">Pro+</span>
+  </div>
+  <p class="ep-desc">Returns high-level statistics about the trend database: total trends tracked, platforms active, average daily trends, and more. Requires Pro plan or higher.</p>
+  
+  
+  <div class="code-tabs">
+    <div class="tab-bar"><button class="tab active" data-lang="curl">cURL</button><button class="tab" data-lang="js">JavaScript</button><button class="tab" data-lang="py">Python</button></div>
+    <div class="tab-content active" data-lang="curl"><pre><code>curl -s -b cookies.txt http://localhost:3000/api/analytics/stats</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="js"><pre><code>const res = await fetch('/api/analytics/stats', { credentials: 'include' });
+const data = await res.json();</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+    <div class="tab-content" data-lang="py"><pre><code>import requests
+res = requests.get('http://localhost:3000/api/analytics/stats')
+data = res.json()</code></pre><button class="copy-btn" title="Copy">📋</button></div>
+  </div>
+  <div class="response ok"><span class="resp-code">200</span> Aggregate statistics<pre><code>{
+  "total_trends": 18420,
+  "total_platforms": 6,
+  "avg_daily_trends": 219,
+  "avg_score": 64.3,
+  "top_platform": "twitter",
+  "top_category": "technology",
+  "data_since": "2024-06-01T00:00:00.000Z",
+  "last_updated": "2025-01-15T14:30:00.000Z"
+}</code></pre></div><div class="response err"><span class="resp-code">403</span> Plan upgrade required<pre><code>{
+  "$ref": "#/components/schemas/ErrorResponse"
+}</code></pre></div>
+</div>
+</section>
+
+
+  <footer class="footer">
+    Wavecrest Pro · <a href="/index.html">Home</a> · <a href="/dashboard.html">Dashboard</a> · <a href="api-docs.json" target="_blank">OpenAPI Spec</a> · © 2026
+  </footer>
+</main>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-bar').forEach(bar => {
+  bar.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const lang = tab.dataset.lang;
+      const parent = bar.closest('.code-tabs');
+      parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      parent.querySelector(`.tab-content[data-lang="${lang}"]`).classList.add('active');
+    });
+  });
+});
+
+// Copy buttons
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const code = btn.parentElement.querySelector('code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = '✓';
+      setTimeout(() => btn.textContent = '📋', 1500);
+    });
+  });
+});
+
+// Sidebar active state on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.sb-link[href="#${id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-80px 0px -60% 0px' });
+
+document.querySelectorAll('.endpoint, section[id]').forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('.sb-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelector('.sidebar').classList.remove('open');
+  });
+});
+
+// Close sidebar on outside click (mobile)
+document.querySelector('.main').addEventListener('click', () => {
+  document.querySelector('.sidebar').classList.remove('open');
+});
+</script>
+</body>
+</html>

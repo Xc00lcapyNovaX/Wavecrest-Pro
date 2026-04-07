@@ -1,31 +1,46 @@
 /**
  * Wavecrest Pro — Express Server
- * In-memory DB + mock OAuth/Stripe. Replace with real services later.
+ * PostgreSQL-backed. Supports real Stripe (when keys are set) or mock mode.
  */
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === 'production';
+
+// ── Trust proxy (required behind Vercel/nginx) ─────
+if (isProd) app.set('trust proxy', 1);
 
 // ── Middleware ──────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+app.use(cors({
+  origin: isProd ? (process.env.BASE_URL || 'https://wavecrest.pro') : true,
+  credentials: true,
+}));
+app.use((req, res, next) => {
+  // Skip JSON parsing for Stripe webhooks — they need raw body
+  if (req.originalUrl === '/api/stripe/webhook') return next();
+  express.json()(req, res, next);
+});
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
+  store: new pgSession({ pool: db.pool, tableName: 'session' }),
   secret: process.env.SESSION_SECRET || 'wavecrest-dev-secret',
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: false, // Set to true in production with HTTPS
+    secure: isProd,
     sameSite: 'lax',
   },
 }));
@@ -35,10 +50,12 @@ app.use(express.static(path.join(__dirname, '..')));       // serves index.html,
 app.use(express.static(path.join(__dirname, '..', 'public'))); // serves signin.html, dashboard.html, etc.
 
 // ── API Routes ─────────────────────────────────────
+const trendsRouter = require('./routes/trends');
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/trends', require('./routes/trends'));
+app.use('/api/trends', trendsRouter);
 app.use('/api/stripe', require('./routes/stripe'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // ── Health check ───────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -62,13 +79,26 @@ app.use((err, req, res, next) => {
 });
 
 // ── Start ──────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log('');
-  console.log('  🌊 Wavecrest Pro Server');
-  console.log(`  ✓ Running on http://localhost:${PORT}`);
-  console.log(`  ✓ Mode: ${process.env.MODE || 'mock'} (in-memory DB, dummy OAuth/Stripe)`);
-  console.log(`  ✓ Landing page: http://localhost:${PORT}/index.html`);
-  console.log(`  ✓ Dashboard: http://localhost:${PORT}/dashboard.html`);
-  console.log(`  ✓ API Health: http://localhost:${PORT}/api/health`);
-  console.log('');
-});
+if (process.env.VERCEL) {
+  // Vercel serverless — export app, no listen()
+  module.exports = app;
+} else {
+  app.listen(PORT, async () => {
+    // Only auto-seed in development
+    if (!isProd) {
+      await trendsRouter.seedTrendsFromFile();
+    }
+    console.log('');
+    console.log('  🌊 Wavecrest Pro Server');
+    console.log(`  ✓ Running on http://localhost:${PORT}`);
+    console.log(`  ✓ Mode: ${isProd ? 'production' : 'development'}`);
+    console.log(`  ✓ DB: ${process.env.DATABASE_URL ? '***connected***' : 'postgresql://localhost:5432/wavecrest'}`);
+    console.log(`  ✓ Stripe: ${process.env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : process.env.STRIPE_SECRET_KEY?.startsWith('sk_test') ? 'TEST' : 'mock'}`);
+    if (!isProd) {
+      console.log(`  ✓ Landing: http://localhost:${PORT}/index.html`);
+      console.log(`  ✓ Dashboard: http://localhost:${PORT}/dashboard.html`);
+      console.log(`  ✓ Health: http://localhost:${PORT}/api/health`);
+    }
+    console.log('');
+  });
+}

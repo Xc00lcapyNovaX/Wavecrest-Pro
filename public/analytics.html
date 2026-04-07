@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — Wavecrest Pro</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* ── Nav ── */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);z-index:100}
+  .logo{font-size:1.2rem;font-weight:700;text-decoration:none;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .nav-links{display:flex;align-items:center;gap:24px}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a.active{color:var(--text)}
+  .nav-right{display:flex;align-items:center;gap:16px}
+  .plan-badge{padding:4px 12px;border-radius:980px;font-size:.75rem;font-weight:600;text-transform:uppercase}
+  .plan-free{background:rgba(255,255,255,.08);color:var(--muted)}
+  .plan-plus{background:rgba(0,113,227,.15);color:var(--blue)}
+  .plan-pro{background:rgba(48,209,88,.15);color:var(--green)}
+  .plan-max{background:rgba(255,159,10,.15);color:var(--orange)}
+  .plan-teams,.plan-enterprise{background:rgba(175,130,255,.15);color:#af82ff}
+  .user-name{font-size:.9rem;color:var(--muted)}
+  .btn-sm{padding:8px 16px;border-radius:980px;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:.82rem;cursor:pointer;transition:background .2s}
+  .btn-sm:hover{background:rgba(255,255,255,.06)}
+
+  /* ── Layout ── */
+  .container{max-width:1100px;margin:0 auto;padding:40px 24px}
+
+  /* ── Stats row ── */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px}
+  .stat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px}
+  .stat-card .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .stat-card .value{font-size:1.8rem;font-weight:700}
+  .stat-card .sub{font-size:.82rem;color:var(--muted);margin-top:4px}
+
+  /* ── Section titles ── */
+  .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
+
+  /* ── Chart card ── */
+  .chart-card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px;margin-bottom:32px}
+  .chart-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+  .chart-card-header h2{font-size:1rem;font-weight:600}
+  .toggle-group{display:flex;gap:0;border-radius:980px;overflow:hidden;border:1px solid var(--card-border)}
+  .toggle-btn{padding:6px 16px;font-size:.78rem;font-weight:600;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .2s}
+  .toggle-btn.active{background:var(--blue);color:#fff}
+  .toggle-btn:hover:not(.active){background:rgba(255,255,255,.04)}
+  .chart-wrap{position:relative;height:280px}
+
+  /* ── Two-column grid ── */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
+
+  /* ── Doughnut ── */
+  .doughnut-wrap{position:relative;max-width:260px;margin:0 auto}
+  .doughnut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+  .doughnut-center .big{font-size:2rem;font-weight:700}
+  .doughnut-center .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .legend{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+  .legend-item{display:flex;align-items:center;gap:10px;font-size:.88rem}
+  .legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+  .legend-pct{color:var(--muted);margin-left:auto;font-weight:600;font-size:.82rem}
+
+  /* ── Horizontal bar groups ── */
+  .bar-group{margin-bottom:24px}
+  .bar-group:last-child{margin-bottom:0}
+  .bar-group-title{display:inline-block;padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;text-transform:uppercase;margin-bottom:12px}
+  .bar-group-title.hot{background:rgba(255,69,58,.15);color:var(--red)}
+  .bar-group-title.rising{background:rgba(48,209,88,.15);color:var(--green)}
+  .bar-group-title.warm{background:rgba(255,159,10,.15);color:var(--orange)}
+  .bar-item{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .bar-item:last-child{margin-bottom:0}
+  .bar-label{font-size:.85rem;min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar-track{flex:1;height:24px;background:rgba(255,255,255,.04);border-radius:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;transition:width .6s ease}
+  .bar-value{font-size:.78rem;color:var(--muted);min-width:36px;text-align:right}
+
+  /* ── Loading / Error / Gate ── */
+  .loading{text-align:center;padding:60px;color:var(--muted)}
+  .error-banner{background:rgba(255,69,58,.12);color:var(--red);padding:16px 24px;border-radius:12px;margin-bottom:24px;display:none}
+  .gate{display:none;text-align:center;padding:100px 24px}
+  .gate .icon{font-size:3rem;margin-bottom:16px}
+  .gate h2{font-size:1.4rem;margin-bottom:8px}
+  .gate p{color:var(--muted);margin-bottom:24px;font-size:.95rem}
+  .gate a{display:inline-block;padding:14px 32px;background:var(--blue);color:#fff;border-radius:980px;text-decoration:none;font-weight:600;font-size:.95rem}
+  .gate a:hover{opacity:.85}
+
+  /* ── Footer ── */
+  .footer{text-align:center;padding:48px 0 24px;color:var(--muted);font-size:.8rem}
+  .footer a{color:var(--muted);text-decoration:none}
+  .footer a:hover{color:var(--text)}
+
+  /* ── Mobile ── */
+  @media(max-width:768px){
+    nav{padding:12px 16px;flex-wrap:wrap;gap:8px}
+    .nav-links{gap:16px}
+    .nav-right{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .user-name{display:none}
+    .container{padding:24px 16px}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .two-col{grid-template-columns:1fr}
+    .stat-card .value{font-size:1.4rem}
+    .chart-wrap{height:220px}
+    .bar-label{min-width:100px;font-size:.8rem}
+  }
+  @media(max-width:480px){
+    .btn-sm{padding:6px 12px;font-size:.76rem}
+    .plan-badge{font-size:.68rem}
+    .stats-grid{gap:12px}
+    .stat-card{padding:18px}
+    .stat-card .value{font-size:1.2rem}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="analytics.html" class="active">Analytics</a>
+  </div>
+  <div class="nav-right">
+    <span id="planBadge" class="plan-badge plan-free">Free</span>
+    <span id="userName" class="user-name"></span>
+    <button class="btn-sm" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<!-- Gate: shown when user plan is too low -->
+<div id="gate" class="gate">
+  <div class="icon">🔒</div>
+  <h2>Analytics requires Pro plan or higher</h2>
+  <p>Unlock trend velocity charts, platform breakdowns, and top-trending leaderboards.</p>
+  <a href="checkout-pro.html">Upgrade to Pro →</a>
+</div>
+
+<!-- Main content: hidden until auth + plan check passes -->
+<div id="main" class="container" style="display:none">
+  <div id="error" class="error-banner"></div>
+
+  <!-- Stats Summary -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">Week Total</div>
+      <div class="value" id="statWeekTotal">—</div>
+      <div class="sub">Trends tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg Velocity</div>
+      <div class="value" id="statAvgVelocity">—</div>
+      <div class="sub">Trends per day</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Top Platform</div>
+      <div class="value" id="statTopPlatform">—</div>
+      <div class="sub" id="statTopPlatformPct"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Your Searches</div>
+      <div class="value" id="statSearches">—</div>
+      <div class="sub">This period</div>
+    </div>
+  </div>
+
+  <!-- Trend Velocity -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h2>Trend Velocity</h2>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-days="7" onclick="switchRange(7,this)">7d</button>
+        <button class="toggle-btn" data-days="14" onclick="switchRange(14,this)">14d</button>
+        <button class="toggle-btn" data-days="30" onclick="switchRange(30,this)">30d</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="velocityChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Two column: Platform Breakdown + Top Trending -->
+  <div class="two-col">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <h2>Platform Breakdown</h2>
+      </div>
+      <div class="doughnut-wrap">
+        <canvas id="platformChart"></canvas>
+        <div class="doughnut-center">
+          <div class="big" id="doughnutTotal">—</div>
+          <div class="lbl">Total</div>
+        </div>
+      </div>
+      <div class="legend" id="platformLegend"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <h2>Top Trending</h2>
+      </div>
+      <div id="topTrends">
+        <div class="loading">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a href="index.html">Wavecrest Pro</a> · <a href="index.html#pricing">Plans</a> · © 2026
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const API = window.location.origin;
+
+let velocityChart = null;
+let platformChart = null;
+
+// ── Helpers ──
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = String(str || '');
+  return d.innerHTML;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+function hideError() {
+  const el = document.getElementById('error');
+  if (el) el.style.display = 'none';
+}
+
+async function logout() {
+  try { await fetch(API + '/api/auth/logout', { method: 'POST', credentials: 'include' }); }
+  catch (e) { /* proceed */ }
+  window.location.href = '/signin.html';
+}
+
+// ── Auth & Plan Check ──
+
+async function boot() {
+  try {
+    const res = await fetch(API + '/api/analytics/stats', { credentials: 'include' });
+
+    if (res.status === 401) {
+      window.location.href = '/signin.html';
+      return;
+    }
+
+    if (res.status === 403) {
+      // Attempt to get user info for nav even when gated
+      try {
+        const dRes = await fetch(API + '/api/dashboard', { credentials: 'include' });
+        if (dRes.ok) {
+          const d = await dRes.json();
+          setNav(d.user);
+        }
+      } catch (e) { /* ignore */ }
+      document.getElementById('gate').style.display = 'block';
+      return;
+    }
+
+    const statsData = await res.json();
+    if (!res.ok) throw new Error(statsData.error || 'Failed to load analytics');
+
+    // Set nav from stats user data if available, or fetch dashboard
+    if (statsData.user) {
+      setNav(statsData.user);
+    } else {
+      try {
+        const dRes = await fetch(API + '/api/dashboard', { credentials: 'include' });
+        if (dRes.ok) { const d = await dRes.json(); setNav(d.user); }
+      } catch (e) { /* ignore */ }
+    }
+
+    // Show main, render stats
+    document.getElementById('main').style.display = 'block';
+    renderStats(statsData);
+
+    // Load remaining data in parallel
+    const [velocityRes, platformRes, topRes] = await Promise.all([
+      fetch(API + '/api/analytics/velocity?days=7', { credentials: 'include' }),
+      fetch(API + '/api/analytics/platforms', { credentials: 'include' }),
+      fetch(API + '/api/analytics/top-trends?days=7', { credentials: 'include' })
+    ]);
+
+    const velocityData = await velocityRes.json();
+    const platformData = await platformRes.json();
+    const topData = await topRes.json();
+
+    if (!velocityRes.ok) throw new Error(velocityData.error || 'Failed to load velocity data');
+    if (!platformRes.ok) throw new Error(platformData.error || 'Failed to load platform data');
+    if (!topRes.ok) throw new Error(topData.error || 'Failed to load top trends');
+
+    renderVelocity(velocityData);
+    renderPlatforms(platformData);
+    renderTopTrends(topData);
+
+  } catch (err) {
+    document.getElementById('main').style.display = 'block';
+    showError(err.message || 'Failed to load analytics. Is the server running?');
+  }
+}
+
+function setNav(user) {
+  if (!user) return;
+  const badge = document.getElementById('planBadge');
+  const plan = user.plan || 'free';
+  badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
+  badge.className = 'plan-badge plan-' + plan;
+  document.getElementById('userName').textContent = user.name || user.email || '';
+}
+
+// ── Stats ──
+
+function renderStats(data) {
+  document.getElementById('statWeekTotal').textContent = data.week_total != null ? data.week_total : '—';
+  document.getElementById('statAvgVelocity').textContent = data.avg_velocity != null ? data.avg_velocity + '/day' : '—';
+
+  if (data.top_platform) {
+    document.getElementById('statTopPlatform').textContent = data.top_platform.name || '—';
+    document.getElementById('statTopPlatformPct').textContent = data.top_platform.percentage != null ? data.top_platform.percentage + '%' : '';
+  }
+
+  document.getElementById('statSearches').textContent = data.user_searches != null ? data.user_searches : '—';
+}
+
+// ── Velocity Chart ──
+
+function renderVelocity(data) {
+  const ctx = document.getElementById('velocityChart').getContext('2d');
+  const labels = (data.days || []).map(function(d) { return d.date; });
+  const values = (data.days || []).map(function(d) { return d.count; });
+  const avg = data.average || 0;
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+  gradient.addColorStop(0, 'rgba(0,113,227,.35)');
+  gradient.addColorStop(1, 'rgba(0,113,227,0)');
+
+  if (velocityChart) velocityChart.destroy();
+
+  velocityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Trends',
+          data: values,
+          borderColor: '#0071e3',
+          backgroundColor: gradient,
+          fill: true,
+          tension: .4,
+          pointBackgroundColor: '#0071e3',
+          pointBorderColor: '#0071e3',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 2
+        },
+        {
+          label: 'Average',
+          data: labels.map(function() { return avg; }),
+          borderColor: 'rgba(134,134,139,.5)',
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1d1d1f',
+          titleColor: '#f5f5f7',
+          bodyColor: '#f5f5f7',
+          borderColor: 'rgba(255,255,255,.08)',
+          borderWidth: 1,
+          cornerRadius: 10,
+          padding: 12,
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.dataset.label === 'Average') return 'Avg: ' + avg;
+              return ctx.parsed.y + ' trends';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#86868b', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,.04)' },
+          border: { color: 'rgba(255,255,255,.08)' }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#86868b', font: { size: 11 }, precision: 0 },
+          grid: { color: 'rgba(255,255,255,.04)' },
+          border: { color: 'rgba(255,255,255,.08)' }
+        }
+      }
+    }
+  });
+}
+
+async function switchRange(days, btn) {
+  document.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+
+  try {
+    const res = await fetch(API + '/api/analytics/velocity?days=' + days, { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load');
+    renderVelocity(data);
+  } catch (err) {
+    showError('Failed to load velocity data: ' + (err.message || 'Unknown error'));
+  }
+}
+
+// ── Platform Doughnut ──
+
+const PLATFORM_COLORS = {
+  youtube: '#ff0000',
+  tiktok: '#000000',
+  instagram: '#C13584'
+};
+const PLATFORM_BORDERS = {
+  youtube: '#ff0000',
+  tiktok: '#ffffff',
+  instagram: '#C13584'
+};
+
+function renderPlatforms(data) {
+  const platforms = data.platforms || [];
+  const total = platforms.reduce(function(s, p) { return s + (p.count || 0); }, 0);
+
+  document.getElementById('doughnutTotal').textContent = total;
+
+  const labels = platforms.map(function(p) { return p.name; });
+  const values = platforms.map(function(p) { return p.count; });
+  const bgColors = platforms.map(function(p) {
+    return PLATFORM_COLORS[p.name.toLowerCase()] || '#86868b';
+  });
+  const borderColors = platforms.map(function(p) {
+    return PLATFORM_BORDERS[p.name.toLowerCase()] || 'transparent';
+  });
+
+  const ctx = document.getElementById('platformChart').getContext('2d');
+
+  if (platformChart) platformChart.destroy();
+
+  platformChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: bgColors,
+        borderColor: borderColors,
+        borderWidth: 2,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1d1d1f',
+          titleColor: '#f5f5f7',
+          bodyColor: '#f5f5f7',
+          borderColor: 'rgba(255,255,255,.08)',
+          borderWidth: 1,
+          cornerRadius: 10,
+          padding: 12,
+          callbacks: {
+            label: function(ctx) {
+              var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+              return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Legend
+  var legend = document.getElementById('platformLegend');
+  legend.innerHTML = platforms.map(function(p) {
+    var pct = total > 0 ? ((p.count / total) * 100).toFixed(1) : '0.0';
+    var color = PLATFORM_COLORS[p.name.toLowerCase()] || '#86868b';
+    var dotBorder = p.name.toLowerCase() === 'tiktok' ? 'border:1px solid #fff;' : '';
+    return '<div class="legend-item">' +
+      '<span class="legend-dot" style="background:' + esc(color) + ';' + dotBorder + '"></span>' +
+      '<span>' + esc(p.name) + '</span>' +
+      '<span class="legend-pct">' + esc(pct) + '%</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── Top Trending Bars ──
+
+function renderTopTrends(data) {
+  var container = document.getElementById('topTrends');
+  var groups = data.groups || [];
+
+  if (!groups.length) {
+    container.innerHTML = '<div class="loading">No trending data available.</div>';
+    return;
+  }
+
+  var barColors = {
+    hot: 'var(--red)',
+    rising: 'var(--green)',
+    warm: 'var(--orange)'
+  };
+
+  var html = '';
+
+  groups.forEach(function(group) {
+    var key = (group.label || '').toLowerCase();
+    var color = barColors[key] || 'var(--muted)';
+    var cssClass = ['hot', 'rising', 'warm'].indexOf(key) !== -1 ? key : 'warm';
+    var items = group.items || [];
+    var maxCount = items.reduce(function(m, i) { return Math.max(m, i.count || 0); }, 1);
+
+    html += '<div class="bar-group">';
+    html += '<span class="bar-group-title ' + cssClass + '">' + esc(group.label) + '</span>';
+
+    items.forEach(function(item) {
+      var widthPct = maxCount > 0 ? ((item.count / maxCount) * 100).toFixed(1) : 0;
+      html += '<div class="bar-item">' +
+        '<span class="bar-label">' + esc(item.topic) + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + widthPct + '%;background:' + color + '"></div></div>' +
+        '<span class="bar-value">' + esc(item.count) + '</span>' +
+      '</div>';
+    });
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Boot ──
+boot();
+</script>
+</body>
+</html>

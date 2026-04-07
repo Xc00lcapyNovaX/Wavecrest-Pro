@@ -720,6 +720,8 @@
     <a href="checkout-enterprise.html">Talk to us about Enterprise &#8594;</a>
   </div>
 
+  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
+
 </div>
 
 <script>
@@ -791,7 +793,8 @@ initWaveText();
         body: JSON.stringify({plan:'teams', team_size: teamSize})
       });
     }).then(function(r){return r.json()}).then(function(data){
-      if (data.checkout_url) window.location.href = data.checkout_url;
+      if (data.url) window.location.href = data.url;
+      else if (data.checkout_url) window.location.href = data.checkout_url;
       else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = origText; }
     }).catch(function(){
       alert('Something went wrong. Please try again.');

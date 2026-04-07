@@ -78,6 +78,25 @@
   .upgrade-banner p{color:var(--muted);font-size:.95rem}
   .upgrade-banner strong{color:var(--text)}
   .upgrade-banner a{padding:12px 24px;background:var(--blue);color:#fff;border-radius:980px;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+
+  /* ── Mobile responsive ── */
+  @media(max-width:768px){
+    nav{padding:12px 16px;flex-wrap:wrap;gap:8px}
+    .nav-right{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .user-name{display:none}
+    .container{padding:24px 16px}
+    .search-bar{flex-direction:column}
+    .search-bar input,.search-bar select,.search-bar button{width:100%}
+    .trend-row{padding:12px 16px;flex-wrap:wrap;gap:8px}
+    .trend-platform{margin:0;min-width:auto}
+    .upgrade-banner{flex-direction:column;text-align:center;padding:20px}
+    .upgrade-banner a{width:100%;text-align:center}
+    .stat-card .value{font-size:1.4rem}
+  }
+  @media(max-width:480px){
+    .btn-sm{padding:6px 12px;font-size:.76rem}
+    .plan-badge{font-size:.68rem}
+  }
 </style>
 </head>
 <body>
@@ -141,6 +160,28 @@
   <div id="trendList" class="trend-list">
     <div class="loading">Loading trends...</div>
   </div>
+
+  <!-- BYOAK Section (Free users) -->
+  <div id="byoakSection" style="display:none;margin-top:40px">
+    <div class="section-title">Bring Your Own API Key</div>
+    <div style="background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px">
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Connect your own API keys for higher limits on the free plan.</p>
+      <div id="byoakKeys"></div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+        <select id="byoakService" style="padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.88rem">
+          <option value="google_trends">Google Trends</option>
+          <option value="youtube">YouTube Data API</option>
+          <option value="tiktok">TikTok API</option>
+        </select>
+        <input id="byoakKey" type="text" placeholder="Paste your API key" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:.88rem;min-width:200px">
+        <button onclick="saveApiKey()" class="btn-sm" style="background:var(--blue);color:#fff;border:none">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:48px 0 24px;color:var(--muted);font-size:.8rem">
+    <a href="index.html" style="color:var(--muted);text-decoration:none">Wavecrest Pro</a> · <a href="index.html#pricing" style="color:var(--muted);text-decoration:none">Plans</a> · © 2026
+  </div>
 </div>
 
 <script>
@@ -166,6 +207,7 @@ async function loadDashboard() {
     if (!res.ok) throw new Error(data.error || 'Failed to load');
     dashboardData = data;
     render();
+    renderByoak();
     checkSubscriptionToast();
   } catch (err) {
     showError(err.message || 'Failed to load dashboard. Is the server running?');
@@ -307,7 +349,8 @@ async function manageBilling() {
   try {
     const res = await fetch(API + '/api/stripe/portal', { method: 'POST', credentials: 'include' });
     const data = await res.json();
-    if (data.portal_url) window.location.href = data.portal_url;
+    if (data.url) window.location.href = data.url;
+    else if (data.portal_url) window.location.href = data.portal_url;
     else alert('Billing portal is not available yet.');
   } catch (err) { alert('Could not open billing portal.'); }
 }
@@ -320,6 +363,47 @@ async function logout() {
 }
 
 function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+
+// ── BYOAK ──
+function renderByoak() {
+  if (!dashboardData || dashboardData.user.plan !== 'free') return;
+  document.getElementById('byoakSection').style.display = 'block';
+  fetch(API + '/api/dashboard/api-keys', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var container = document.getElementById('byoakKeys');
+      if (!data.keys || !data.keys.length) {
+        container.innerHTML = '<p style="color:var(--muted);font-size:.85rem">No API keys saved yet.</p>';
+        return;
+      }
+      container.innerHTML = data.keys.map(function(k) {
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--card-border)">' +
+          '<span style="font-size:.88rem"><strong>' + esc(k.service) + '</strong> · ' + esc(k.key_preview) + '</span>' +
+          '<button onclick="deleteApiKey(\'' + esc(k.id) + '\')" class="btn-sm" style="font-size:.76rem;padding:4px 12px;color:var(--red);border-color:var(--red)">Remove</button></div>';
+      }).join('');
+    }).catch(function() {});
+}
+
+function saveApiKey() {
+  var service = document.getElementById('byoakService').value;
+  var key = document.getElementById('byoakKey').value.trim();
+  if (!key) { alert('Please paste an API key.'); return; }
+  fetch(API + '/api/dashboard/api-keys', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ service: service, api_key: key })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.error) { alert(data.error); return; }
+    document.getElementById('byoakKey').value = '';
+    renderByoak();
+  }).catch(function() { alert('Failed to save key.'); });
+}
+
+function deleteApiKey(id) {
+  fetch(API + '/api/dashboard/api-keys/' + id, {
+    method: 'DELETE', credentials: 'include'
+  }).then(function() { renderByoak(); }).catch(function() {});
+}
 
 // Boot
 filterPlatform('');

@@ -13,3 +13,6 @@ build/
 *.swo
 *~
 .cache/
+plan.md
+cron.log
+

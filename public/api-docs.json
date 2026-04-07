@@ -1,0 +1,1481 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Wavecrest Pro API",
+    "version": "1.0.0",
+    "description": "Wavecrest Pro is a real-time trend intelligence platform that aggregates trending topics across multiple social platforms. This API provides endpoints for authentication, trend discovery, dashboard management, billing, and analytics.",
+    "contact": {
+      "name": "Wavecrest Pro Support",
+      "url": "https://wavecrest.pro",
+      "email": "support@wavecrest.pro"
+    },
+    "license": {
+      "name": "Proprietary"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://wavecrest.pro",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for signup, login, logout, and session management"
+    },
+    {
+      "name": "Trends",
+      "description": "Trend discovery and search endpoints"
+    },
+    {
+      "name": "Dashboard",
+      "description": "User dashboard and API key management"
+    },
+    {
+      "name": "Billing",
+      "description": "Stripe-based subscription and billing management"
+    },
+    {
+      "name": "Analytics",
+      "description": "Trend analytics, velocity tracking, and statistics"
+    }
+  ],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Create a new account",
+        "description": "Register a new user account with email and password. A session cookie is automatically set on success.",
+        "operationId": "signup",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              },
+              "example": {
+                "email": "you@example.com",
+                "password": "secret123",
+                "name": "Efe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "example": {
+                  "message": "Account created successfully",
+                  "user": {
+                    "id": 1,
+                    "email": "you@example.com",
+                    "name": "Efe",
+                    "plan": "free",
+                    "provider": "local",
+                    "created_at": "2025-01-15T10:30:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (missing fields or email already exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Email already registered"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Log in to an existing account",
+        "description": "Authenticate with email and password. A session cookie is set on success.",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "email": "you@example.com",
+                "password": "secret123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "example": {
+                  "message": "Login successful",
+                  "user": {
+                    "id": 1,
+                    "email": "you@example.com",
+                    "name": "Efe",
+                    "plan": "pro",
+                    "provider": "local",
+                    "created_at": "2025-01-15T10:30:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Invalid email or password"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Log out the current session",
+        "description": "Destroy the current session and clear the session cookie.",
+        "operationId": "logout",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "message": "Logged out successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user info",
+        "description": "Returns the currently authenticated user's profile and plan information.",
+        "operationId": "getMe",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current user info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": 1,
+                  "email": "you@example.com",
+                  "name": "Efe",
+                  "plan": "pro",
+                  "provider": "local",
+                  "created_at": "2025-01-15T10:30:00.000Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Not authenticated"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/{provider}/callback": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "OAuth provider callback",
+        "description": "Handle OAuth callback from a third-party provider (e.g., Google, GitHub). Exchanges the authorization code for a session.",
+        "operationId": "oauthCallback",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "description": "OAuth provider name",
+            "schema": {
+              "type": "string",
+              "enum": ["google", "github"]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Authorization code from OAuth provider"
+                  }
+                }
+              },
+              "example": {
+                "code": "4/0AX4XfWh..."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OAuth login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "example": {
+                  "message": "Login successful",
+                  "user": {
+                    "id": 2,
+                    "email": "you@gmail.com",
+                    "name": "Efe",
+                    "plan": "free",
+                    "provider": "google",
+                    "created_at": "2025-01-16T08:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired authorization code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Invalid authorization code"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trends": {
+      "get": {
+        "tags": ["Trends"],
+        "summary": "Get trending topics",
+        "description": "Retrieve the latest trending topics across all platforms. Free users see a limited subset; paid plans unlock full results.",
+        "operationId": "getTrends",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Filter trends by date (YYYY-MM-DD). Defaults to today.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "description": "Filter by platform name",
+            "schema": { "type": "string", "enum": ["twitter", "reddit", "tiktok", "youtube", "google", "github"] }
+          },
+          {
+            "name": "score",
+            "in": "query",
+            "description": "Minimum trend score (0-100)",
+            "schema": { "type": "integer", "minimum": 0, "maximum": 100 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of results to return (default 20, max 100)",
+            "schema": { "type": "integer", "default": 20, "maximum": 100 }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "schema": { "type": "integer", "default": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trending topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendsResponse"
+                },
+                "example": {
+                  "date": "2025-01-15",
+                  "trends": [
+                    {
+                      "id": 142,
+                      "topic": "Apple Vision Pro 2",
+                      "score": 94,
+                      "platform": "twitter",
+                      "category": "technology",
+                      "fetched_at": "2025-01-15T14:30:00.000Z"
+                    },
+                    {
+                      "id": 143,
+                      "topic": "Super Bowl LIX",
+                      "score": 91,
+                      "platform": "google",
+                      "category": "sports",
+                      "fetched_at": "2025-01-15T14:30:00.000Z"
+                    }
+                  ],
+                  "total": 248,
+                  "user_plan": "pro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trends/search": {
+      "get": {
+        "tags": ["Trends"],
+        "summary": "Search trends by keyword",
+        "description": "Full-text search across all trending topics. Requires Pro plan or higher.",
+        "operationId": "searchTrends",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query string",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "description": "Filter results by platform",
+            "schema": { "type": "string", "enum": ["twitter", "reddit", "tiktok", "youtube", "google", "github"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                },
+                "example": {
+                  "query": "AI",
+                  "platform": null,
+                  "count": 12,
+                  "results": [
+                    {
+                      "topic": "OpenAI GPT-5 Launch",
+                      "score": 97,
+                      "platform": "twitter",
+                      "fetched_at": "2025-01-15T14:30:00.000Z"
+                    },
+                    {
+                      "topic": "AI Video Generation",
+                      "score": 85,
+                      "platform": "youtube",
+                      "fetched_at": "2025-01-15T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing search query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Query parameter 'q' is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required (Pro+ only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Search requires a Pro plan or higher"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trends/history": {
+      "get": {
+        "tags": ["Trends"],
+        "summary": "Get historical trend data",
+        "description": "Retrieve trend data for a specific topic over a date range. Useful for tracking how a topic's popularity changes over time.",
+        "operationId": "getTrendHistory",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "topic",
+            "in": "query",
+            "required": true,
+            "description": "Topic name to look up",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Number of days of history (default 7, max 90)",
+            "schema": { "type": "integer", "default": 7, "maximum": 90 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historical data for the topic",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryResponse"
+                },
+                "example": {
+                  "topic": "Apple Vision Pro 2",
+                  "days": 7,
+                  "history": [
+                    { "date": "2025-01-09", "score": 42, "platform": "twitter" },
+                    { "date": "2025-01-10", "score": 55, "platform": "twitter" },
+                    { "date": "2025-01-11", "score": 68, "platform": "twitter" },
+                    { "date": "2025-01-12", "score": 74, "platform": "twitter" },
+                    { "date": "2025-01-13", "score": 82, "platform": "twitter" },
+                    { "date": "2025-01-14", "score": 89, "platform": "twitter" },
+                    { "date": "2025-01-15", "score": 94, "platform": "twitter" }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing topic parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Query parameter 'topic' is required"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trends/platforms": {
+      "get": {
+        "tags": ["Trends"],
+        "summary": "List supported platforms",
+        "description": "Returns a list of all platforms from which Wavecrest aggregates trending data, along with their current status.",
+        "operationId": "getPlatforms",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of platforms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsResponse"
+                },
+                "example": {
+                  "platforms": [
+                    { "id": "twitter", "name": "Twitter / X", "status": "active", "last_fetch": "2025-01-15T14:30:00.000Z" },
+                    { "id": "reddit", "name": "Reddit", "status": "active", "last_fetch": "2025-01-15T14:28:00.000Z" },
+                    { "id": "tiktok", "name": "TikTok", "status": "active", "last_fetch": "2025-01-15T14:25:00.000Z" },
+                    { "id": "youtube", "name": "YouTube", "status": "active", "last_fetch": "2025-01-15T14:20:00.000Z" },
+                    { "id": "google", "name": "Google Trends", "status": "active", "last_fetch": "2025-01-15T14:15:00.000Z" },
+                    { "id": "github", "name": "GitHub", "status": "active", "last_fetch": "2025-01-15T14:10:00.000Z" }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Get dashboard overview",
+        "description": "Returns a comprehensive dashboard view including user info, subscription status, API usage, today's trends, and available features for the current plan.",
+        "operationId": "getDashboard",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Dashboard data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "email": "you@example.com",
+                    "name": "Efe",
+                    "plan": "pro"
+                  },
+                  "subscription": {
+                    "plan": "pro",
+                    "status": "active",
+                    "current_period_end": "2025-02-15T00:00:00.000Z"
+                  },
+                  "usage": {
+                    "today": 23,
+                    "limit": 500,
+                    "remaining": 477
+                  },
+                  "trends": {
+                    "date": "2025-01-15",
+                    "total": 248,
+                    "items": [
+                      { "topic": "Apple Vision Pro 2", "score": 94, "platform": "twitter" },
+                      { "topic": "Super Bowl LIX", "score": 91, "platform": "google" }
+                    ],
+                    "locked_count": 0
+                  },
+                  "features": {
+                    "search": true,
+                    "export": true,
+                    "analytics": true,
+                    "api_keys": true,
+                    "history_days": 90
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/export": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Export trends as CSV",
+        "description": "Export the current day's trending topics as a downloadable CSV file. Requires Plus plan or higher.",
+        "operationId": "exportTrends",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Date to export (YYYY-MM-DD). Defaults to today.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "description": "Filter export by platform",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CSV file download",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "topic,score,platform,category,fetched_at\nApple Vision Pro 2,94,twitter,technology,2025-01-15T14:30:00.000Z\nSuper Bowl LIX,91,google,sports,2025-01-15T14:30:00.000Z"
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required (Plus+ only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Export requires a Plus plan or higher"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/api-keys": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "List your API keys",
+        "description": "Retrieve all API keys associated with your account. Keys are partially masked for security.",
+        "operationId": "listApiKeys",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeysListResponse"
+                },
+                "example": {
+                  "keys": [
+                    {
+                      "id": 1,
+                      "name": "Production App",
+                      "key": "wc_pro_****...a3f2",
+                      "created_at": "2025-01-10T09:00:00.000Z",
+                      "last_used": "2025-01-15T13:45:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Dashboard"],
+        "summary": "Create a new API key",
+        "description": "Generate a new API key for programmatic access. The full key is only shown once on creation.",
+        "operationId": "createApiKey",
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "A descriptive name for this API key"
+                  }
+                }
+              },
+              "example": {
+                "name": "Production App"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "API key created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreateResponse"
+                },
+                "example": {
+                  "message": "API key created",
+                  "key": {
+                    "id": 2,
+                    "name": "Production App",
+                    "key": "wc_pro_sk_live_abc123def456ghi789jkl012mno345",
+                    "created_at": "2025-01-15T15:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan does not support API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "API keys require a Pro plan or higher"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/api-keys/{id}": {
+      "delete": {
+        "tags": ["Dashboard"],
+        "summary": "Delete an API key",
+        "description": "Permanently revoke and delete an API key. This action cannot be undone.",
+        "operationId": "deleteApiKey",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "API key ID to delete",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "message": "API key deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API key not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "API key not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stripe/plans": {
+      "get": {
+        "tags": ["Billing"],
+        "summary": "List available plans",
+        "description": "Returns all available subscription plans with their features and pricing.",
+        "operationId": "getPlans",
+        "responses": {
+          "200": {
+            "description": "Available plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlansResponse"
+                },
+                "example": {
+                  "plans": [
+                    { "id": "free", "name": "Free", "price": 0, "interval": null, "daily_limit": 10, "features": ["5 trends per day", "Basic platforms"] },
+                    { "id": "plus", "name": "Plus", "price": 9, "interval": "month", "daily_limit": 50, "features": ["50 requests/day", "All platforms", "CSV export"] },
+                    { "id": "pro", "name": "Pro", "price": 29, "interval": "month", "daily_limit": 500, "features": ["500 requests/day", "Search", "Analytics", "API keys", "90-day history"] },
+                    { "id": "max", "name": "Max", "price": 79, "interval": "month", "daily_limit": null, "features": ["Unlimited requests", "Priority support", "Custom alerts", "Webhooks"] }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stripe/create-checkout": {
+      "post": {
+        "tags": ["Billing"],
+        "summary": "Create a Stripe checkout session",
+        "description": "Initiate a Stripe Checkout session for subscribing to a paid plan. Returns a URL to redirect the user to Stripe's hosted checkout page.",
+        "operationId": "createCheckout",
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan"],
+                "properties": {
+                  "plan": {
+                    "type": "string",
+                    "enum": ["plus", "pro", "max", "teams", "enterprise"],
+                    "description": "Plan ID to subscribe to"
+                  }
+                }
+              },
+              "example": {
+                "plan": "pro"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Stripe Checkout URL to redirect user to"
+                    }
+                  }
+                },
+                "example": {
+                  "url": "https://checkout.stripe.com/c/pay/cs_live_abc123..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Invalid plan selected"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stripe/portal": {
+      "post": {
+        "tags": ["Billing"],
+        "summary": "Open Stripe billing portal",
+        "description": "Create a Stripe Customer Portal session. The portal allows users to manage their subscription, update payment methods, and view invoices.",
+        "operationId": "createPortal",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Portal session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Stripe Customer Portal URL"
+                    }
+                  }
+                },
+                "example": {
+                  "url": "https://billing.stripe.com/p/session/abc123..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No active subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "No active subscription found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stripe/cancel": {
+      "post": {
+        "tags": ["Billing"],
+        "summary": "Cancel subscription",
+        "description": "Cancel the current subscription. The subscription remains active until the end of the current billing period, then downgrades to the Free plan.",
+        "operationId": "cancelSubscription",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "effective_date": { "type": "string", "format": "date-time" }
+                  }
+                },
+                "example": {
+                  "message": "Subscription cancelled. Active until end of billing period.",
+                  "effective_date": "2025-02-15T00:00:00.000Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No active subscription to cancel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "No active subscription to cancel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/velocity": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get trend velocity data",
+        "description": "Returns the number of new trends detected per day over a given period, along with the daily average. Requires Pro plan or higher.",
+        "operationId": "getVelocity",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Number of days to analyze (default 7, max 90)",
+            "schema": { "type": "integer", "default": 7, "maximum": 90 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Velocity data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VelocityResponse"
+                },
+                "example": {
+                  "days": 7,
+                  "dates": ["2025-01-09", "2025-01-10", "2025-01-11", "2025-01-12", "2025-01-13", "2025-01-14", "2025-01-15"],
+                  "counts": [180, 210, 195, 220, 248, 232, 248],
+                  "avg": 219
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required (Pro+ only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Analytics requires a Pro plan or higher"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/platforms": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get platform breakdown",
+        "description": "Returns the distribution of trending topics across platforms for the current day. Requires Pro plan or higher.",
+        "operationId": "getPlatformAnalytics",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Platform distribution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformAnalyticsResponse"
+                },
+                "example": {
+                  "date": "2025-01-15",
+                  "total": 248,
+                  "platforms": [
+                    { "platform": "twitter", "count": 62, "percentage": 25.0 },
+                    { "platform": "reddit", "count": 48, "percentage": 19.4 },
+                    { "platform": "tiktok", "count": 45, "percentage": 18.1 },
+                    { "platform": "youtube", "count": 38, "percentage": 15.3 },
+                    { "platform": "google", "count": 35, "percentage": 14.1 },
+                    { "platform": "github", "count": 20, "percentage": 8.1 }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/top-trends": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get top trending topics",
+        "description": "Returns the highest-scoring trending topics across all platforms, optionally filtered by time range. Requires Pro plan or higher.",
+        "operationId": "getTopTrends",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Look-back period in days (default 1, max 30)",
+            "schema": { "type": "integer", "default": 1, "maximum": 30 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of top trends to return (default 10, max 50)",
+            "schema": { "type": "integer", "default": 10, "maximum": 50 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top trending topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopTrendsResponse"
+                },
+                "example": {
+                  "days": 1,
+                  "count": 10,
+                  "trends": [
+                    { "topic": "OpenAI GPT-5 Launch", "score": 97, "platform": "twitter", "category": "technology" },
+                    { "topic": "Apple Vision Pro 2", "score": 94, "platform": "twitter", "category": "technology" },
+                    { "topic": "Super Bowl LIX", "score": 91, "platform": "google", "category": "sports" },
+                    { "topic": "Bitcoin ATH", "score": 89, "platform": "reddit", "category": "finance" },
+                    { "topic": "GTA VI Trailer 2", "score": 88, "platform": "youtube", "category": "gaming" }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/stats": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get aggregate statistics",
+        "description": "Returns high-level statistics about the trend database: total trends tracked, platforms active, average daily trends, and more. Requires Pro plan or higher.",
+        "operationId": "getStats",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Aggregate statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsResponse"
+                },
+                "example": {
+                  "total_trends": 18420,
+                  "total_platforms": 6,
+                  "avg_daily_trends": 219,
+                  "avg_score": 64.3,
+                  "top_platform": "twitter",
+                  "top_category": "technology",
+                  "data_since": "2024-06-01T00:00:00.000Z",
+                  "last_updated": "2025-01-15T14:30:00.000Z"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Plan upgrade required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Session cookie set after login or signup"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique user ID" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "plan": { "type": "string", "enum": ["free", "plus", "pro", "max", "teams", "enterprise"] },
+          "provider": { "type": "string", "enum": ["local", "google", "github"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Trend": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "topic": { "type": "string", "description": "Trending topic name" },
+          "score": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Trend score (0-100)" },
+          "platform": { "type": "string", "enum": ["twitter", "reddit", "tiktok", "youtube", "google", "github"] },
+          "category": { "type": "string", "description": "Topic category" },
+          "fetched_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "plan": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "cancelled", "past_due", "trialing"] },
+          "current_period_end": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ApiKey": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "key": { "type": "string", "description": "Masked API key (full key only shown on creation)" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "last_used": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+      "Platform": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "inactive", "maintenance"] },
+          "last_fetch": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "interval": { "type": "string", "nullable": true, "enum": ["month", "year", null] },
+          "daily_limit": { "type": "integer", "nullable": true, "description": "null means unlimited" },
+          "features": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "SignupRequest": {
+        "type": "object",
+        "required": ["email", "password", "name"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "name": { "type": "string" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "description": "Human-readable error message" }
+        }
+      },
+      "TrendsResponse": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "trends": { "type": "array", "items": { "$ref": "#/components/schemas/Trend" } },
+          "total": { "type": "integer" },
+          "user_plan": { "type": "string" }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "platform": { "type": "string", "nullable": true },
+          "count": { "type": "integer" },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic": { "type": "string" },
+                "score": { "type": "integer" },
+                "platform": { "type": "string" },
+                "fetched_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        }
+      },
+      "HistoryResponse": {
+        "type": "object",
+        "properties": {
+          "topic": { "type": "string" },
+          "days": { "type": "integer" },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": { "type": "string", "format": "date" },
+                "score": { "type": "integer" },
+                "platform": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "PlatformsResponse": {
+        "type": "object",
+        "properties": {
+          "platforms": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Platform" }
+          }
+        }
+      },
+      "DashboardResponse": {
+        "type": "object",
+        "properties": {
+          "user": { "$ref": "#/components/schemas/User" },
+          "subscription": { "$ref": "#/components/schemas/Subscription" },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "today": { "type": "integer" },
+              "limit": { "type": "integer" },
+              "remaining": { "type": "integer" }
+            }
+          },
+          "trends": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "total": { "type": "integer" },
+              "items": { "type": "array", "items": { "$ref": "#/components/schemas/Trend" } },
+              "locked_count": { "type": "integer" }
+            }
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "search": { "type": "boolean" },
+              "export": { "type": "boolean" },
+              "analytics": { "type": "boolean" },
+              "api_keys": { "type": "boolean" },
+              "history_days": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "ApiKeysListResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ApiKey" }
+          }
+        }
+      },
+      "ApiKeyCreateResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "key": { "$ref": "#/components/schemas/ApiKey" }
+        }
+      },
+      "PlansResponse": {
+        "type": "object",
+        "properties": {
+          "plans": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Plan" }
+          }
+        }
+      },
+      "VelocityResponse": {
+        "type": "object",
+        "properties": {
+          "days": { "type": "integer" },
+          "dates": { "type": "array", "items": { "type": "string", "format": "date" } },
+          "counts": { "type": "array", "items": { "type": "integer" } },
+          "avg": { "type": "number" }
+        }
+      },
+      "PlatformAnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "total": { "type": "integer" },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "platform": { "type": "string" },
+                "count": { "type": "integer" },
+                "percentage": { "type": "number" }
+              }
+            }
+          }
+        }
+      },
+      "TopTrendsResponse": {
+        "type": "object",
+        "properties": {
+          "days": { "type": "integer" },
+          "count": { "type": "integer" },
+          "trends": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic": { "type": "string" },
+                "score": { "type": "integer" },
+                "platform": { "type": "string" },
+                "category": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "StatsResponse": {
+        "type": "object",
+        "properties": {
+          "total_trends": { "type": "integer" },
+          "total_platforms": { "type": "integer" },
+          "avg_daily_trends": { "type": "number" },
+          "avg_score": { "type": "number" },
+          "top_platform": { "type": "string" },
+          "top_category": { "type": "string" },
+          "data_since": { "type": "string", "format": "date-time" },
+          "last_updated": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}
