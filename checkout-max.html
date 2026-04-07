@@ -493,29 +493,25 @@
 
   <hr class="section-divider">
 
-  <!-- Checkout: two-column -->
+  <!-- Checkout: Beta Signup -->
   <div class="checkout-section">
-    <p class="section-label">Complete Your Purchase</p>
+    <p class="section-label">Get Early Access</p>
     <div class="checkout-grid">
 
-      <!-- Left — Order Summary -->
+      <!-- Left — Beta Offer -->
       <div class="order-summary">
-        <p class="section-label">Order Summary</p>
+        <p class="section-label">Beta Offer</p>
         <div class="summary-line">
           <span class="label">Wavecrest Pro — Max</span>
-          <span class="value"><s style="opacity:.5">$99.99</s> $59.99</span>
+          <span class="value"><s style="opacity:.5">$99.99</s> <span style="color:#30d158;font-weight:600">Free</span></span>
         </div>
         <div class="summary-line muted">
-          <span class="label">Intro period</span>
-          <span class="value">3 months at $59.99</span>
-        </div>
-        <div class="summary-line muted">
-          <span class="label">Then</span>
-          <span class="value">$99.99/mo · Cancel anytime</span>
+          <span class="label">Beta access</span>
+          <span class="value">Limited spots for early testers</span>
         </div>
         <div class="summary-total">
           <span>Due today</span>
-          <span>$59.99</span>
+          <span style="color:#30d158">$0.00</span>
         </div>
         <div class="summary-features">
           <p><span class="check">&#10003;</span> Unlimited searches, all platforms</p>
@@ -523,31 +519,31 @@
           <p><span class="check">&#10003;</span> Real-time alerts, unlimited history</p>
           <p><span class="check">&#10003;</span> Advanced analytics, webhooks, priority support</p>
         </div>
+        <p style="color:var(--muted);font-size:.75rem;margin-top:12px;line-height:1.4">Beta users get free access for a limited time. Standard pricing applies after beta ends.</p>
       </div>
 
-      <!-- Right — Payment Form -->
+      <!-- Right — Beta Form -->
       <div class="payment-form">
-        <p class="section-label">Payment</p>
+        <p class="section-label">Join the Beta</p>
         <div class="form-group">
           <label>Email address</label>
           <input type="email" placeholder="you@example.com">
         </div>
         <div class="form-group">
-          <label>Card number</label>
-          <input type="text" placeholder="1234 5678 9012 3456">
+          <label>Your name (optional)</label>
+          <input type="text" id="betaName" placeholder="What should we call you?" autocomplete="name">
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Expiry</label>
-            <input type="text" placeholder="MM / YY">
-          </div>
-          <div class="form-group">
-            <label>CVC</label>
-            <input type="text" placeholder="123">
-          </div>
+        <div class="form-group">
+          <label>Primary platform (optional)</label>
+          <select id="betaPlatform" style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#f5f5f7;font-size:1rem;font-family:inherit">
+            <option value="">Choose your main platform</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+          </select>
         </div>
-        <button class="btn-pay">Subscribe — $59.99/mo</button>
-        <p class="secure-note">Encrypted with industry-standard technology. Cancel anytime.</p>
+        <button class="btn-pay">Get Free Beta Access</button>
+        <p class="secure-note">No credit card required. Instant Max access.</p>
       </div>
 
     </div>
@@ -723,7 +719,7 @@ var dashObs=new IntersectionObserver(function(entries){
 
 document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observe(el);});
 
-// ── Wire checkout form to backend ──
+// ── Wire beta signup form ──
 (function(){
   var btn = document.querySelector('.btn-pay');
   if (!btn) return;
@@ -731,24 +727,19 @@ document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observ
     e.preventDefault();
     var email = document.querySelector('.payment-form input[type="email"]');
     if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
-    btn.disabled = true; btn.textContent = 'Processing…';
-    fetch('/api/auth/signup', {
+    btn.disabled = true; btn.textContent = 'Setting up your account…';
+    var name = document.getElementById('betaName');
+    var platform = document.getElementById('betaPlatform');
+    fetch('/api/auth/beta-signup', {
       method:'POST', credentials:'include',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email: email.value.trim(), password: 'temp_' + Date.now(), name: email.value.split('@')[0]})
-    }).then(function(r){return r.json()}).then(function(){
-      return fetch('/api/stripe/create-checkout', {
-        method:'POST', credentials:'include',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({plan:'max'})
-      });
+      body: JSON.stringify({email: email.value.trim(), name: name ? name.value.trim() : '', platform: platform ? platform.value : ''})
     }).then(function(r){return r.json()}).then(function(data){
-      if (data.url) window.location.href = data.url;
-      else if (data.checkout_url) window.location.href = data.checkout_url;
-      else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = 'Subscribe — $59.99/mo'; }
+      if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = 'Get Free Beta Access'; return; }
+      window.location.href = '/dashboard.html?subscribed=max&beta=true';
     }).catch(function(){
       alert('Something went wrong. Please try again.');
-      btn.disabled = false; btn.textContent = 'Subscribe — $59.99/mo';
+      btn.disabled = false; btn.textContent = 'Get Free Beta Access';
     });
   });
 })();

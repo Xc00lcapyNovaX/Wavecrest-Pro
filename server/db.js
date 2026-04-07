@@ -39,7 +39,7 @@ db.createUser = async ({ email, passwordHash, name, provider = 'email', provider
 };
 
 db.updateUser = async (id, fields) => {
-  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id'];
+  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id', 'is_beta'];
   const sets = [];
   const vals = [];
   let i = 1;

@@ -176,6 +176,14 @@
 <div class="container">
   <div id="error" class="error-banner"></div>
 
+  <div id="betaBanner" class="upgrade-banner" style="display:none;background:linear-gradient(135deg,rgba(48,209,88,.12),rgba(0,113,227,.12));border:1px solid rgba(48,209,88,.25)">
+    <div>
+      <strong>🧪 You're a beta tester</strong>
+      <p>You have free Pro access during our beta. We'll give you plenty of notice before pricing kicks in.</p>
+    </div>
+    <span style="color:#30d158;font-weight:600;white-space:nowrap">Pro • Free</span>
+  </div>
+
   <div id="upgradeBanner" class="upgrade-banner" style="display:none">
     <div>
       <strong>You're missing the best features</strong>
@@ -308,12 +316,15 @@ async function loadDashboard() {
 function checkSubscriptionToast() {
   const params = new URLSearchParams(window.location.search);
   const plan = params.get('subscribed');
+  const isBeta = params.get('beta');
   if (plan) {
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(48,209,88,.15);color:#30d158;padding:16px 32px;border-radius:12px;border:1px solid rgba(48,209,88,.3);font-weight:600;z-index:200;backdrop-filter:blur(12px);animation:fadeIn .3s';
-    toast.textContent = '🎉 Welcome to ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '!';
+    toast.textContent = isBeta
+      ? '🧪 Welcome to the beta! You have free Pro access.'
+      : '🎉 Welcome to ' + plan.charAt(0).toUpperCase() + plan.slice(1) + '!';
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 600); }, 4000);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 600); }, 5000);
     window.history.replaceState({}, '', '/dashboard.html');
   }
 }
@@ -336,9 +347,14 @@ function render() {
   document.getElementById('statPlan').textContent = d.user.plan.charAt(0).toUpperCase() + d.user.plan.slice(1);
   document.getElementById('statPlanSub').textContent = d.subscription ? ('Status: ' + d.subscription.status) : 'No active subscription';
 
-  // Upgrade banner for free/plus
-  if (['free', 'plus'].includes(d.user.plan)) {
+  // Upgrade banner for free/plus (not beta)
+  if (['free', 'plus'].includes(d.user.plan) && !d.user.is_beta) {
     document.getElementById('upgradeBanner').style.display = 'flex';
+  }
+
+  // Beta banner
+  if (d.user.is_beta) {
+    document.getElementById('betaBanner').style.display = 'flex';
   }
 
   // Niche search

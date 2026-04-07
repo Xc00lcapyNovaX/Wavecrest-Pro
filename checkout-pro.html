@@ -214,41 +214,45 @@
 
   <hr class="section-divider">
 
-  <!-- Checkout: Order Summary + Payment Form -->
+  <!-- Checkout: Beta Signup -->
   <div class="checkout-area">
-    <p class="section-label">Complete Your Purchase</p>
+    <p class="section-label">Get Early Access</p>
     <div class="checkout-grid">
 
       <div class="order-summary">
-        <h2 class="summary-heading">Order summary</h2>
-        <div class="summary-line"><span>Wavecrest Pro (intro)</span><span>$14.99</span></div>
-        <div class="summary-line"><span>Billing</span><span class="summary-muted">Monthly</span></div>
-        <div class="summary-line"><span class="summary-muted">Cancel anytime — no commitment</span><span></span></div>
-        <div class="summary-line total"><span>Due today</span><span>$14.99</span></div>
+        <h2 class="summary-heading">Beta offer</h2>
+        <div class="summary-line"><span>Wavecrest Pro</span><span style="text-decoration:line-through;color:var(--muted)">$24.99/mo</span></div>
+        <div class="summary-line"><span>Beta discount</span><span style="color:#30d158;font-weight:600">−$24.99</span></div>
+        <div class="summary-line"><span class="summary-muted">Limited spots for early testers</span><span></span></div>
+        <div class="summary-line total"><span>Due today</span><span style="color:#30d158;font-weight:700">$0.00</span></div>
+        <p style="color:var(--muted);font-size:.78rem;margin-top:16px;line-height:1.5">Beta users get free Pro access for a limited time. Standard pricing will apply after the beta period ends — we'll give you plenty of notice.</p>
       </div>
 
       <div class="payment-form">
-        <h2 class="form-heading">Payment</h2>
+        <h2 class="form-heading">Join the Beta</h2>
         <div class="form-group">
           <label>Email</label>
           <input type="email" placeholder="you@example.com" autocomplete="email">
         </div>
         <div class="form-group">
-          <label>Card number</label>
-          <input type="text" placeholder="1234 5678 9012 3456" autocomplete="cc-number">
+          <label>Your name (optional)</label>
+          <input type="text" id="betaName" placeholder="What should we call you?" autocomplete="name">
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Expiry</label>
-            <input type="text" placeholder="MM / YY" autocomplete="cc-exp">
-          </div>
-          <div class="form-group">
-            <label>CVC</label>
-            <input type="text" placeholder="123" autocomplete="cc-csc">
-          </div>
+        <div class="form-group">
+          <label>Your niche (optional)</label>
+          <input type="text" id="betaNiche" placeholder="e.g. fitness, cooking, tech reviews">
         </div>
-        <button class="btn-pay">Subscribe — $14.99/mo</button>
-        <p class="secure-note">Encrypted with industry-standard technology. Cancel anytime.</p>
+        <div class="form-group">
+          <label>Primary platform (optional)</label>
+          <select id="betaPlatform" style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#f5f5f7;font-size:1rem;font-family:inherit">
+            <option value="">Choose your main platform</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+          </select>
+        </div>
+        <button class="btn-pay">Get Free Beta Access</button>
+        <p class="secure-note">No credit card required. Instant Pro access.</p>
       </div>
 
     </div>
@@ -424,7 +428,7 @@ var dashObs=new IntersectionObserver(function(entries){
 
 document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observe(el);});
 
-// ── Wire checkout form to backend ──
+// ── Wire beta signup form ──
 (function(){
   var btn = document.querySelector('.btn-pay');
   if (!btn) return;
@@ -432,27 +436,31 @@ document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observ
     e.preventDefault();
     var email = document.querySelector('.payment-form input[type="email"]');
     if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
-    btn.disabled = true; btn.textContent = 'Processing…';
+    btn.disabled = true; btn.textContent = 'Setting up your account…';
 
-    // First sign up / sign in the user
-    fetch('/api/auth/signup', {
+    var name = document.getElementById('betaName');
+    var niche = document.getElementById('betaNiche');
+    var platform = document.getElementById('betaPlatform');
+
+    fetch('/api/auth/beta-signup', {
       method:'POST', credentials:'include',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email: email.value.trim(), password: 'temp_' + Date.now(), name: email.value.split('@')[0]})
-    }).then(function(r){return r.json()}).then(function(){
-      // Then create checkout
-      return fetch('/api/stripe/create-checkout', {
-        method:'POST', credentials:'include',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({plan:'pro'})
-      });
+      body: JSON.stringify({
+        email: email.value.trim(),
+        name: name ? name.value.trim() : '',
+        niche: niche ? niche.value.trim() : '',
+        platform: platform ? platform.value : ''
+      })
     }).then(function(r){return r.json()}).then(function(data){
-      if (data.url) window.location.href = data.url;
-      else if (data.checkout_url) window.location.href = data.checkout_url;
-      else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = 'Subscribe — $14.99/mo'; }
+      if (data.error) {
+        alert(data.error);
+        btn.disabled = false; btn.textContent = 'Get Free Beta Access';
+        return;
+      }
+      window.location.href = '/dashboard.html?subscribed=pro&beta=true';
     }).catch(function(){
       alert('Something went wrong. Please try again.');
-      btn.disabled = false; btn.textContent = 'Subscribe — $14.99/mo';
+      btn.disabled = false; btn.textContent = 'Get Free Beta Access';
     });
   });
 })();

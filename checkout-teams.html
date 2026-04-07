@@ -619,97 +619,55 @@
     </div>
   </div>
 
-  <!-- Payment Area (two-column) -->
+  <!-- Payment Area: Beta Signup -->
   <div class="payment-area">
     <div class="payment-grid">
 
-      <!-- Left: Order Summary -->
+      <!-- Left: Beta Offer -->
       <div class="order-summary">
-        <p class="section-label" style="text-align:left">Order Summary</p>
+        <p class="section-label" style="text-align:left">Beta Offer</p>
         <h3>Wavecrest Pro — Teams</h3>
         <div class="summary-block">
           <div class="summary-line">
             <span class="label">Plan</span>
-            <span>Teams</span>
+            <span>Teams (Pro access)</span>
           </div>
           <div class="summary-line">
-            <span class="label">Price per seat</span>
-            <span>$49.99/mo</span>
+            <span class="label">Regular price</span>
+            <span style="text-decoration:line-through;color:var(--muted)">$49.99/seat/mo</span>
           </div>
           <div class="summary-line">
-            <span class="label">Team size</span>
-            <span id="summary-seats">3 members</span>
-          </div>
-          <div class="summary-line">
-            <span class="label">Billing</span>
-            <span>Monthly</span>
+            <span class="label">Beta price</span>
+            <span style="color:#30d158;font-weight:600">Free</span>
           </div>
           <div class="summary-line total">
-            <span class="label">Total today</span>
-            <span id="summary-total">$149.97</span>
+            <span class="label">Due today</span>
+            <span style="color:#30d158">$0.00</span>
           </div>
         </div>
-        <p class="price-per-seat">$49.99 per person per month. Cancel anytime.<br>All prices in USD.</p>
+        <p class="price-per-seat">Beta users get free team access for a limited time.<br>Standard pricing applies after beta ends.</p>
       </div>
 
-      <!-- Right: Payment Form -->
+      <!-- Right: Beta Form -->
       <div class="payment-form">
-        <p class="section-label" style="text-align:left">Payment Details</p>
+        <p class="section-label" style="text-align:left">Join the Beta</p>
         <h3>Start your team</h3>
 
         <div class="form-group">
           <label>Team name</label>
-          <input type="text" placeholder="Your agency or team name">
+          <input type="text" id="betaTeamName" placeholder="Your agency or team name">
         </div>
         <div class="form-group">
           <label>Admin email</label>
           <input type="email" placeholder="you@example.com">
         </div>
-
         <div class="form-group">
-          <label>Team size</label>
-          <div class="team-size-grid">
-            <div class="size-option active" data-members="3" onclick="selectSize(this)">
-              <span class="num">3</span>
-              <span class="per">$149.97/mo</span>
-            </div>
-            <div class="size-option" data-members="5" onclick="selectSize(this)">
-              <span class="num">5</span>
-              <span class="per">$249.95/mo</span>
-            </div>
-            <div class="size-option" data-members="10" onclick="selectSize(this)">
-              <span class="num">10</span>
-              <span class="per">$499.90/mo</span>
-            </div>
-            <div class="size-option" data-members="15" onclick="selectSize(this)">
-              <span class="num">15</span>
-              <span class="per">$749.85/mo</span>
-            </div>
-            <div class="size-option" data-members="25" onclick="selectSize(this)">
-              <span class="num">25</span>
-              <span class="per">$1,249.75/mo</span>
-            </div>
-          </div>
-          <div class="dynamic-price"><strong id="dynamic-total">$149.97</strong>/mo for <span id="dynamic-seats">3</span> members</div>
+          <label>Your name (optional)</label>
+          <input type="text" id="betaName" placeholder="What should we call you?" autocomplete="name">
         </div>
 
-        <div class="form-group">
-          <label>Card number</label>
-          <input type="text" placeholder="1234 5678 9012 3456">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Expiry</label>
-            <input type="text" placeholder="MM / YY">
-          </div>
-          <div class="form-group">
-            <label>CVC</label>
-            <input type="text" placeholder="123">
-          </div>
-        </div>
-
-        <button class="btn-pay" id="btn-pay">Start Team — $149.97/mo</button>
-        <p class="secure-note">Encrypted with industry-standard technology. Cancel anytime.</p>
+        <button class="btn-pay" id="btn-pay">Get Free Team Beta Access</button>
+        <p class="secure-note">No credit card required. Instant team access.</p>
       </div>
     </div>
   </div>
@@ -771,7 +729,7 @@ function initWaveText(){
 }
 initWaveText();
 
-// ── Wire checkout form to backend ──
+// ── Wire beta signup form ──
 (function(){
   var btn = document.getElementById('btn-pay');
   if (!btn) return;
@@ -779,26 +737,18 @@ initWaveText();
     e.preventDefault();
     var email = document.querySelector('.payment-form input[type="email"]');
     if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
-    var activeSize = document.querySelector('.size-option.active');
-    var teamSize = activeSize ? parseInt(activeSize.getAttribute('data-members'), 10) : 3;
-    btn.disabled = true; var origText = btn.textContent; btn.textContent = 'Processing…';
-    fetch('/api/auth/signup', {
+    btn.disabled = true; btn.textContent = 'Setting up your team…';
+    var name = document.getElementById('betaName');
+    fetch('/api/auth/beta-signup', {
       method:'POST', credentials:'include',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email: email.value.trim(), password: 'temp_' + Date.now(), name: email.value.split('@')[0]})
-    }).then(function(r){return r.json()}).then(function(){
-      return fetch('/api/stripe/create-checkout', {
-        method:'POST', credentials:'include',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({plan:'teams', team_size: teamSize})
-      });
+      body: JSON.stringify({email: email.value.trim(), name: name ? name.value.trim() : ''})
     }).then(function(r){return r.json()}).then(function(data){
-      if (data.url) window.location.href = data.url;
-      else if (data.checkout_url) window.location.href = data.checkout_url;
-      else { alert(data.message || 'Checkout created'); btn.disabled = false; btn.textContent = origText; }
+      if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = 'Get Free Team Beta Access'; return; }
+      window.location.href = '/dashboard.html?subscribed=teams&beta=true';
     }).catch(function(){
       alert('Something went wrong. Please try again.');
-      btn.disabled = false; btn.textContent = origText;
+      btn.disabled = false; btn.textContent = 'Get Free Team Beta Access';
     });
   });
 })();

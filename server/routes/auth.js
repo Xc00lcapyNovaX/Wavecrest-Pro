@@ -128,6 +128,54 @@ OAUTH_PROVIDERS.forEach((provider) => {
   });
 });
 
+// ── Beta signup — free Pro access for early testers ──
+router.post('/beta-signup', async (req, res) => {
+  try {
+    const { email, name, niche, platform } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required.' });
+    }
+
+    let user = await db.findUserByEmail(email);
+    if (user) {
+      // Existing user — upgrade to Pro beta if not already
+      if (user.plan === 'free' || user.plan === 'plus') {
+        await db.updateUser(user.id, { plan: 'pro', is_beta: true });
+        user.plan = 'pro';
+      }
+      req.session.userId = user.id;
+      return res.json({
+        message: 'Welcome back! You now have free Pro access.',
+        user: sanitize(user),
+        beta: true,
+      });
+    }
+
+    // New user — create with Pro plan
+    const passwordHash = await bcrypt.hash('beta_' + Date.now(), 12);
+    user = await db.createUser({ email, passwordHash, name: name || email.split('@')[0] });
+    await db.updateUser(user.id, { plan: 'pro', is_beta: true });
+    user.plan = 'pro';
+    user.is_beta = true;
+
+    // Store niche/platform preference as metadata (log it for now)
+    if (niche || platform) {
+      console.log(`[Beta] New signup: ${email} | niche: ${niche || 'none'} | platform: ${platform || 'all'}`);
+    }
+
+    req.session.userId = user.id;
+
+    res.status(201).json({
+      message: 'Welcome to the Wavecrest Pro beta!',
+      user: sanitize(user),
+      beta: true,
+    });
+  } catch (err) {
+    console.error('[Beta Signup]', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 // ── Helper ─────────────────────────────────────────
 function sanitize(user) {
   return {
@@ -136,6 +184,7 @@ function sanitize(user) {
     name: user.name,
     avatar_url: user.avatar_url,
     plan: user.plan,
+    is_beta: user.is_beta || false,
     provider: user.provider,
     created_at: user.created_at,
   };
