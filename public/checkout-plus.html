@@ -222,9 +222,10 @@
     }
     .preview-body { padding: 8px 20px; }
     .preview-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
+      column-gap: 12px;
       padding: 13px 0;
       border-bottom: 1px solid var(--card-border);
     }
@@ -232,6 +233,8 @@
     .preview-row .topic {
       font-size: .875rem;
       font-weight: 500;
+      min-width: 0;
+      line-height: 1.35;
     }
     .preview-row .tag {
       padding: 3px 10px;
@@ -239,6 +242,7 @@
       font-size: .7rem;
       font-weight: 600;
       letter-spacing: .02em;
+      white-space: nowrap;
     }
     .tag-hot { background: rgba(255,69,58,.12); color: #ff453a; }
     .tag-rising { background: rgba(48,209,88,.12); color: #30d158; }
