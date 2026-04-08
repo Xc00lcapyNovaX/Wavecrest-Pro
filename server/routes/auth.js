@@ -9,10 +9,29 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const db = require('../db');
 const router = express.Router();
 
-const isReal = (val) => val && val.length > 0 && !val.includes('PLACEHOLDER');
-const googleConfigured = isReal(process.env.GOOGLE_CLIENT_ID) && isReal(process.env.GOOGLE_CLIENT_SECRET);
-const githubConfigured = isReal(process.env.GITHUB_CLIENT_ID) && isReal(process.env.GITHUB_CLIENT_SECRET);
-const baseUrl = isReal(process.env.BASE_URL) ? process.env.BASE_URL : 'http://localhost:3000';
+const isNonEmpty = (value) => typeof value === 'string' && value.trim().length > 0;
+const baseUrl = process.env.BASE_URL;
+const googleConfigured = isNonEmpty(process.env.GOOGLE_CLIENT_ID) && isNonEmpty(process.env.GOOGLE_CLIENT_SECRET);
+const githubConfigured = isNonEmpty(process.env.GITHUB_CLIENT_ID) && isNonEmpty(process.env.GITHUB_CLIENT_SECRET);
+
+if (!isNonEmpty(baseUrl)) {
+  throw new Error('[Auth] BASE_URL is required.');
+}
+
+if (process.env.NODE_ENV === 'production') {
+  const missing = [];
+  if (!isNonEmpty(process.env.GOOGLE_CLIENT_ID)) missing.push('GOOGLE_CLIENT_ID');
+  if (!isNonEmpty(process.env.GOOGLE_CLIENT_SECRET)) missing.push('GOOGLE_CLIENT_SECRET');
+  if (!isNonEmpty(process.env.GITHUB_CLIENT_ID)) missing.push('GITHUB_CLIENT_ID');
+  if (!isNonEmpty(process.env.GITHUB_CLIENT_SECRET)) missing.push('GITHUB_CLIENT_SECRET');
+  if (missing.length) {
+    throw new Error(`[Auth] Missing required OAuth env vars in production: ${missing.join(', ')}`);
+  }
+}
+
+console.log(`[Auth] Google OAuth: ${googleConfigured ? 'ON' : 'OFF'}`);
+console.log(`[Auth] GitHub OAuth: ${githubConfigured ? 'ON' : 'OFF'}`);
+console.log(`[Auth] BASE_URL: ${baseUrl}`);
 
 // Passport setup
 if (googleConfigured) {
@@ -36,6 +55,7 @@ if (googleConfigured) {
       }
       done(null, user);
     } catch (err) {
+      console.error('[Auth] Google strategy error:', err.message);
       done(err);
     }
   }));
@@ -62,6 +82,7 @@ if (githubConfigured) {
       }
       done(null, user);
     } catch (err) {
+      console.error('[Auth] GitHub strategy error:', err.message);
       done(err);
     }
   }));
@@ -155,17 +176,20 @@ router.get('/me', async (req, res) => {
 // Google OAuth is now strict real OAuth only. No mock fallback route.
 router.get('/google', (req, res, next) => {
   if (!googleConfigured) {
-    return res.redirect('/signin.html?error=google_oauth_not_configured');
+    return res.redirect('/signin.html?error=google_not_configured');
   }
   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
   if (!googleConfigured) {
-    return res.redirect('/signin.html?error=google_oauth_not_configured');
+    return res.redirect('/signin.html?error=google_not_configured');
   }
   passport.authenticate('google', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
-    if (err) return res.redirect('/signin.html?error=oauth_failed');
+    if (err) {
+      console.error('[Auth] Google OAuth callback error:', err.message);
+      return res.redirect('/signin.html?error=oauth_failed');
+    }
     req.session.userId = req.user.id;
     const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
     return res.redirect(dest);
@@ -176,20 +200,23 @@ router.get('/github', (req, res, next) => {
   if (githubConfigured) {
     passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
   } else {
-    res.redirect('/signin.html?oauth=github');
+    res.redirect('/signin.html?error=github_not_configured');
   }
 });
 
 router.get('/github/callback', (req, res, next) => {
   if (githubConfigured) {
     passport.authenticate('github', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
-      if (err) return res.redirect('/signin.html?error=oauth_failed');
+      if (err) {
+        console.error('[Auth] GitHub OAuth callback error:', err.message);
+        return res.redirect('/signin.html?error=oauth_failed');
+      }
       req.session.userId = req.user.id;
       const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
       return res.redirect(dest);
     });
   } else {
-    res.redirect('/signin.html');
+    res.redirect('/signin.html?error=github_not_configured');
   }
 });
 
