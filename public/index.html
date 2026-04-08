@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
   <title>Wavecrest Pro — See What's Next</title>
   <link rel="preload" href="/css/glass.css" as="style">
   <link rel="stylesheet" href="/css/glass.css">
@@ -188,15 +189,21 @@
     }
     .price-card.featured{padding-top:56px}
     .price-card h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
+    .price-card .title-row{min-height:34px;display:flex;align-items:center}
     .price-card .price{font-size:2.4rem;font-weight:700;margin:12px 0 4px}
     .price-card .price span{font-size:.9rem;font-weight:400;color:var(--muted)}
-    .price-card .trial{display:inline-block;padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;margin-bottom:14px;letter-spacing:.02em}
+    .price-card .trial{
+      display:inline-flex;align-items:center;
+      min-height:24px;padding:4px 12px;border-radius:980px;
+      font-size:.72rem;font-weight:600;margin-bottom:14px;letter-spacing:.02em
+    }
+    .price-card .trial-placeholder{visibility:hidden}
     .trial-free{background:rgba(48,209,88,.12);color:var(--accent3)}
     .trial-discount{background:rgba(41,151,255,.12);color:var(--accent)}
     .price-card .original-price{text-decoration:line-through;color:var(--muted);font-size:1rem;font-weight:400;margin-right:6px}
-    .price-card .note{font-size:.82rem;color:var(--muted);margin-bottom:20px}
+    .price-card .note{font-size:.82rem;color:var(--muted);margin-bottom:20px;min-height:38px;line-height:1.45}
     .price-card ul{list-style:none;margin-bottom:28px;flex:1}
-    .price-card li{padding:7px 0;font-size:.88rem;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04)}
+    .price-card li{padding:8px 0;font-size:.88rem;color:var(--muted);line-height:1.4;border-bottom:1px solid rgba(255,255,255,.04)}
     .price-card li::before{content:'✓ ';color:var(--accent3);font-weight:700}
     .price-card .btn-card{
       display:block;text-align:center;padding:12px;border-radius:980px;font-size:.9rem;font-weight:600;
@@ -373,7 +380,8 @@
     <div class="pricing-grid">
       <!-- Free -->
       <div class="price-card glass-strong reveal">
-        <h3>Free</h3>
+        <div class="title-row"><h3>Free</h3></div>
+        <div class="trial trial-placeholder" aria-hidden="true">placeholder</div>
         <div class="price">$0<span>/mo</span></div>
         <div class="note">Bring Your Own API Key</div>
         <ul>
@@ -389,7 +397,7 @@
       </div>
       <!-- Plus -->
       <div class="price-card glass-strong reveal reveal-delay-1">
-        <h3>Plus</h3>
+        <div class="title-row"><h3>Plus</h3></div>
         <div class="trial trial-free" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$9.99</span>$0<span>/mo</span></div>
         <div class="note">Free for beta testers. $9.99/mo after beta ends.</div>
@@ -406,7 +414,7 @@
       </div>
       <!-- Pro -->
       <div class="price-card glass-strong featured reveal reveal-delay-2">
-        <h3>Pro <span style="font-size:.6em;background:linear-gradient(135deg,#30d158,#0071e3);color:#fff;padding:2px 8px;border-radius:8px;vertical-align:middle;margin-left:4px">POPULAR</span></h3>
+        <div class="title-row"><h3>Pro <span style="font-size:.6em;background:linear-gradient(135deg,#30d158,#0071e3);color:#fff;padding:2px 8px;border-radius:8px;vertical-align:middle;margin-left:4px">POPULAR</span></h3></div>
         <div class="trial trial-discount" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$24.99</span>$0<span>/mo</span></div>
         <div class="note">Free for beta testers. $24.99/mo after beta ends.</div>
@@ -424,7 +432,7 @@
       </div>
       <!-- Max -->
       <div class="price-card glass-strong reveal reveal-delay-3">
-        <h3>Max</h3>
+        <div class="title-row"><h3>Max</h3></div>
         <div class="trial trial-discount" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$99.99</span>$0<span>/mo</span></div>
         <div class="note">Free for beta testers. $99.99/mo after beta ends.</div>
@@ -442,7 +450,7 @@
       </div>
       <!-- Teams -->
       <div class="price-card glass-strong reveal reveal-delay-1">
-        <h3>Teams</h3>
+        <div class="title-row"><h3>Teams</h3></div>
         <div class="trial trial-free" style="background:linear-gradient(135deg,#30d158,#0071e3);color:#fff">🧪 Free during beta</div>
         <div class="price"><span class="original-price">$49.99</span>$0<span>/person/mo</span></div>
         <div class="note">Free for beta teams. $49.99/seat/mo after beta ends.</div>
@@ -459,7 +467,8 @@
       </div>
       <!-- Enterprise -->
       <div class="price-card glass-strong reveal reveal-delay-2">
-        <h3>Enterprise</h3>
+        <div class="title-row"><h3>Enterprise</h3></div>
+        <div class="trial trial-placeholder" aria-hidden="true">placeholder</div>
         <div class="price">Custom</div>
         <div class="note">Custom everything</div>
         <ul>
