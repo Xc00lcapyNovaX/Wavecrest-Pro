@@ -26,6 +26,7 @@
   .user-name{font-size:.9rem;color:var(--muted)}
   .btn-sm{padding:8px 16px;border-radius:980px;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:.82rem;cursor:pointer;transition:background .2s}
   .btn-sm:hover{background:rgba(255,255,255,.06)}
+  .btn-sm.active{border-color:var(--blue);color:var(--blue);background:rgba(0,113,227,.08)}
 
   /* ── Layout ── */
   .container{max-width:1100px;margin:0 auto;padding:40px 24px}
@@ -38,6 +39,7 @@
   .stat-card .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
   .stat-card .value{font-size:1.8rem;font-weight:700}
   .stat-card .sub{font-size:.82rem;color:var(--muted);margin-top:4px}
+  .stat-card .value.placeholder{color:var(--muted)}
 
   /* ── Search ── */
   .search-section{margin-bottom:32px}
@@ -54,13 +56,13 @@
   /* ── Trends table ── */
   .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
   .trend-list{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
-  .trend-row{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s}
+  .trend-row{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;align-items:center;column-gap:16px;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s}
   .trend-row:last-child{border-bottom:none}
   .trend-row:hover{background:rgba(255,255,255,.03)}
   .trend-row.locked{opacity:.4;filter:blur(2px);pointer-events:none}
-  .trend-topic{font-weight:500;flex:1}
-  .trend-platform{font-size:.78rem;color:var(--muted);margin:0 16px;min-width:80px}
-  .tag{padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;text-transform:uppercase}
+  .trend-topic{font-weight:500;min-width:0;line-height:1.35}
+  .trend-platform{font-size:.78rem;color:var(--muted);text-transform:capitalize}
+  .tag{padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:600;text-transform:uppercase;white-space:nowrap}
   .tag-hot{background:rgba(255,69,58,.15);color:var(--red)}
   .tag-rising{background:rgba(48,209,88,.15);color:var(--green)}
   .tag-warm{background:rgba(255,159,10,.15);color:var(--orange)}
@@ -152,8 +154,8 @@
     .container{padding:24px 16px}
     .search-bar{flex-direction:column}
     .search-bar input,.search-bar select,.search-bar button{width:100%}
-    .trend-row{padding:12px 16px;flex-wrap:wrap;gap:8px}
-    .trend-platform{margin:0;min-width:auto}
+    .trend-row{grid-template-columns:minmax(0,1fr) auto;padding:12px 16px;row-gap:8px}
+    .trend-platform{grid-column:1 / -1}
     .upgrade-banner{flex-direction:column;text-align:center;padding:20px}
     .upgrade-banner a{width:100%;text-align:center}
     .stat-card .value{font-size:1.4rem}
@@ -313,7 +315,9 @@ async function loadDashboard() {
     renderByoak();
     checkSubscriptionToast();
   } catch (err) {
-    showError(err.message || 'Failed to load dashboard. Is the server running?');
+    const message = err.message || 'Failed to load dashboard. Is the server running?';
+    showError(message);
+    renderDashboardFallback(message);
   }
 }
 
@@ -347,6 +351,9 @@ function render() {
   badge.className = 'plan-badge plan-' + d.user.plan;
 
   // Stats
+  document.getElementById('statTotal').classList.remove('placeholder');
+  document.getElementById('statRemaining').classList.remove('placeholder');
+  document.getElementById('statPlan').classList.remove('placeholder');
   document.getElementById('statTotal').textContent = d.trends.total;
   document.getElementById('statDate').textContent = d.trends.date;
   document.getElementById('statRemaining').textContent = d.usage.limit === 'unlimited' ? '∞' : d.usage.remaining;
@@ -425,6 +432,10 @@ async function doSearch() {
 
 function renderTrends(filter) {
   const list = document.getElementById('trendList');
+  if (!dashboardData || !dashboardData.trends || !Array.isArray(dashboardData.trends.items)) {
+    list.innerHTML = '<div class="loading">Loading trends...</div>';
+    return;
+  }
   let items = dashboardData.trends.items;
   if (filter) items = items.filter(function(t) { return t.platform === filter; });
 
@@ -441,10 +452,9 @@ function renderTrends(filter) {
 
 function filterPlatform(p) {
   currentFilter = p;
-  // Highlight active filter
-  document.querySelectorAll('.actions .btn-sm').forEach(function(b) { b.style.borderColor = ''; b.style.color = ''; });
+  document.querySelectorAll('.actions .btn-sm').forEach(function(b) { b.classList.remove('active'); });
   var activeBtn = p ? document.querySelector('.actions .btn-sm[onclick*="' + p + '"]') : document.getElementById('filterAll');
-  if (activeBtn) { activeBtn.style.borderColor = 'var(--blue)'; activeBtn.style.color = 'var(--blue)'; }
+  if (activeBtn) activeBtn.classList.add('active');
   renderTrends(p);
 }
 
@@ -484,6 +494,19 @@ async function logout() {
 }
 
 function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+
+function renderDashboardFallback(msg) {
+  document.getElementById('statTotal').textContent = '—';
+  document.getElementById('statTotal').classList.add('placeholder');
+  document.getElementById('statDate').textContent = 'Unable to load trend stats';
+  document.getElementById('statRemaining').textContent = '—';
+  document.getElementById('statRemaining').classList.add('placeholder');
+  document.getElementById('statLimit').textContent = 'Usage unavailable';
+  document.getElementById('statPlan').textContent = '—';
+  document.getElementById('statPlan').classList.add('placeholder');
+  document.getElementById('statPlanSub').textContent = 'Plan unavailable';
+  document.getElementById('trendList').innerHTML = '<div class="loading" style="color:var(--red)">' + esc(msg) + '</div>';
+}
 
 // ── AI Predictions (Pro+) ──
 async function loadPredictions() {
