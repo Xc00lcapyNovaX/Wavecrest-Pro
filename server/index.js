@@ -60,9 +60,9 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ── Passport (OAuth) ───────────────────────────────
 // Auth module registers Passport strategies when required
-const authRouter = require('./routes/auth');
 app.use(passport.initialize());
 app.use(passport.session());
+const authRouter = require('./routes/auth');
 
 
 const trendsRouter = require('./routes/trends');

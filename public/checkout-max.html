@@ -349,6 +349,11 @@
       font-size:.75rem;
       color:var(--muted);
     }
+    .oauth-divider{display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:var(--muted);font-size:.72rem;letter-spacing:.02em;text-transform:uppercase}
+    .oauth-divider::before,.oauth-divider::after{content:'';flex:1;height:1px;background:var(--card-border)}
+    .oauth-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .oauth-btn{display:flex;align-items:center;justify-content:center;padding:11px 12px;border:1px solid var(--card-border);border-radius:10px;background:rgba(255,255,255,.03);color:var(--fg);text-decoration:none;font-size:.82rem;font-weight:600;transition:border-color .2s ease,background .2s ease}
+    .oauth-btn:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06)}
 
     /* Upsell */
     .upsell{
@@ -543,6 +548,11 @@
           </select>
         </div>
         <button class="btn-pay">Get Free Beta Access</button>
+        <div class="oauth-divider">or continue with</div>
+        <div class="oauth-row">
+          <a class="oauth-btn" href="/api/auth/google">Google</a>
+          <a class="oauth-btn" href="/api/auth/github">GitHub</a>
+        </div>
         <p class="secure-note">No credit card required. Instant Max access.</p>
       </div>
 
