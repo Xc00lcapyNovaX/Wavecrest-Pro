@@ -9,15 +9,17 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const db = require('../db');
 const router = express.Router();
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const isReal = (val) => val && val.length > 0 && !val.includes('PLACEHOLDER');
+const googleConfigured = isReal(process.env.GOOGLE_CLIENT_ID) && isReal(process.env.GOOGLE_CLIENT_SECRET);
+const githubConfigured = isReal(process.env.GITHUB_CLIENT_ID) && isReal(process.env.GITHUB_CLIENT_SECRET);
+const baseUrl = isReal(process.env.BASE_URL) ? process.env.BASE_URL : 'http://localhost:3000';
 
-// ── Passport setup ─────────────────────────────────
-// Strategies activate when env vars are set (GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID)
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+// Passport setup
+if (googleConfigured) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${BASE_URL}/api/auth/google/callback`,
+    callbackURL: `${baseUrl}/api/auth/google/callback`,
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails?.[0]?.value;
@@ -39,11 +41,11 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   }));
 }
 
-if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+if (githubConfigured) {
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: `${BASE_URL}/api/auth/github/callback`,
+    callbackURL: `${baseUrl}/api/auth/github/callback`,
     scope: ['user:email'],
   }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -71,7 +73,6 @@ passport.deserializeUser(async (id, done) => {
   catch (err) { done(err); }
 });
 
-// ── Email signup ───────────────────────────────────
 router.post('/signup', async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -98,7 +99,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// ── Email login ────────────────────────────────────
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -123,7 +123,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ── Logout ─────────────────────────────────────────
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error('[Auth] Logout error:', err.message);
@@ -132,7 +131,6 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// ── Current user ───────────────────────────────────
 router.get('/me', async (req, res) => {
   try {
     if (!req.session.userId) {
@@ -154,50 +152,49 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// ── Google OAuth ────────────────────────────────────
-if (process.env.GOOGLE_CLIENT_ID) {
-  router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Google OAuth is now strict real OAuth only. No mock fallback route.
+router.get('/google', (req, res, next) => {
+  if (!googleConfigured) {
+    return res.redirect('/signin.html?error=google_oauth_not_configured');
+  }
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
-  router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/signin.html?error=oauth_failed' }),
-    (req, res) => {
+router.get('/google/callback', (req, res, next) => {
+  if (!googleConfigured) {
+    return res.redirect('/signin.html?error=google_oauth_not_configured');
+  }
+  passport.authenticate('google', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
+    if (err) return res.redirect('/signin.html?error=oauth_failed');
+    req.session.userId = req.user.id;
+    const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    return res.redirect(dest);
+  });
+});
+
+router.get('/github', (req, res, next) => {
+  if (githubConfigured) {
+    passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
+  } else {
+    res.redirect('/signin.html?oauth=github');
+  }
+});
+
+router.get('/github/callback', (req, res, next) => {
+  if (githubConfigured) {
+    passport.authenticate('github', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
+      if (err) return res.redirect('/signin.html?error=oauth_failed');
       req.session.userId = req.user.id;
       const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
-      res.redirect(dest);
-    }
-  );
-} else {
-  // Fallback when env vars not set — redirect to signin with notice
-  router.get('/google', (req, res) => {
-    res.redirect('/signin.html?error=oauth_not_configured');
-  });
-  router.get('/google/callback', (req, res) => res.redirect('/signin.html'));
-}
+      return res.redirect(dest);
+    });
+  } else {
+    res.redirect('/signin.html');
+  }
+});
 
-// ── GitHub OAuth ────────────────────────────────────
-if (process.env.GITHUB_CLIENT_ID) {
-  router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
-
-  router.get('/github/callback',
-    passport.authenticate('github', { failureRedirect: '/signin.html?error=oauth_failed' }),
-    (req, res) => {
-      req.session.userId = req.user.id;
-      const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
-      res.redirect(dest);
-    }
-  );
-} else {
-  router.get('/github', (req, res) => {
-    res.redirect('/signin.html?error=oauth_not_configured');
-  });
-  router.get('/github/callback', (req, res) => res.redirect('/signin.html'));
-}
-
-// ── Apple + Microsoft — mock (require paid dev accounts) ──
-['apple', 'microsoft'].forEach((provider) => {
-  router.get(`/${provider}`, (req, res) => {
-    res.redirect(`/signin.html?oauth=${provider}`);
-  });
+['apple', 'microsoft', 'github'].forEach((provider) => {
+  if (provider === 'github' && githubConfigured) return;
 
   router.post(`/${provider}/callback`, async (req, res) => {
     try {
@@ -213,14 +210,13 @@ if (process.env.GITHUB_CLIENT_ID) {
         });
       }
       req.session.userId = user.id;
-      res.json({ message: `Signed in with ${provider}.`, user: sanitize(user) });
+      res.json({ message: `Signed in with ${provider} (mock).`, user: sanitize(user) });
     } catch (err) {
       res.status(500).json({ error: 'Server error.' });
     }
   });
 });
 
-// ── Beta signup — free Pro access for early testers ──
 router.post('/beta-signup', async (req, res) => {
   try {
     const { email, name, niche, platform } = req.body;
@@ -230,7 +226,6 @@ router.post('/beta-signup', async (req, res) => {
 
     let user = await db.findUserByEmail(email);
     if (user) {
-      // Existing user — upgrade to Pro beta if not already
       if (user.plan === 'free' || user.plan === 'plus') {
         await db.updateUser(user.id, { plan: 'pro', is_beta: true });
         user.plan = 'pro';
@@ -243,14 +238,12 @@ router.post('/beta-signup', async (req, res) => {
       });
     }
 
-    // New user — create with Pro plan
-    const passwordHash = await bcrypt.hash('beta_' + Date.now(), 12);
+    const passwordHash = await bcrypt.hash(`beta_${Date.now()}`, 12);
     user = await db.createUser({ email, passwordHash, name: name || email.split('@')[0] });
     await db.updateUser(user.id, { plan: 'pro', is_beta: true });
     user.plan = 'pro';
     user.is_beta = true;
 
-    // Store niche/platform preference as metadata (log it for now)
     if (niche || platform) {
       console.log(`[Beta] New signup: ${email} | niche: ${niche || 'none'} | platform: ${platform || 'all'}`);
     }
@@ -268,7 +261,6 @@ router.post('/beta-signup', async (req, res) => {
   }
 });
 
-// ── Helper ─────────────────────────────────────────
 function sanitize(user) {
   return {
     id: user.id,
