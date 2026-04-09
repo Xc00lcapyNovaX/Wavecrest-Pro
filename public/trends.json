@@ -1,45 +1,15 @@
 {
-  "date": "2026-04-08",
-  "updated_at": "2026-04-08T07:08:31.828874+00:00",
+  "date": "2026-04-09",
+  "updated_at": "2026-04-09T07:12:39.383133+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "♪ is claude down",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ adam back",
+      "topic": "▶️ lee cronin's the mummy",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "📸 Studio apartment hacks",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ #CleanTok deep cleaning",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ Analog photography revival",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ #FitnessTok home workouts",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Coffee shop aesthetic reels",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ Silent vlog trend",
+      "topic": "♪ nfl schedule this week",
       "score": "hot",
       "platform": "tiktok"
     },
@@ -49,19 +19,49 @@
       "platform": "instagram"
     },
     {
-      "topic": "♪ winona ryder",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ derek fisher",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 patrick mahomes personal news",
-      "score": "rising",
+      "topic": "📸 Vintage fashion hauls",
+      "score": "hot",
       "platform": "instagram"
+    },
+    {
+      "topic": "▶️ Coding tutorial series",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Tiny house living tours",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Micro-adventure weekends",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 #OOTD street fashion",
+      "score": "hot",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 Golden hour photography",
+      "score": "hot",
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ stock market news today",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ world cup qualifiers schedule",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ tax filing deadline",
+      "score": "rising",
+      "platform": "youtube"
     },
     {
       "topic": "📸 Cafe hopping vlogs",
@@ -69,14 +69,29 @@
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Budget travel hacks",
+      "topic": "♪ #FitnessTok home workouts",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Sunset drone cinematography",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ 3D printing oddities",
       "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "♪ GRWM morning routines",
+      "topic": "📸 Coffee shop aesthetic reels",
       "score": "rising",
-      "platform": "tiktok"
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 Pet rescue stories",
+      "score": "rising",
+      "platform": "instagram"
     },
     {
       "topic": "♪ #BookTok dark academia",
@@ -84,57 +99,47 @@
       "platform": "tiktok"
     },
     {
-      "topic": "▶️ DIY room makeover timelapse",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ #NailTok chrome art",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ Thrift flip challenges",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ fireball meteor",
+      "topic": "♪ apple iphone",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ amen thompson",
+      "topic": "♪ yankees games",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "▶️ reed sheppard",
+      "topic": "▶️ anthony davis",
       "score": "warm",
       "platform": "youtube"
     },
     {
-      "topic": "📸 john krasinski",
+      "topic": "▶️ journey",
       "score": "warm",
-      "platform": "instagram"
+      "platform": "youtube"
     },
     {
-      "topic": "♪ scooter braun",
+      "topic": "♪ netflix top movies right now",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Pet rescue stories",
+      "topic": "♪ #HairTok curtain bangs",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 #PlantTok propagation tips",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "📸 Golden hour photography",
+      "topic": "♪ Analog photography revival",
       "score": "warm",
-      "platform": "instagram"
+      "platform": "tiktok"
     },
     {
-      "topic": "♪ Skincare routine layers",
+      "topic": "♪ GRWM morning routines",
       "score": "warm",
       "platform": "tiktok"
     },
@@ -144,12 +149,7 @@
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Tiny house living tours",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Coding tutorial series",
+      "topic": "▶️ Lo-fi study setups",
       "score": "warm",
       "platform": "youtube"
     }
