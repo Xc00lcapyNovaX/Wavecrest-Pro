@@ -1,70 +1,75 @@
 {
-  "date": "2026-04-09",
-  "updated_at": "2026-04-09T07:12:39.383133+00:00",
+  "date": "2026-04-10",
+  "updated_at": "2026-04-10T07:17:06.450801+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "▶️ lee cronin's the mummy",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ nfl schedule this week",
+      "topic": "♪ real estate",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Street style lookbooks",
+      "topic": "📸 prediction market",
       "score": "hot",
       "platform": "instagram"
     },
     {
-      "topic": "📸 Vintage fashion hauls",
+      "topic": "▶️ AI music generation tools",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Speed coding challenges",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ #CleanTok deep cleaning",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Pet rescue stories",
       "score": "hot",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Coding tutorial series",
+      "topic": "♪ Analog photography revival",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "▶️ Tiny house living tours",
+      "topic": "♪ Thrift flip challenges",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "▶️ Micro-adventure weekends",
+      "topic": "📸 Cottagecore baking reels",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 donald trump military draft",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 melissa mccarthy",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 malcolm in the middle: life's still unfair",
+      "score": "rising",
+      "platform": "instagram"
     },
     {
       "topic": "📸 #OOTD street fashion",
-      "score": "hot",
+      "score": "rising",
       "platform": "instagram"
     },
     {
-      "topic": "📸 Golden hour photography",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ stock market news today",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ world cup qualifiers schedule",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ tax filing deadline",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 Cafe hopping vlogs",
+      "topic": "📸 Sunset drone cinematography",
       "score": "rising",
       "platform": "instagram"
     },
@@ -74,52 +79,47 @@
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Sunset drone cinematography",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ 3D printing oddities",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 Coffee shop aesthetic reels",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 Pet rescue stories",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ #BookTok dark academia",
+      "topic": "♪ POV acting skits",
       "score": "rising",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ apple iphone",
+      "topic": "▶️ Lo-fi study setups",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ GRWM morning routines",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ Skincare routine layers",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 xander bogaerts",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 erin moriarty",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 laura loomer",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ gen v",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ yankees games",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ anthony davis",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ journey",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ netflix top movies right now",
+      "topic": "♪ kyle karros",
       "score": "warm",
       "platform": "tiktok"
     },
@@ -129,27 +129,27 @@
       "platform": "tiktok"
     },
     {
-      "topic": "📸 #PlantTok propagation tips",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ Analog photography revival",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ GRWM morning routines",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
       "topic": "📸 Meal prep aesthetic reels",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Lo-fi study setups",
+      "topic": "♪ Silent vlog trend",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Studio apartment hacks",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ #BookTok dark academia",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ 3D printing oddities",
       "score": "warm",
       "platform": "youtube"
     }
