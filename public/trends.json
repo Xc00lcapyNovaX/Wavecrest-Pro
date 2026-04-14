@@ -1,95 +1,70 @@
 {
-  "date": "2026-04-13",
-  "updated_at": "2026-04-13T07:50:23.618452+00:00",
+  "date": "2026-04-14",
+  "updated_at": "2026-04-14T07:20:07.837979+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "▶️ coachella headliners 2026",
+      "topic": "♪ tornado siren",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "📸 sykkuno drama",
+      "topic": "📸 miu miu",
       "score": "hot",
       "platform": "instagram"
-    },
-    {
-      "topic": "♪ #HairTok curtain bangs",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ #BookTok dark academia",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Speed coding challenges",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 #OOTD street fashion",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ Storytime animated shorts",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ POV acting skits",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Pet rescue stories",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ coachella 2026 tickets",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 what time does coachella end",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ coachella 2023",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Car detailing ASMR",
-      "score": "rising",
-      "platform": "youtube"
     },
     {
       "topic": "📸 #PlantTok propagation tips",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ GRWM morning routines",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Coffee shop aesthetic reels",
-      "score": "rising",
+      "score": "hot",
       "platform": "instagram"
     },
     {
       "topic": "📸 Cafe hopping vlogs",
-      "score": "rising",
+      "score": "hot",
       "platform": "instagram"
     },
     {
-      "topic": "♪ #FitnessTok home workouts",
+      "topic": "♪ Analog photography revival",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ #NailTok chrome art",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ Car detailing ASMR",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 Golden hour photography",
+      "score": "hot",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 Studio apartment hacks",
+      "score": "hot",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ fox 6",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ fox6",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ scott bessent",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ POV acting skits",
       "score": "rising",
       "platform": "tiktok"
     },
@@ -99,59 +74,84 @@
       "platform": "tiktok"
     },
     {
-      "topic": "♪ colombia",
-      "score": "warm",
+      "topic": "▶️ Speed coding challenges",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ Silent vlog trend",
+      "score": "rising",
       "platform": "tiktok"
-    },
-    {
-      "topic": "📸 anuel aa",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 coachella weather",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ seattle",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 bernie sanders",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ Lo-fi study setups",
-      "score": "warm",
-      "platform": "youtube"
     },
     {
       "topic": "📸 Sunset drone cinematography",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ AI music generation tools",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 Cottagecore baking reels",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 tornado warning",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "📸 Studio apartment hacks",
+      "topic": "📸 tornado near me",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "📸 Golden hour photography",
+      "topic": "📸 national weather service",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "♪ #NailTok chrome art",
+      "topic": "📸 tornado warning near me",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ power outage near me",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "▶️ Minimalist apartment tours",
+      "topic": "♪ #BookTok dark academia",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ Coding tutorial series",
       "score": "warm",
       "platform": "youtube"
+    },
+    {
+      "topic": "♪ #FitnessTok home workouts",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ Skincare routine layers",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ GRWM morning routines",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Coffee shop aesthetic reels",
+      "score": "warm",
+      "platform": "instagram"
     }
   ]
 }
