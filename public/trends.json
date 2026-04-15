@@ -1,42 +1,32 @@
 {
-  "date": "2026-04-14",
-  "updated_at": "2026-04-14T07:20:07.837979+00:00",
+  "date": "2026-04-15",
+  "updated_at": "2026-04-15T07:20:33.937124+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "♪ tornado siren",
+      "topic": "♪ old navy christopher john rogers",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 miu miu",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 #PlantTok propagation tips",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 Cafe hopping vlogs",
-      "score": "hot",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ Analog photography revival",
+      "topic": "♪ fox 2 news",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ #NailTok chrome art",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Car detailing ASMR",
+      "topic": "▶️ Retro gaming nostalgia",
       "score": "hot",
       "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Micro-adventure weekends",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 Street style lookbooks",
+      "score": "hot",
+      "platform": "instagram"
     },
     {
       "topic": "📸 Golden hour photography",
@@ -44,39 +34,39 @@
       "platform": "instagram"
     },
     {
-      "topic": "📸 Studio apartment hacks",
+      "topic": "♪ POV acting skits",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Coffee shop aesthetic reels",
       "score": "hot",
       "platform": "instagram"
     },
     {
-      "topic": "♪ fox 6",
+      "topic": "♪ GRWM morning routines",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 joshua jackson katie holmes red carpet",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ peter thiel",
       "score": "rising",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ fox6",
+      "topic": "📸 oreo",
       "score": "rising",
-      "platform": "tiktok"
+      "platform": "instagram"
     },
     {
-      "topic": "▶️ scott bessent",
+      "topic": "📸 Vintage fashion hauls",
       "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ POV acting skits",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ Thrift flip challenges",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Speed coding challenges",
-      "score": "rising",
-      "platform": "youtube"
+      "platform": "instagram"
     },
     {
       "topic": "♪ Silent vlog trend",
@@ -84,54 +74,74 @@
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Sunset drone cinematography",
+      "topic": "♪ #HairTok curtain bangs",
       "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ AI music generation tools",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 Cottagecore baking reels",
-      "score": "rising",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 tornado warning",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 tornado near me",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 national weather service",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "📸 tornado warning near me",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ power outage near me",
-      "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ #BookTok dark academia",
-      "score": "warm",
+      "topic": "♪ Storytime animated shorts",
+      "score": "rising",
       "platform": "tiktok"
     },
     {
       "topic": "▶️ Coding tutorial series",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ #BookTok dark academia",
+      "score": "rising",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ Minimalist apartment tours",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 auto accident attorney",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 click on detroit weather",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ local news",
       "score": "warm",
       "platform": "youtube"
+    },
+    {
+      "topic": "📸 lurcher dog",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ truck accident attorneys",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Sunset drone cinematography",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 #OOTD street fashion",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ Thrift flip challenges",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ Analog photography revival",
+      "score": "warm",
+      "platform": "tiktok"
     },
     {
       "topic": "♪ #FitnessTok home workouts",
@@ -139,19 +149,9 @@
       "platform": "tiktok"
     },
     {
-      "topic": "♪ Skincare routine layers",
+      "topic": "▶️ Tiny house living tours",
       "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ GRWM morning routines",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Coffee shop aesthetic reels",
-      "score": "warm",
-      "platform": "instagram"
+      "platform": "youtube"
     }
   ]
 }
