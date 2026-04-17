@@ -1,35 +1,30 @@
 {
-  "date": "2026-04-16",
-  "updated_at": "2026-04-16T07:21:15.931764+00:00",
+  "date": "2026-04-17",
+  "updated_at": "2026-04-17T07:21:48.207328+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "♪ tsmc stock",
+      "topic": "♪ toronto",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ the sopranos",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Budget travel hacks",
+      "topic": "▶️ china news",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Coding tutorial series",
+      "topic": "▶️ Speed coding challenges",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Lo-fi study setups",
+      "topic": "📸 Street style lookbooks",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "instagram"
     },
     {
-      "topic": "♪ POV acting skits",
+      "topic": "♪ Skincare routine layers",
       "score": "hot",
       "platform": "tiktok"
     },
@@ -39,34 +34,44 @@
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Minimalist apartment tours",
+      "topic": "▶️ Car detailing ASMR",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "📸 Coffee shop aesthetic reels",
+      "topic": "♪ #HairTok curtain bangs",
       "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ Storytime animated shorts",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 cvg",
+      "score": "rising",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ earthquake now",
+      "topic": "▶️ riley green",
       "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ mel brooks",
+      "topic": "♪ better call saul",
       "score": "rising",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "▶️ macbook pro",
+      "topic": "♪ POV acting skits",
       "score": "rising",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "▶️ Micro-adventure weekends",
+      "topic": "📸 Golden hour photography",
       "score": "rising",
-      "platform": "youtube"
+      "platform": "instagram"
     },
     {
       "topic": "♪ #NailTok chrome art",
@@ -74,19 +79,14 @@
       "platform": "tiktok"
     },
     {
-      "topic": "▶️ Tiny house living tours",
+      "topic": "▶️ Coding tutorial series",
       "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ DIY room makeover timelapse",
+      "topic": "📸 Vintage fashion hauls",
       "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ #FitnessTok home workouts",
-      "score": "rising",
-      "platform": "tiktok"
+      "platform": "instagram"
     },
     {
       "topic": "♪ Analog photography revival",
@@ -94,64 +94,64 @@
       "platform": "tiktok"
     },
     {
-      "topic": "♪ Storytime animated shorts",
+      "topic": "📸 Cafe hopping vlogs",
       "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 mlb standings",
-      "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ gen v",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ wednesday powerball results 2026",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 chris paul",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "▶️ manny machado",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ AI music generation tools",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ 3D printing oddities",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ #HairTok curtain bangs",
+      "topic": "♪ miley cyrus",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Meal prep aesthetic reels",
-      "score": "warm",
-      "platform": "instagram"
-    },
-    {
-      "topic": "♪ Skincare routine layers",
+      "topic": "♪ invincible comics",
       "score": "warm",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 Street style lookbooks",
+      "topic": "▶️ stephen miller",
+      "score": "warm",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ jose alvarado",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ daniel radcliffe",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ Tiny house living tours",
+      "score": "warm",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Budget travel hacks",
+      "score": "warm",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ Silent vlog trend",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Pet rescue stories",
       "score": "warm",
       "platform": "instagram"
+    },
+    {
+      "topic": "▶️ Retro gaming nostalgia",
+      "score": "warm",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ #CleanTok deep cleaning",
+      "score": "warm",
+      "platform": "tiktok"
     }
   ]
 }
