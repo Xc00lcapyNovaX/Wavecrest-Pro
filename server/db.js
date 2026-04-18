@@ -52,7 +52,7 @@ db.createUser = async ({ email, passwordHash, name, provider = 'email', provider
 };
 
 db.updateUser = async (id, fields) => {
-  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id', 'is_beta', 'niche', 'platform_focus', 'goal', 'onboarding_done', 'email_verified'];
+  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id', 'is_beta'];
   const sets = [];
   const vals = [];
   let i = 1;
@@ -265,6 +265,38 @@ db.consumeEmailToken = async (tokenId) => {
 
 db.markEmailVerified = async (userId) => {
   await pool.query(`UPDATE users SET email_verified = true WHERE id = $1`, [userId]);
+};
+
+// ── Saved Trends (Bookmarks) ──────────────────────
+db.saveTrend = async (userId, { trendId, topic, platform, score }) => {
+  const { rows } = await pool.query(
+    `INSERT INTO saved_trends (user_id, trend_id, topic, platform, score)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (user_id, trend_id) DO NOTHING RETURNING *`,
+    [userId, trendId, topic, platform || 'general', score || 'warm']
+  );
+  return rows[0] || null;
+};
+
+db.unsaveTrend = async (userId, savedId) => {
+  const { rowCount } = await pool.query(
+    `DELETE FROM saved_trends WHERE id = $1 AND user_id = $2`, [savedId, userId]
+  );
+  return rowCount > 0;
+};
+
+db.getSavedTrends = async (userId) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM saved_trends WHERE user_id = $1 ORDER BY saved_at DESC`, [userId]
+  );
+  return rows;
+};
+
+db.isTrendSaved = async (userId, trendId) => {
+  const { rows } = await pool.query(
+    `SELECT id FROM saved_trends WHERE user_id = $1 AND trend_id = $2`, [userId, trendId]
+  );
+  return rows[0] || null;
 };
 
 // ── API Keys (BYOAK) ──────────────────────────────

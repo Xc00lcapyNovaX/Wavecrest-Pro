@@ -120,25 +120,17 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
-DO $$ BEGIN
-  ALTER TABLE users ADD COLUMN niche TEXT;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE users ADD COLUMN platform_focus TEXT;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE users ADD COLUMN goal TEXT;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE users ADD COLUMN onboarding_done BOOLEAN DEFAULT false;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
+CREATE TABLE IF NOT EXISTS saved_trends (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  trend_id   INTEGER REFERENCES trends(id) ON DELETE SET NULL,
+  topic      TEXT NOT NULL,
+  platform   VARCHAR(20),
+  score      VARCHAR(10),
+  saved_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, trend_id)
+);
+CREATE INDEX IF NOT EXISTS idx_saved_trends_user ON saved_trends(user_id);
 `;
 
 (async () => {

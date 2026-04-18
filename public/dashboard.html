@@ -56,7 +56,7 @@
   /* ── Trends table ── */
   .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
   .trend-list{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
-  .trend-row{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;align-items:center;column-gap:16px;padding:16px 24px;border-bottom:1px solid var(--card-border);transition:background .15s}
+  /* trend-row defined in actions section */
   .trend-row:last-child{border-bottom:none}
   .trend-row:hover{background:rgba(255,255,255,.03)}
   .trend-row.locked{opacity:.4;filter:blur(2px);pointer-events:none}
@@ -69,7 +69,19 @@
   .tag-locked{background:rgba(255,255,255,.06);color:var(--muted)}
 
   /* ── Actions bar ── */
-  .actions{display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .actions{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .filter-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;align-items:center}
+  .filter-divider{width:1px;height:20px;background:var(--card-border);margin:0 4px}
+
+  /* ── Bookmark button ── */
+  .btn-bookmark{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;font-size:1rem;line-height:1;transition:transform .15s,opacity .15s;opacity:.4}
+  .btn-bookmark:hover{opacity:1;transform:scale(1.15)}
+  .btn-bookmark.saved{opacity:1;filter:drop-shadow(0 0 4px rgba(255,159,10,.6))}
+  .trend-row{display:grid;grid-template-columns:minmax(0,1fr) 90px auto 32px;align-items:center;column-gap:12px;padding:16px 20px;border-bottom:1px solid var(--card-border);transition:background .15s}
+
+  /* ── Saved section ── */
+  .saved-section{margin-bottom:32px}
+  .saved-empty{padding:32px;text-align:center;color:var(--muted);font-size:.9rem}
 
   /* ── Search results ── */
   .search-results{margin-top:16px}
@@ -163,8 +175,8 @@
     .container{padding:24px 16px}
     .search-bar{flex-direction:column}
     .search-bar input,.search-bar select,.search-bar button{width:100%}
-    .trend-row{grid-template-columns:minmax(0,1fr) auto;padding:12px 16px;row-gap:8px}
-    .trend-platform{grid-column:1 / -1}
+    .trend-row{grid-template-columns:minmax(0,1fr) auto auto;padding:12px 16px;row-gap:8px}
+    .trend-platform{display:none}
     .upgrade-banner{flex-direction:column;text-align:center;padding:20px}
     .upgrade-banner a{width:100%;text-align:center}
     .stat-card .value{font-size:1.4rem}
@@ -275,13 +287,30 @@
     <div id="crossPlatArea"></div>
   </div>
 
+  <!-- Saved Trends -->
+  <div class="saved-section" id="savedSection" style="display:none">
+    <div class="section-header">
+      <div class="section-title">🔖 Saved Trends</div>
+      <button class="btn-sm" id="savedToggle" onclick="toggleSaved()">Show</button>
+    </div>
+    <div id="savedList" style="display:none"></div>
+  </div>
+
   <!-- Today's Trends -->
   <div class="section-title">Today's Trending Topics</div>
   <div class="actions">
-    <button class="btn-sm" onclick="filterPlatform('')" id="filterAll">All Platforms</button>
-    <button class="btn-sm" onclick="filterPlatform('youtube')">YouTube</button>
-    <button class="btn-sm" onclick="filterPlatform('tiktok')">TikTok</button>
-    <button class="btn-sm" onclick="filterPlatform('instagram')">Instagram</button>
+    <button class="btn-sm active" onclick="filterPlatform('')" id="filterAll">All</button>
+    <button class="btn-sm" onclick="filterPlatform('youtube')" id="filterYoutube">YouTube</button>
+    <button class="btn-sm" onclick="filterPlatform('tiktok')" id="filterTiktok">TikTok</button>
+    <button class="btn-sm" onclick="filterPlatform('instagram')" id="filterInstagram">Instagram</button>
+    <button class="btn-sm" onclick="filterPlatform('reddit')" id="filterReddit">Reddit</button>
+    <button class="btn-sm" onclick="filterPlatform('general')" id="filterGeneral">General</button>
+  </div>
+  <div class="filter-row">
+    <button class="btn-sm active" onclick="filterScore('')" id="scoreAll">All Scores</button>
+    <button class="btn-sm" onclick="filterScore('hot')" id="scoreHot">🔥 Hot</button>
+    <button class="btn-sm" onclick="filterScore('rising')" id="scoreRising">📈 Rising</button>
+    <button class="btn-sm" onclick="filterScore('warm')" id="scoreWarm">🌊 Warm</button>
   </div>
   <div id="trendList" class="trend-list">
     <div class="skel-row skeleton"></div>
@@ -318,7 +347,9 @@
 <script>
 const API = window.location.origin;
 let dashboardData = null;
-let currentFilter = '';
+let currentPlatform = '';
+let currentScore = '';
+let savedTrends = []; // [{id, trend_id, topic, ...}]
 
 // HTML escaping to prevent XSS
 function esc(str) {
@@ -412,8 +443,9 @@ function render() {
   // Max features
   loadCrossPlatform();
 
-  // Trends
+  // Trends + bookmarks
   renderTrends();
+  loadSavedTrends();
 }
 
 function renderSearch() {
@@ -461,14 +493,15 @@ async function doSearch() {
   }
 }
 
-function renderTrends(filter) {
+function renderTrends() {
   const list = document.getElementById('trendList');
   if (!dashboardData || !dashboardData.trends || !Array.isArray(dashboardData.trends.items)) {
     list.innerHTML = '<div class="loading">Loading trends...</div>';
     return;
   }
   let items = dashboardData.trends.items;
-  if (filter) items = items.filter(function(t) { return t.platform === filter; });
+  if (currentPlatform) items = items.filter(function(t) { return t.platform === currentPlatform; });
+  if (currentScore) items = items.filter(function(t) { return t.score === currentScore; });
 
   if (!items.length) {
     list.innerHTML = '<div class="loading">No trends for this filter.</div>';
@@ -477,16 +510,129 @@ function renderTrends(filter) {
 
   list.innerHTML = items.map(function(t) {
     var scoreClass = ['hot','rising','warm','locked'].includes(t.score) ? t.score : 'warm';
-    return '<div class="trend-row ' + (t.locked ? 'locked' : '') + '"><span class="trend-topic">' + esc(t.topic) + '</span><span class="trend-platform">' + esc(t.platform || '') + '</span><span class="tag tag-' + scoreClass + '">' + esc(t.score).toUpperCase() + '</span></div>';
+    var isSaved = savedTrends.some(function(s) { return s.trend_id === t.id; });
+    var savedRecord = savedTrends.find(function(s) { return s.trend_id === t.id; });
+    var bookmarkBtn = t.locked ? '' :
+      '<button class="btn-bookmark ' + (isSaved ? 'saved' : '') + '" ' +
+      'onclick="toggleBookmark(event,' + t.id + ',\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\',\'' + esc(t.platform||'general') + '\',\'' + esc(t.score||'warm') + '\',\'' + (savedRecord ? savedRecord.id : '') + '\')" ' +
+      'title="' + (isSaved ? 'Remove bookmark' : 'Save trend') + '">' +
+      (isSaved ? '🔖' : '🤍') + '</button>';
+    return '<div class="trend-row ' + (t.locked ? 'locked' : '') + '">' +
+      '<span class="trend-topic">' + esc(t.topic) + '</span>' +
+      '<span class="trend-platform">' + esc(t.platform || '') + '</span>' +
+      '<span class="tag tag-' + scoreClass + '">' + esc(t.score).toUpperCase() + '</span>' +
+      bookmarkBtn + '</div>';
   }).join('');
 }
 
 function filterPlatform(p) {
-  currentFilter = p;
+  currentPlatform = p;
   document.querySelectorAll('.actions .btn-sm').forEach(function(b) { b.classList.remove('active'); });
-  var activeBtn = p ? document.querySelector('.actions .btn-sm[onclick*="' + p + '"]') : document.getElementById('filterAll');
-  if (activeBtn) activeBtn.classList.add('active');
-  renderTrends(p);
+  var id = p ? 'filter' + p.charAt(0).toUpperCase() + p.slice(1) : 'filterAll';
+  var btn = document.getElementById(id);
+  if (btn) btn.classList.add('active');
+  renderTrends();
+}
+
+function filterScore(s) {
+  currentScore = s;
+  document.querySelectorAll('.filter-row .btn-sm').forEach(function(b) { b.classList.remove('active'); });
+  var id = s ? 'score' + s.charAt(0).toUpperCase() + s.slice(1) : 'scoreAll';
+  var btn = document.getElementById(id);
+  if (btn) btn.classList.add('active');
+  renderTrends();
+}
+
+// ── Bookmarks ──
+async function loadSavedTrends() {
+  try {
+    var res = await fetch(API + '/api/dashboard/saved', { credentials: 'include' });
+    var data = await res.json();
+    if (res.ok && data.saved) {
+      savedTrends = data.saved;
+      renderTrends(); // re-render with bookmark states
+      if (savedTrends.length > 0) {
+        document.getElementById('savedSection').style.display = 'block';
+      }
+    }
+  } catch (e) { /* non-fatal */ }
+}
+
+async function toggleBookmark(e, trendId, topic, platform, score, savedId) {
+  e.stopPropagation();
+  var btn = e.currentTarget;
+  var isSaved = btn.classList.contains('saved');
+
+  if (isSaved && savedId) {
+    // Remove
+    try {
+      var res = await fetch(API + '/api/dashboard/saved/' + savedId, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        savedTrends = savedTrends.filter(function(s) { return s.id !== savedId; });
+        renderTrends();
+        renderSavedList();
+        if (savedTrends.length === 0) document.getElementById('savedSection').style.display = 'none';
+      }
+    } catch (e) { /* non-fatal */ }
+  } else {
+    // Save
+    try {
+      var res = await fetch(API + '/api/dashboard/saved', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trend_id: trendId, topic: topic, platform: platform, score: score })
+      });
+      var data = await res.json();
+      if (res.ok || res.status === 201) {
+        savedTrends.push(data.saved || { id: data.saved?.id, trend_id: trendId, topic, platform, score });
+        renderTrends();
+        renderSavedList();
+        document.getElementById('savedSection').style.display = 'block';
+      }
+    } catch (e) { /* non-fatal */ }
+  }
+}
+
+function toggleSaved() {
+  var list = document.getElementById('savedList');
+  var btn = document.getElementById('savedToggle');
+  if (list.style.display === 'none') {
+    list.style.display = 'block';
+    btn.textContent = 'Hide';
+    renderSavedList();
+  } else {
+    list.style.display = 'none';
+    btn.textContent = 'Show';
+  }
+}
+
+function renderSavedList() {
+  var list = document.getElementById('savedList');
+  if (!savedTrends.length) {
+    list.innerHTML = '<div class="saved-empty">No saved trends yet. Click 🤍 on any trend to bookmark it.</div>';
+    return;
+  }
+  list.innerHTML = '<div class="trend-list">' + savedTrends.map(function(s) {
+    var scoreClass = ['hot','rising','warm'].includes(s.score) ? s.score : 'warm';
+    return '<div class="trend-row">' +
+      '<span class="trend-topic">' + esc(s.topic) + '</span>' +
+      '<span class="trend-platform">' + esc(s.platform || '') + '</span>' +
+      '<span class="tag tag-' + scoreClass + '">' + esc(s.score || 'warm').toUpperCase() + '</span>' +
+      '<button class="btn-bookmark saved" onclick="removeSaved(\'' + esc(s.id) + '\')" title="Remove">🔖</button>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+async function removeSaved(savedId) {
+  try {
+    var res = await fetch(API + '/api/dashboard/saved/' + savedId, { method: 'DELETE', credentials: 'include' });
+    if (res.ok) {
+      savedTrends = savedTrends.filter(function(s) { return s.id !== savedId; });
+      renderTrends();
+      renderSavedList();
+      if (savedTrends.length === 0) document.getElementById('savedSection').style.display = 'none';
+    }
+  } catch (e) { /* non-fatal */ }
 }
 
 async function exportCSV() {
@@ -495,14 +641,23 @@ async function exportCSV() {
     return;
   }
   try {
-    const res = await fetch(API + '/api/dashboard/export', { credentials: 'include' });
+    const params = new URLSearchParams();
+    if (currentPlatform) params.set('platform', currentPlatform);
+    if (currentScore) params.set('score', currentScore);
+    const qs = params.toString() ? '?' + params.toString() : '';
+    const res = await fetch(API + '/api/dashboard/export' + qs, { credentials: 'include' });
     if (!res.ok) {
       try { const d = await res.json(); alert(d.error || 'Export failed.'); } catch(e) { alert('Export failed.'); }
       return;
     }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'wavecrest-trends.csv'; a.click();
+    const today = new Date().toISOString().slice(0,10);
+    const suffix = [currentPlatform, currentScore].filter(Boolean).join('-');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'wavecrest-trends-' + today + (suffix ? '-' + suffix : '') + '.csv';
+    a.click();
     URL.revokeObjectURL(url);
   } catch (err) { alert('Export failed — check your connection.'); }
 }
@@ -705,7 +860,6 @@ async function resendVerification() {
 }
 
 // Boot
-filterPlatform('');
 loadDashboard();
 </script>
 </body>

@@ -72,22 +72,68 @@ router.get('/export', requireAuth, async (req, res) => {
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    const { trends } = await db.getTrends({ date: today, limit: 100 });
+    const { platform, score, date } = req.query;
+    const { trends } = await db.getTrends({
+      date: date || today,
+      platform: platform || undefined,
+      score: score || undefined,
+      limit: 500,
+    });
 
-  // Sanitize CSV fields to prevent formula injection
-  function csvSafe(str) {
-    let s = String(str).replace(/"/g, '""');
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
-    return '"' + s + '"';
-  }
+    function csvSafe(str) {
+      let s = String(str).replace(/"/g, '""');
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return '"' + s + '"';
+    }
 
-  const csv = ['Topic,Score,Platform,Date']
-    .concat(trends.map((t) => `${csvSafe(t.topic)},${csvSafe(t.score)},${csvSafe(t.platform)},${csvSafe(t.fetched_at)}`))
-    .join('\n');
+    const csv = ['Topic,Score,Platform,Date']
+      .concat(trends.map((t) => `${csvSafe(t.topic)},${csvSafe(t.score)},${csvSafe(t.platform)},${csvSafe(t.fetched_at)}`))
+      .join('\n');
 
+    const exportDate = date || today;
     res.set('Content-Type', 'text/csv; charset=utf-8');
-    res.set('Content-Disposition', `attachment; filename="wavecrest-trends-${today}.csv"`);
+    res.set('Content-Disposition', `attachment; filename="wavecrest-trends-${exportDate}.csv"`);
     res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ── Saved Trends (Bookmarks) ───────────────────────
+router.get('/saved', requireAuth, async (req, res) => {
+  try {
+    const saved = await db.getSavedTrends(req.session.userId);
+    res.json({ saved });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+router.post('/saved', requireAuth, async (req, res) => {
+  try {
+    const { trend_id, topic, platform, score } = req.body;
+    if (!trend_id || !topic) {
+      return res.status(400).json({ error: 'trend_id and topic required.' });
+    }
+    const saved = await db.saveTrend(req.session.userId, {
+      trendId: trend_id, topic, platform, score,
+    });
+    if (!saved) {
+      // Already saved — return the existing record
+      const existing = await db.isTrendSaved(req.session.userId, trend_id);
+      return res.json({ saved: existing, already_saved: true });
+    }
+    res.status(201).json({ saved });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+router.delete('/saved/:id', requireAuth, async (req, res) => {
+  try {
+    const deleted = await db.unsaveTrend(req.session.userId, req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Saved trend not found.' });
+    res.json({ message: 'Removed from saved.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
   }
