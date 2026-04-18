@@ -209,7 +209,9 @@ router.get('/google/callback', (req, res, next) => {
       return res.redirect('/signin.html?error=oauth_failed');
     }
     req.session.userId = req.user.id;
-    const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    let dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    // New users (no onboarding yet) go through onboarding
+    if (!req.user.onboarding_done) dest = '/onboarding.html';
     return res.redirect(dest);
   });
 });
@@ -230,7 +232,8 @@ router.get('/github/callback', (req, res, next) => {
         return res.redirect('/signin.html?error=oauth_failed');
       }
       req.session.userId = req.user.id;
-      const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+      let dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+      if (!req.user.onboarding_done) dest = '/onboarding.html';
       return res.redirect(dest);
     });
   } else {
@@ -391,6 +394,25 @@ router.post('/resend-verification', async (req, res) => {
   }
 });
 
+// ── Onboarding ────────────────────────────────────────────────────────────
+router.post('/onboarding', async (req, res) => {
+  try {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated.' });
+    const { platform_focus, niche, goal, skipped } = req.body;
+
+    const updates = { onboarding_done: true };
+    if (platform_focus) updates.platform_focus = platform_focus;
+    if (niche) updates.niche = niche;
+    if (goal) updates.goal = goal;
+
+    await db.updateUser(req.session.userId, updates);
+    res.json({ message: skipped ? 'Skipped.' : 'Onboarding complete.' });
+  } catch (err) {
+    console.error('[Auth] Onboarding error:', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 function sanitize(user) {
   return {
     id: user.id,
@@ -401,6 +423,9 @@ function sanitize(user) {
     is_beta: user.is_beta || false,
     email_verified: user.email_verified || false,
     provider: user.provider,
+    niche: user.niche || null,
+    platform_focus: user.platform_focus || null,
+    onboarding_done: user.onboarding_done || false,
     created_at: user.created_at,
   };
 }
