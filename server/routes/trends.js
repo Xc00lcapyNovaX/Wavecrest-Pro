@@ -370,6 +370,23 @@ function daysBetween(dateA, dateB) {
   return Math.round(Math.abs(b - a) / (1000 * 60 * 60 * 24));
 }
 
+// ── POST /api/trends/seed — called by GitHub Actions after daily update ──
+router.post('/seed', async (req, res) => {
+  const secret = process.env.SEED_SECRET;
+  const provided = req.headers['x-seed-secret'] || req.body?.secret;
+  if (secret && provided !== secret) {
+    return res.status(401).json({ error: 'Unauthorized.' });
+  }
+  try {
+    await seedTrendsFromFile();
+    await db._refreshTrendsCache();
+    res.json({ message: 'Seeded successfully.', count: db.trends.length });
+  } catch (err) {
+    console.error('[Seed webhook]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Seed trends from trends.json — call explicitly from index.js ──
 async function seedTrendsFromFile() {
   const trendsPath = path.join(__dirname, '..', '..', 'public', 'trends.json');

@@ -79,6 +79,15 @@
   .loading{text-align:center;padding:60px;color:var(--muted)}
   .error-banner{background:rgba(255,69,58,.12);color:var(--red);padding:16px 24px;border-radius:12px;margin-bottom:24px;display:none}
 
+  /* ── Skeletons ── */
+  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+  .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:8px}
+  .skel-value{height:36px;width:60%;margin-bottom:8px}
+  .skel-sub{height:14px;width:40%}
+  .skel-row{height:52px;margin-bottom:1px;border-radius:0}
+  .skel-row:first-child{border-radius:16px 16px 0 0}
+  .skel-row:last-child{border-radius:0 0 16px 16px}
+
   /* ── Upgrade banner ── */
   .upgrade-banner{background:linear-gradient(135deg,rgba(0,113,227,.12),rgba(48,209,88,.08));border:1px solid rgba(0,113,227,.2);border-radius:16px;padding:24px 32px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;gap:20px}
   .upgrade-banner p{color:var(--muted);font-size:.95rem}
@@ -214,18 +223,18 @@
   <div class="grid">
     <div class="stat-card">
       <div class="label">Today's Trends</div>
-      <div class="value" id="statTotal">—</div>
-      <div class="sub" id="statDate"></div>
+      <div class="value" id="statTotal"><div class="skel-value skeleton"></div></div>
+      <div class="sub" id="statDate"><div class="skel-sub skeleton"></div></div>
     </div>
     <div class="stat-card">
       <div class="label">API Calls Remaining</div>
-      <div class="value" id="statRemaining">—</div>
-      <div class="sub" id="statLimit"></div>
+      <div class="value" id="statRemaining"><div class="skel-value skeleton"></div></div>
+      <div class="sub" id="statLimit"><div class="skel-sub skeleton"></div></div>
     </div>
     <div class="stat-card">
       <div class="label">Your Plan</div>
-      <div class="value" id="statPlan">—</div>
-      <div class="sub" id="statPlanSub"></div>
+      <div class="value" id="statPlan"><div class="skel-value skeleton"></div></div>
+      <div class="sub" id="statPlanSub"><div class="skel-sub skeleton"></div></div>
     </div>
   </div>
 
@@ -275,7 +284,12 @@
     <button class="btn-sm" onclick="filterPlatform('instagram')">Instagram</button>
   </div>
   <div id="trendList" class="trend-list">
-    <div class="loading">Loading trends...</div>
+    <div class="skel-row skeleton"></div>
+    <div class="skel-row skeleton"></div>
+    <div class="skel-row skeleton"></div>
+    <div class="skel-row skeleton"></div>
+    <div class="skel-row skeleton"></div>
+    <div class="skel-row skeleton"></div>
   </div>
 
   <!-- BYOAK Section (Free users) -->
