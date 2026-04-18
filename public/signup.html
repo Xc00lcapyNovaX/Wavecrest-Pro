@@ -107,7 +107,7 @@ async function emailSignup(e) {
     const data = await res.json();
     if (!res.ok) return showError(data.error);
     showSuccess('Account created! Check your email to verify your address. Redirecting...');
-    setTimeout(() => window.location.href = '/onboarding.html', 1500);
+    setTimeout(() => window.location.href = '/dashboard.html', 1500);
   } catch (err) {
     showError('Network error. Is the server running?');
   }
@@ -128,7 +128,7 @@ async function oauthSignup(provider) {
     const data = await res.json();
     if (!res.ok) return showError(data.error);
     showSuccess('Signed up with ' + provider + '! Redirecting...');
-    setTimeout(() => window.location.href = '/onboarding.html', 800);
+    setTimeout(() => window.location.href = '/dashboard.html', 800);
   } catch (err) {
     showError('Network error. Is the server running?');
   }

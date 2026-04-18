@@ -339,6 +339,22 @@
     </div>
   </div>
 
+  <!-- Email digest toggle -->
+  <div id="digestSection" style="margin-top:32px;background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:600;font-size:.95rem">📧 Daily Trend Digest</div>
+      <div style="color:var(--muted);font-size:.82rem;margin-top:3px">Get today's top 10 trends in your inbox every morning at 6 AM UTC.</div>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+      <span id="digestLabel" style="font-size:.85rem;color:var(--muted)">On</span>
+      <div style="position:relative;width:44px;height:24px" onclick="toggleDigest()">
+        <span id="digestTrack" style="position:absolute;inset:0;border-radius:24px;background:var(--green);cursor:pointer;transition:background .2s">
+          <span id="digestThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;transform:translateX(20px)"></span>
+        </span>
+      </div>
+    </label>
+  </div>
+
   <div style="text-align:center;padding:48px 0 24px;color:var(--muted);font-size:.8rem">
     <a href="index.html" style="color:var(--muted);text-decoration:none">Wavecrest Pro</a> · <a href="index.html#pricing" style="color:var(--muted);text-decoration:none">Plans</a> · <a href="terms.html" style="color:var(--muted);text-decoration:none">Terms</a> · <a href="privacy.html" style="color:var(--muted);text-decoration:none">Privacy</a> · © 2026
   </div>
@@ -446,6 +462,9 @@ function render() {
   // Trends + bookmarks
   renderTrends();
   loadSavedTrends();
+
+  // Digest toggle
+  initDigestToggle(d.user.digest_enabled !== false);
 }
 
 function renderSearch() {
@@ -858,6 +877,50 @@ async function resendVerification() {
   } catch { btn.textContent = 'Failed — try again'; }
   setTimeout(() => { btn.disabled = false; if (btn.textContent !== 'Sent! Check your inbox ✓') btn.textContent = 'Resend Email'; }, 3000);
 }
+
+// ── Digest toggle ──
+var digestEnabled = true;
+
+function initDigestToggle(enabled) {
+  digestEnabled = enabled;
+  var thumb = document.getElementById('digestThumb');
+  var track = document.getElementById('digestTrack');
+  var label = document.getElementById('digestLabel');
+  if (enabled) {
+    thumb.style.transform = 'translateX(20px)';
+    track.style.background = 'var(--green)';
+    label.textContent = 'On';
+  } else {
+    thumb.style.transform = 'translateX(0)';
+    track.style.background = 'rgba(255,255,255,.12)';
+    label.textContent = 'Off';
+  }
+}
+
+async function toggleDigest() {
+  var newVal = !digestEnabled;
+  initDigestToggle(newVal);
+  try {
+    await fetch(API + '/api/auth/digest-preference', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: newVal })
+    });
+  } catch (e) { /* non-fatal */ }
+}
+
+// Check for unsubscribed param
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('unsubscribed') === '1') {
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.08);color:var(--text);padding:14px 28px;border-radius:12px;border:1px solid rgba(255,255,255,.12);font-size:.9rem;z-index:200;backdrop-filter:blur(12px)';
+    toast.textContent = '✓ Unsubscribed from daily digest.';
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 4000);
+    window.history.replaceState({}, '', '/dashboard.html');
+  }
+})();
 
 // Boot
 loadDashboard();

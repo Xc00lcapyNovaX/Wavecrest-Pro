@@ -91,8 +91,7 @@ async function verify() {
     } else if (type === 'magic') {
       document.getElementById('signedin').style.display = 'block';
       setTimeout(() => {
-        const u = data.user;
-        const dest = u && u.is_beta ? '/dashboard.html?beta_login=true' : (u && !u.onboarding_done ? '/onboarding.html' : '/dashboard.html');
+        const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
         window.location.href = dest;
       }, 1500);
     }

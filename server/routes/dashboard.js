@@ -43,6 +43,9 @@ router.get('/', requireAuth, async (req, res) => {
       user: {
         id: user.id, name: user.name, email: user.email,
         plan: user.plan, avatar_url: user.avatar_url,
+        is_beta: user.is_beta || false,
+        email_verified: user.email_verified || false,
+        digest_enabled: user.digest_enabled !== false,
       },
       subscription: sub ? {
         plan: sub.plan, status: sub.status,

@@ -131,6 +131,16 @@ CREATE TABLE IF NOT EXISTS saved_trends (
   UNIQUE(user_id, trend_id)
 );
 CREATE INDEX IF NOT EXISTS idx_saved_trends_user ON saved_trends(user_id);
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN digest_enabled BOOLEAN DEFAULT true;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN digest_token TEXT UNIQUE;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 `;
 
 (async () => {

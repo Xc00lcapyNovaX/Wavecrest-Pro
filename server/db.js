@@ -299,6 +299,34 @@ db.isTrendSaved = async (userId, trendId) => {
   return rows[0] || null;
 };
 
+// ── Email Digest ───────────────────────────────────
+db.getDigestSubscribers = async () => {
+  const { rows } = await pool.query(
+    `SELECT id, email, name, plan, digest_token FROM users
+     WHERE digest_enabled = true AND email IS NOT NULL
+     ORDER BY created_at ASC`
+  );
+  return rows;
+};
+
+db.setDigestEnabled = async (userId, enabled) => {
+  await pool.query(`UPDATE users SET digest_enabled = $1 WHERE id = $2`, [enabled, userId]);
+};
+
+db.findUserByDigestToken = async (token) => {
+  const { rows } = await pool.query(`SELECT * FROM users WHERE digest_token = $1`, [token]);
+  return rows[0] || null;
+};
+
+db.ensureDigestToken = async (userId) => {
+  // Generate a token if the user doesn't have one yet
+  const { rows } = await pool.query(`SELECT digest_token FROM users WHERE id = $1`, [userId]);
+  if (rows[0]?.digest_token) return rows[0].digest_token;
+  const token = require('crypto').randomBytes(20).toString('hex');
+  await pool.query(`UPDATE users SET digest_token = $1 WHERE id = $2`, [token, userId]);
+  return token;
+};
+
 // ── API Keys (BYOAK) ──────────────────────────────
 db.saveApiKey = async (userId, service, key) => {
   const { rows } = await pool.query(

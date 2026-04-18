@@ -44,3 +44,19 @@ jobs:
             --retry 3 \
             --retry-delay 5 \
             || echo "Seed ping failed (non-fatal)"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install server dependencies
+        run: npm install --prefix server
+
+      - name: Send daily digest emails
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BASE_URL: https://wavecrest.pro
+          NODE_ENV: production
+        run: node server/scripts/send-digest.js || echo "Digest send failed (non-fatal)"

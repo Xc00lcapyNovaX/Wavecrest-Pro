@@ -94,4 +94,84 @@ async function sendMagicLink({ to, token, baseUrl }) {
   await send({ to, subject: 'Your Wavecrest Pro sign-in link', html });
 }
 
-module.exports = { sendVerificationEmail, sendMagicLink };
+// ── Daily digest email ─────────────────────────────────────────────────────
+
+function scoreEmoji(score) {
+  return score === 'hot' ? '🔥' : score === 'rising' ? '📈' : '🌊';
+}
+
+function scoreBadge(score) {
+  const colors = {
+    hot:    { bg: 'rgba(255,69,58,.18)',  text: '#ff453a' },
+    rising: { bg: 'rgba(48,209,88,.18)', text: '#30d158' },
+    warm:   { bg: 'rgba(255,159,10,.18)',text: '#ff9f0a' },
+  };
+  const c = colors[score] || colors.warm;
+  return `<span style="display:inline-block;padding:2px 10px;border-radius:980px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:${c.bg};color:${c.text}">${score}</span>`;
+}
+
+function platformLabel(platform) {
+  const labels = { youtube: 'YouTube', tiktok: 'TikTok', instagram: 'Instagram', reddit: 'Reddit', general: 'General' };
+  return labels[platform] || platform;
+}
+
+async function sendDailyDigest({ to, name, trends, date, baseUrl, unsubscribeToken }) {
+  const displayDate = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const unsubUrl = `${baseUrl}/api/auth/unsubscribe?token=${unsubscribeToken}`;
+
+  const trendRows = trends.slice(0, 10).map((t, i) => `
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="28" style="color:#636366;font-size:.82rem;font-weight:600;vertical-align:top;padding-top:2px">${i + 1}</td>
+            <td style="vertical-align:top">
+              <div style="font-weight:600;color:#f5f5f7;font-size:.95rem;margin-bottom:4px">${scoreEmoji(t.score)} ${t.topic}</div>
+              <div style="font-size:.78rem;color:#636366">${platformLabel(t.platform)}</div>
+            </td>
+            <td width="70" style="text-align:right;vertical-align:top;padding-top:2px">${scoreBadge(t.score)}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `).join('');
+
+  const hotCount  = trends.filter(t => t.score === 'hot').length;
+  const riseCount = trends.filter(t => t.score === 'rising').length;
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 6px;font-size:1.35rem;font-weight:700">Your daily trend briefing</h2>
+    <p style="margin:0 0 24px;color:#636366;font-size:.88rem">${displayDate}</p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">
+      <tr>
+        <td width="48%" style="background:rgba(255,69,58,.08);border-radius:10px;padding:14px 16px;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:#ff453a">${hotCount}</div>
+          <div style="font-size:.78rem;color:#636366;margin-top:2px">🔥 Hot trends</div>
+        </td>
+        <td width="4%"></td>
+        <td width="48%" style="background:rgba(48,209,88,.08);border-radius:10px;padding:14px 16px;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:#30d158">${riseCount}</div>
+          <div style="font-size:.78rem;color:#636366;margin-top:2px">📈 Rising trends</div>
+        </td>
+      </tr>
+    </table>
+
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${trendRows}
+    </table>
+
+    <div style="text-align:center;margin-top:28px">
+      <a href="${baseUrl}/dashboard.html" style="${btnStyle()}">Open Dashboard →</a>
+    </div>
+
+    <p style="margin:28px 0 0;font-size:.78rem;color:#636366;text-align:center">
+      You're receiving this because you signed up for daily trend updates.<br>
+      <a href="${unsubUrl}" style="color:#636366">Unsubscribe</a>
+    </p>
+  `);
+
+  await send({ to, subject: `🌊 ${hotCount} hot trends today — ${displayDate}`, html });
+}
+
+module.exports = { sendVerificationEmail, sendMagicLink, sendDailyDigest };
