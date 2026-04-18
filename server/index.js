@@ -93,16 +93,27 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// ── Startup tasks (seed + warm cache) ─────────────
+async function onStartup() {
+  try {
+    // Seed today's trends from trends.json (idempotent — skips if already done today)
+    await trendsRouter.seedTrendsFromFile();
+    // Warm the in-memory cache from DB (critical for serverless cold starts)
+    await db.ensureCacheWarmed();
+    console.log(`  ✓ Trend cache warmed (${db.trends.length} trends in memory)`);
+  } catch (err) {
+    console.warn('  ⚠ Startup trend seed/cache warning:', err.message);
+  }
+}
+
 // ── Start ──────────────────────────────────────────
 if (process.env.VERCEL) {
-  // Vercel serverless — export app, no listen()
+  // Vercel serverless — fire startup tasks without blocking first request
+  onStartup().catch(err => console.error('[Startup]', err.message));
   module.exports = app;
 } else {
   app.listen(PORT, async () => {
-    // Only auto-seed in development
-    if (!isProd) {
-      await trendsRouter.seedTrendsFromFile();
-    }
+    await onStartup();
     console.log('');
     console.log('  🌊 Wavecrest Pro Server');
     console.log(`  ✓ Running on http://localhost:${PORT}`);

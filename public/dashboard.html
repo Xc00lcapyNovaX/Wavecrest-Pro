@@ -182,6 +182,18 @@
 <div class="container">
   <div id="error" class="error-banner"></div>
 
+  <!-- Email verification banner -->
+  <div id="verifyBanner" style="display:none;background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:16px;padding:16px 24px;margin-bottom:24px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:1.2rem">📬</span>
+      <div>
+        <strong style="color:#ff9f0a">Verify your email</strong>
+        <p style="color:#86868b;font-size:.85rem;margin:2px 0 0">Check your inbox for a verification link to secure your account.</p>
+      </div>
+    </div>
+    <button onclick="resendVerification()" id="resendBtn" style="padding:8px 18px;border-radius:980px;border:1px solid rgba(255,159,10,.4);background:transparent;color:#ff9f0a;font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap">Resend Email</button>
+  </div>
+
   <div id="betaBanner" class="upgrade-banner" style="display:none;background:linear-gradient(135deg,rgba(48,209,88,.12),rgba(0,113,227,.12));border:1px solid rgba(48,209,88,.25)">
     <div>
       <strong>🧪 You're a beta tester</strong>
@@ -364,6 +376,11 @@ function render() {
   // Upgrade banner for free/plus (not beta)
   if (['free', 'plus'].includes(d.user.plan) && !d.user.is_beta) {
     document.getElementById('upgradeBanner').style.display = 'flex';
+  }
+
+  // Email verification banner (only for email signups, not OAuth)
+  if (!d.user.email_verified && d.user.provider === 'email') {
+    document.getElementById('verifyBanner').style.display = 'flex';
   }
 
   // Beta banner
@@ -659,6 +676,18 @@ function deleteApiKey(id) {
   fetch(API + '/api/dashboard/api-keys/' + id, {
     method: 'DELETE', credentials: 'include'
   }).then(function() { renderByoak(); }).catch(function() {});
+}
+
+async function resendVerification() {
+  const btn = document.getElementById('resendBtn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    const res = await fetch(API + '/api/auth/resend-verification', { method: 'POST', credentials: 'include' });
+    const data = await res.json();
+    btn.textContent = res.ok ? 'Sent! Check your inbox ✓' : (data.error || 'Failed');
+    if (res.ok) setTimeout(() => { document.getElementById('verifyBanner').style.display = 'none'; }, 4000);
+  } catch { btn.textContent = 'Failed — try again'; }
+  setTimeout(() => { btn.disabled = false; if (btn.textContent !== 'Sent! Check your inbox ✓') btn.textContent = 'Resend Email'; }, 3000);
 }
 
 // Boot

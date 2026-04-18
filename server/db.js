@@ -179,6 +179,13 @@ db._refreshTrendsCache = async () => {
   }));
 };
 
+// Warm cache if empty (called on every cold start in serverless)
+db.ensureCacheWarmed = async () => {
+  if (db.trends.length === 0) {
+    await db._refreshTrendsCache();
+  }
+};
+
 db.getTrends = async ({ date, platform, score, limit = 30, offset = 0 }) => {
   const where = []; const vals = []; let i = 1;
   if (date) { where.push(`fetched_at = $${i}`); vals.push(date); i++; }
