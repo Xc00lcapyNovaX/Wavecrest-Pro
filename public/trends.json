@@ -1,72 +1,77 @@
 {
-  "date": "2026-04-17",
-  "updated_at": "2026-04-17T07:21:48.207328+00:00",
+  "date": "2026-04-18",
+  "updated_at": "2026-04-18T06:58:11.666463+00:00",
   "count": 30,
   "trends": [
     {
-      "topic": "♪ toronto",
+      "topic": "▶️ aj styles",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "♪ prince harry",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "▶️ china news",
+      "topic": "▶️ Day in the Life: Full-Time YouTuber",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Speed coding challenges",
+      "topic": "♪ Silent vlog trend",
       "score": "hot",
-      "platform": "youtube"
+      "platform": "tiktok"
     },
     {
-      "topic": "📸 Street style lookbooks",
+      "topic": "♪ #NailTok chrome art",
+      "score": "hot",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "📸 #OOTD street fashion",
       "score": "hot",
       "platform": "instagram"
     },
     {
-      "topic": "♪ Skincare routine layers",
+      "topic": "♪ #FitnessTok home workouts",
       "score": "hot",
       "platform": "tiktok"
     },
     {
-      "topic": "📸 #PlantTok propagation tips",
+      "topic": "♪ #CleanTok deep cleaning",
       "score": "hot",
-      "platform": "instagram"
+      "platform": "tiktok"
     },
     {
-      "topic": "▶️ Car detailing ASMR",
+      "topic": "▶️ Reacting to Viral TikToks So You Don't Have To",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "♪ #HairTok curtain bangs",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ Storytime animated shorts",
-      "score": "hot",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 cvg",
+      "topic": "📸 swae lee",
       "score": "rising",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ riley green",
+      "topic": "▶️ disclosure",
       "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "♪ better call saul",
+      "topic": "♪ nick hogan",
       "score": "rising",
       "platform": "tiktok"
     },
     {
-      "topic": "♪ POV acting skits",
+      "topic": "📸 troy baker",
       "score": "rising",
-      "platform": "tiktok"
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ gwen stefani",
+      "score": "rising",
+      "platform": "youtube"
     },
     {
       "topic": "📸 Golden hour photography",
@@ -74,84 +79,79 @@
       "platform": "instagram"
     },
     {
-      "topic": "♪ #NailTok chrome art",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ Coding tutorial series",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "📸 Vintage fashion hauls",
+      "topic": "📸 Pet rescue stories",
       "score": "rising",
       "platform": "instagram"
     },
     {
-      "topic": "♪ Analog photography revival",
-      "score": "rising",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Cafe hopping vlogs",
+      "topic": "📸 Sunset drone cinematography",
       "score": "rising",
       "platform": "instagram"
     },
     {
-      "topic": "♪ miley cyrus",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ invincible comics",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "▶️ stephen miller",
-      "score": "warm",
+      "topic": "▶️ The Truth About YouTube Shorts in 2026",
+      "score": "rising",
       "platform": "youtube"
-    },
-    {
-      "topic": "♪ jose alvarado",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "♪ daniel radcliffe",
-      "score": "warm",
-      "platform": "tiktok"
     },
     {
       "topic": "▶️ Tiny house living tours",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Micro-adventure weekends",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "📸 Street style lookbooks",
+      "score": "rising",
+      "platform": "instagram"
+    },
+    {
+      "topic": "▶️ joost klein",
       "score": "warm",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Budget travel hacks",
+      "topic": "▶️ ryan ward",
       "score": "warm",
       "platform": "youtube"
     },
     {
-      "topic": "♪ Silent vlog trend",
-      "score": "warm",
-      "platform": "tiktok"
-    },
-    {
-      "topic": "📸 Pet rescue stories",
+      "topic": "📸 star wars movies",
       "score": "warm",
       "platform": "instagram"
     },
     {
-      "topic": "▶️ Retro gaming nostalgia",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "♪ #CleanTok deep cleaning",
+      "topic": "♪ #HairTok curtain bangs",
       "score": "warm",
       "platform": "tiktok"
+    },
+    {
+      "topic": "📸 Cottagecore baking reels",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "📸 Meal prep aesthetic reels",
+      "score": "warm",
+      "platform": "instagram"
+    },
+    {
+      "topic": "♪ GRWM morning routines",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "♪ #BookTok dark academia",
+      "score": "warm",
+      "platform": "tiktok"
+    },
+    {
+      "topic": "▶️ How I Hit 100K Subscribers (What Actually Worked)",
+      "score": "warm",
+      "platform": "youtube"
     }
   ]
 }
