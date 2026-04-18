@@ -23,6 +23,8 @@ jobs:
           python-version: '3.12'
 
       - name: Run trend updater
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python3 update-trends.py
 
       - name: Commit and push if changed

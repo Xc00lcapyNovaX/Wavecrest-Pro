@@ -1,350 +1,414 @@
 #!/usr/bin/env python3
 """
-Wavecrest Pro — Daily Trend Updater
-Fetches real trending topics from free public sources and writes trends.json.
-Run daily via cron, GitHub Actions, or manually:  python3 update-trends.py
+Wavecrest Pro — Daily Trend Updater  v2
+Sources (in priority order):
+  1. YouTube Data API v3  (set YOUTUBE_API_KEY — free 10k units/day)
+  2. Reddit trending       (free JSON API, no key needed)
+  3. Google Trends RSS     (free, no key)
+  4. YouTube RSS feeds     (creator channels as signal)
+  5. YouTube HTML scrape   (last-resort fallback)
+  6. Curated fallback pool (if all else returns < 25 trends)
 
-Priority order: YouTube (primary) > Google Trends > Instagram/TikTok fallbacks
+Scoring uses VELOCITY — topics new today or climbing fast score higher.
+Run: python3 update-trends.py
 """
 
-import json, re, urllib.request, xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+import json, re, os, time, ssl, random, math
+import urllib.request, urllib.parse
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone, timedelta
 from html import unescape
-import random, ssl, os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT = os.path.join(SCRIPT_DIR, "public", "trends.json")
+OUTPUT     = os.path.join(SCRIPT_DIR, "public", "trends.json")
 
-PLATFORM_EMOJI = {"youtube": "▶️", "tiktok": "♪", "instagram": "📸", "general": "🔥"}
+PLATFORM_EMOJI = {"youtube": "▶️", "tiktok": "♪", "instagram": "📸", "reddit": "🔺", "general": "🔥"}
 
 
-# ─── Google Trends RSS (free, no API key) ────────────────────────────
-def fetch_google_trends(geo="US"):
-    url = f"https://trends.google.com/trending/rss?geo={geo}"
-    trends = []
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+
+def make_ctx():
+    return ssl.create_default_context()
+
+def fetch_url(url, headers=None, timeout=15):
+    h = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "application/json, text/html, */*",
+    }
+    if headers:
+        h.update(headers)
     try:
-        ctx = ssl.create_default_context()
-        req = urllib.request.Request(url, headers={"User-Agent": "WavecrestBot/1.0"})
-        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
-            data = resp.read().decode("utf-8")
-        root = ET.fromstring(data)
-        ns = {"ht": "https://trends.google.com/trending/rss"}
-        for item in root.findall(".//item"):
-            title = item.findtext("title", "").strip()
-            traffic_el = item.find("ht:approx_traffic", ns)
-            traffic = traffic_el.text.strip() if traffic_el is not None else "0"
-            traffic_num = int(re.sub(r"[^\d]", "", traffic) or 0)
-            if title:
-                trends.append({"topic": title, "traffic": traffic_num})
-    except Exception as e:
-        print(f"[warn] Google Trends RSS failed: {e}")
-    return trends
+        req = urllib.request.Request(url, headers=h)
+        with urllib.request.urlopen(req, timeout=timeout, context=make_ctx()) as resp:
+            return resp.read().decode("utf-8", errors="replace")
+    except Exception:
+        return None
 
+def normalize(text):
+    t = re.sub(r'^[\U00010000-\U0010ffff\u25b6\ufe0f\u266a\U0001f4f8\U0001f53a\U0001f525\s]+', '', text.strip())
+    return re.sub(r'\s+', ' ', t).strip().lower()
 
-# ─── YouTube Trending — main feed ────────────────────────────────────
-YT_JUNK = {
-    "try searching", "keyboard shortcuts", "playback", "subtitles",
-    "closed captions", "spherical videos", "navigate", "seek", "change",
-    "volume", "full screen", "caption", "skip", "toggle", "mute",
-    "previous", "next", "open", "close", "turn on", "turn off",
-    "decrease", "increase", "activate", "start watching", "youtube home",
-    "rewind", "fast forward", "rotate through", "font size", "text opacity",
-    "window opacity", "navigate backward", "navigate forward", "settings",
-    "watch later", "save to", "report", "share", "like this", "subscribe",
-    "more actions", "miniplayer", "theater mode", "exit full", "annotations",
-    "dialog", "chapter", "scrubber", "search with your voice", "queue",
-    "autoplay", "ambient mode", "english (auto", "move to", "play next",
-    "copy link", "didn't hear", "try again", "tap microphone",
-    "microphone off", "check your connection", "waiting for permission",
-    "allow microphone", "search with voice", "an error occurred", "no results",
-    "sign in", "learn more", "see more", "show more", "show less",
-    "search youtube", "upload video", "go live", "create a post",
-    "history", "your videos", "your clips", "liked videos",
+JUNK_PHRASES = {
+    "try searching","keyboard shortcuts","playback","subtitles","closed captions",
+    "navigate","seek","volume","full screen","caption","skip","toggle","mute",
+    "previous","next","turn on","turn off","decrease","increase","activate",
+    "start watching","youtube home","rewind","fast forward","settings",
+    "watch later","save to","report","share","like this","subscribe",
+    "more actions","miniplayer","theater mode","annotations","dialog","chapter",
+    "search with your voice","queue","autoplay","ambient mode","sign in",
+    "learn more","see more","show more","show less","search youtube",
+    "upload video","go live","an error occurred","no results","try again",
+    "check your connection","history","liked videos","your videos","loading",
 }
 
-def is_yt_junk(title):
-    low = title.lower().strip()
-    if len(title) < 12:
+def is_junk(title):
+    if len(title) < 8:
         return True
-    if any(j in low for j in YT_JUNK):
+    low = title.lower().strip()
+    if any(j in low for j in JUNK_PHRASES):
         return True
     words = low.split()
-    if len(words) <= 3 and any(w in {"tap","press","click","allow","deny","wait","shorts"} for w in words):
+    if len(words) <= 2 and any(w in {"tap","press","click","allow","deny","wait","shorts","next","back"} for w in words):
         return True
     return False
 
-def fetch_youtube_trending():
-    """Fetch trending YouTube video titles from multiple feeds."""
-    all_titles = []
-    seen = set()
+def load_yesterday():
+    try:
+        with open(OUTPUT, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+        today     = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        if data.get("date") in (yesterday, today):
+            return {normalize(t["topic"]): i for i, t in enumerate(data.get("trends", []))}
+    except Exception:
+        pass
+    return {}
 
-    # Main trending feed
-    urls = [
-        ("https://www.youtube.com/feed/trending", "trending"),
-        ("https://www.youtube.com/feed/trending?bp=6gQJRkVleHBsb3Jl", "gaming"),  # Gaming
-        ("https://www.youtube.com/feed/trending?bp=4gINGgt5dGRfbXVzaWNfMQ%3D%3D", "music"),  # Music
-    ]
 
-    for url, label in urls:
+# ─── Source 1: YouTube Data API v3 ───────────────────────────────────────────
+
+def fetch_youtube_api(api_key, region="US"):
+    categories = [("", "overall"), ("20", "gaming"), ("10", "music"), ("24", "entertainment")]
+    seen, titles = set(), []
+    for cat_id, label in categories:
+        params = {"part":"snippet","chart":"mostPopular","regionCode":region,"maxResults":"50","key":api_key}
+        if cat_id:
+            params["videoCategoryId"] = cat_id
+        url = "https://www.googleapis.com/youtube/v3/videos?" + urllib.parse.urlencode(params)
+        raw = fetch_url(url, headers={"Accept": "application/json"})
+        if not raw:
+            print(f"  [warn] YouTube API ({label}): no response")
+            continue
         try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                "Accept-Language": "en-US,en;q=0.9",
-            })
-            ctx = ssl.create_default_context()
-            with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
-                html = resp.read().decode("utf-8", errors="replace")
-
-            found = 0
-            # Primary pattern: videoTitle in structured JSON
-            for match in re.finditer(r'"videoTitle"\s*:\s*"([^"]{12,100})"', html):
-                t = unescape(match.group(1)).strip()
-                k = t.lower()
-                if t and k not in seen and not is_yt_junk(t):
-                    seen.add(k)
-                    all_titles.append(t)
-                    found += 1
-
-            # Fallback: runs text pattern
-            if found < 5:
-                for match in re.finditer(r'"title":\{"runs":\[\{"text":"([^"]{12,100})"\}', html):
-                    t = unescape(match.group(1)).strip()
-                    k = t.lower()
-                    if t and k not in seen and not is_yt_junk(t):
-                        seen.add(k)
-                        all_titles.append(t)
-                        found += 1
-
-            print(f"  ✓ YouTube {label}: {found} titles")
-        except Exception as e:
-            print(f"[warn] YouTube {label} fetch failed: {e}")
-
-    return all_titles[:40]
+            data = json.loads(raw)
+        except Exception:
+            print(f"  [warn] YouTube API ({label}): bad JSON")
+            continue
+        if "error" in data:
+            print(f"  [warn] YouTube API error: {data['error'].get('message','?')}")
+            break
+        found = 0
+        for item in data.get("items", []):
+            t = item.get("snippet", {}).get("title", "").strip()
+            k = normalize(t)
+            if t and k not in seen and not is_junk(t):
+                seen.add(k); titles.append(t); found += 1
+        print(f"  ✓ YouTube API ({label}): {found} titles")
+        time.sleep(0.1)
+    return titles
 
 
-# ─── YouTube RSS feeds for creator trends ────────────────────────────
+# ─── Source 2: Reddit ─────────────────────────────────────────────────────────
+
+SUBREDDIT_MAP = {
+    "videos": "youtube", "youtubers": "youtube", "gaming": "youtube",
+    "games": "youtube", "pcgaming": "youtube", "tiktokcringe": "tiktok",
+    "TikTokTrends": "tiktok", "Instagram": "instagram", "technology": "general",
+    "programming": "general", "worldnews": "general", "entertainment": "general",
+    "Music": "youtube", "movies": "general", "television": "general",
+    "comicbooks": "general", "sports": "general",
+}
+REDDIT_JUNK = [r"^\[", r"^AITA", r"^CMV", r"^ELI5", r"^Daily", r"^Weekly", r"^Monthly"]
+
+def clean_reddit_title(t):
+    t = re.sub(r'^\[[^\]]{1,25}\]\s*', '', t)
+    t = re.sub(r'\s*\[(video|gif|image|oc|nsfw|meta|xpost)\]$', '', t, flags=re.I)
+    return t.strip()
+
+def is_reddit_junk(title):
+    if len(title) < 10:
+        return True
+    for p in REDDIT_JUNK:
+        if re.search(p, title, re.I):
+            return True
+    return False
+
+def fetch_reddit_trending():
+    results, seen = [], set()
+    for sub, platform in SUBREDDIT_MAP.items():
+        url = f"https://www.reddit.com/r/{sub}/hot.json?limit=15&raw_json=1"
+        raw = fetch_url(url, headers={"User-Agent": "WavecrestBot/2.0 (wavecrest.pro)"})
+        if not raw:
+            print(f"  [warn] Reddit r/{sub}: no response")
+            time.sleep(0.3); continue
+        try:
+            posts = json.loads(raw)["data"]["children"]
+        except Exception:
+            print(f"  [warn] Reddit r/{sub}: bad JSON")
+            time.sleep(0.3); continue
+        found = 0
+        for post in posts:
+            d = post.get("data", {})
+            if d.get("stickied") or d.get("pinned"): continue
+            if d.get("score", 0) < 300: continue
+            title = clean_reddit_title(d.get("title", "").strip())
+            if not title or is_junk(title) or is_reddit_junk(title): continue
+            key = normalize(title)
+            if key in seen: continue
+            seen.add(key)
+            results.append({"topic": title, "platform": platform, "raw_score": d.get("score", 0), "source": "reddit"})
+            found += 1
+        print(f"  ✓ Reddit r/{sub}: {found} posts")
+        time.sleep(0.4)
+    return results
+
+
+# ─── Source 3: Google Trends RSS ─────────────────────────────────────────────
+
+def fetch_google_trends(geo="US"):
+    raw = fetch_url(f"https://trends.google.com/trending/rss?geo={geo}", headers={"User-Agent": "WavecrestBot/2.0"})
+    trends = []
+    if not raw:
+        print("  [warn] Google Trends RSS: no response"); return trends
+    try:
+        root = ET.fromstring(raw)
+        ns = {"ht": "https://trends.google.com/trending/rss"}
+        for item in root.findall(".//item"):
+            title = item.findtext("title", "").strip()
+            el    = item.find("ht:approx_traffic", ns)
+            traffic = int(re.sub(r"[^\d]", "", el.text.strip() if el is not None else "0") or 0)
+            if title and len(title) > 2:
+                trends.append({"topic": title, "traffic": traffic})
+    except Exception as e:
+        print(f"  [warn] Google Trends parse error: {e}")
+    return trends
+
+
+# ─── Source 4: YouTube RSS creator feeds ─────────────────────────────────────
+
 YT_RSS_FEEDS = [
-    # Top creator channels — their latest uploads signal what's trending
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",  # MrBeast
-    "https://www.youtube.com/feeds/videos.xml?channel_id=UCnUYZLuoy1rq1aVMwx4aTzw",  # GrahamStephan (Finance)
-    "https://www.youtube.com/feeds/videos.xml?channel_id=UCbmNph6atAoGfqLoCL_duAg",  # Technoblade Memorial / top gaming
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCnUYZLuoy1rq1aVMwx4aTzw",  # GrahamStephan
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UC-lHJZR3Gqxm24_Vd_AJ5Yw",  # PewDiePie
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCam8T03EOFBsNdR0thrFHdQ",  # Veritasium
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCVjgV3uCgF8bnYPsqZFnFDA",  # MKBHD
 ]
 
-def fetch_youtube_rss_topics():
-    """Pull recent video titles from top YouTube RSS feeds as trend signals."""
-    topics = []
-    seen = set()
+def fetch_youtube_rss():
+    topics, seen = [], set()
     for url in YT_RSS_FEEDS:
+        raw = fetch_url(url, headers={"User-Agent": "WavecrestBot/2.0"})
+        if not raw: continue
         try:
-            ctx = ssl.create_default_context()
-            req = urllib.request.Request(url, headers={"User-Agent": "WavecrestBot/1.0"})
-            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-                data = resp.read().decode("utf-8")
-            root = ET.fromstring(data)
-            ns = {"media": "http://search.yahoo.com/mrss/", "atom": "http://www.w3.org/2005/Atom"}
-            for entry in root.findall(".//atom:entry", ns)[:5]:
-                title_el = entry.find("atom:title", ns)
-                if title_el is not None and title_el.text:
-                    t = unescape(title_el.text.strip())
-                    k = t.lower()
-                    if t and k not in seen and not is_yt_junk(t) and len(t) > 10:
-                        seen.add(k)
-                        topics.append(t)
+            root = ET.fromstring(raw)
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+            for entry in root.findall(".//atom:entry", ns)[:4]:
+                el = entry.find("atom:title", ns)
+                if el is not None and el.text:
+                    t = unescape(el.text.strip())
+                    k = normalize(t)
+                    if t and k not in seen and not is_junk(t) and len(t) > 10:
+                        seen.add(k); topics.append(t)
         except Exception:
             pass
     return topics
 
 
-# ─── Score assignment ─────────────────────────────────────────────────
-def assign_score(traffic, rank, total, source_boost=0):
-    base = 0
-    if traffic > 1000000:
-        base = 3
-    elif traffic > 500000:
-        base = 2.5
-    elif traffic > 100000:
-        base = 2
-    elif traffic > 0:
-        base = 1.5
+# ─── Source 5: YouTube HTML scrape (last resort) ─────────────────────────────
 
-    rank_score = 0
-    if rank < total * 0.15:
-        rank_score = 3
-    elif rank < total * 0.4:
-        rank_score = 2
-    elif rank < total * 0.7:
-        rank_score = 1
+def fetch_youtube_html():
+    seen, titles = set(), []
+    for url in ["https://www.youtube.com/feed/trending", "https://www.youtube.com/feed/trending?bp=6gQJRkVleHBsb3Jl"]:
+        raw = fetch_url(url)
+        if not raw: continue
+        for pattern in [r'"videoTitle"\s*:\s*"([^"]{12,120})"', r'"title":\{"runs":\[\{"text":"([^"]{12,120})"\}']:
+            for m in re.finditer(pattern, raw):
+                t = unescape(m.group(1)).strip()
+                k = normalize(t)
+                if t and k not in seen and not is_junk(t):
+                    seen.add(k); titles.append(t)
+    if titles:
+        print(f"  ✓ YouTube HTML scrape: {len(titles)} titles")
+    return titles[:30]
 
-    total_score = base + rank_score + source_boost
-    if total_score >= 4.5:
-        return "hot"
-    elif total_score >= 2.5:
-        return "rising"
+
+# ─── Scoring ─────────────────────────────────────────────────────────────────
+
+SOURCE_QUALITY = {"youtube_api":3.0,"reddit":2.0,"google_trends":2.0,"youtube_rss":1.5,"youtube_html":1.0,"fallback":0.0}
+
+def compute_score(topic_raw, rank, total, source, raw_score=0, yesterday_map=None):
+    pts = 0.0
+    frac = rank / max(total, 1)
+    if frac < 0.20:   pts += 3.0
+    elif frac < 0.45: pts += 2.0
+    elif frac < 0.70: pts += 1.0
+    pts += SOURCE_QUALITY.get(source, 0.5)
+    if raw_score > 0:
+        pts += min(1.5, math.log10(raw_score + 1) / 4)
+    if yesterday_map:
+        key = normalize(topic_raw)
+        if key not in yesterday_map:
+            pts += 1.5
+        else:
+            prev_frac = yesterday_map[key] / max(len(yesterday_map), 1)
+            if frac < prev_frac - 0.15:
+                pts += 0.8
+    if pts >= 5.5: return "hot"
+    if pts >= 3.5: return "rising"
     return "warm"
 
 
-# ─── Platform assignment ──────────────────────────────────────────────
-TIKTOK_KEYWORDS = ["tiktok","dance","challenge","duet","viral","skit","POV","pov","fyp","trend alert"]
-INSTA_KEYWORDS  = ["instagram","reel","aesthetic","outfit","fashion","beauty","selfie","photo","ootd","grwm"]
-YT_KEYWORDS     = ["youtube","vlog","tutorial","review","stream","episode","series","shorts","gameplay",
-                    "unboxing","react","challenge","explained","documentary","podcast","interview"]
+# ─── Platform guesser ────────────────────────────────────────────────────────
+
+YT_KW = ["youtube","vlog","tutorial","review","stream","episode","series","shorts","gameplay","unboxing","react","challenge","explained","documentary","podcast","interview","minecraft","roblox","fortnite","speedrun","gaming"]
+TT_KW = ["tiktok","dance","duet","skit","pov","fyp","trend alert","transition","viral"]
+IG_KW = ["instagram","reel","aesthetic","outfit","fashion","beauty","selfie","ootd","grwm","golden hour","photodump","carousel"]
 
 def guess_platform(topic):
     low = topic.lower()
-    # YouTube signals are strongest
-    yt_score = sum(1 for k in YT_KEYWORDS if k in low)
-    tt_score = sum(1 for k in TIKTOK_KEYWORDS if k in low)
-    ig_score = sum(1 for k in INSTA_KEYWORDS if k in low)
-
-    if yt_score > 0 and yt_score >= tt_score and yt_score >= ig_score:
-        return "youtube"
-    if tt_score > ig_score:
-        return "tiktok"
-    if ig_score > 0:
-        return "instagram"
-    # Default distribution: skew toward YouTube since it's the focus
-    return random.choices(["youtube", "tiktok", "instagram", "general"], weights=[45, 25, 20, 10])[0]
+    yt = sum(1 for k in YT_KW if k in low)
+    tt = sum(1 for k in TT_KW if k in low)
+    ig = sum(1 for k in IG_KW if k in low)
+    if yt > 0 and yt >= tt and yt >= ig: return "youtube"
+    if tt > ig: return "tiktok"
+    if ig > 0:  return "instagram"
+    return "general"
 
 
-# ─── Main ─────────────────────────────────────────────────────────────
+# ─── Fallbacks ───────────────────────────────────────────────────────────────
+
+FALLBACK_POOL = [
+    ("I Tried This For 30 Days — Here's What Happened","youtube"),
+    ("The Truth About YouTube Shorts in 2026","youtube"),
+    ("My Studio Setup Tour (Full Breakdown)","youtube"),
+    ("How I Hit 100K Subscribers (What Actually Worked)","youtube"),
+    ("Speed Code Challenge: Build an App in 1 Hour","youtube"),
+    ("Honest Review: Best Cameras for YouTube 2026","youtube"),
+    ("Day in the Life: Full-Time YouTuber","youtube"),
+    ("AI music generation tools","youtube"),
+    ("Lo-fi study setups","youtube"),
+    ("Budget travel hacks","youtube"),
+    ("Retro gaming nostalgia","youtube"),
+    ("3D printing oddities","youtube"),
+    ("Micro-adventure weekends","youtube"),
+    ("Tiny house living tours","youtube"),
+    ("GRWM morning routines","tiktok"),
+    ("#BookTok dark academia","tiktok"),
+    ("#FitnessTok home workouts","tiktok"),
+    ("#CleanTok deep cleaning","tiktok"),
+    ("Silent vlog trend","tiktok"),
+    ("Thrift flip challenges","tiktok"),
+    ("Analog photography revival","tiktok"),
+    ("Skincare routine layers","tiktok"),
+    ("Street style lookbooks","instagram"),
+    ("Coffee shop aesthetic reels","instagram"),
+    ("Golden hour photography","instagram"),
+    ("Meal prep aesthetic reels","instagram"),
+    ("Sunset drone cinematography","instagram"),
+    ("#OOTD street fashion","instagram"),
+    ("Studio apartment hacks","instagram"),
+    ("Cafe hopping vlogs","instagram"),
+]
+
+
+# ─── Main ────────────────────────────────────────────────────────────────────
+
 def main():
-    print("🌊 Wavecrest Pro — Fetching daily trends...")
+    print("🌊 Wavecrest Pro — Fetching daily trends (v2)...")
+    today         = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    yesterday_map = load_yesterday()
+    print(f"  📅 {today}  |  {len(yesterday_map)} yesterday trends for velocity scoring")
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    all_trends = []
-    seen = set()
+    all_trends, seen = [], set()
 
-    # 1. YouTube Trending (PRIMARY source — most weight)
-    yt = fetch_youtube_trending()
-    print(f"  ✓ YouTube Trending total: {len(yt)} titles")
-    for i, title in enumerate(yt):
-        key = title.lower()
-        if key not in seen:
-            seen.add(key)
-            score = "hot" if i < 8 else ("rising" if i < 22 else "warm")
-            all_trends.append({
-                "topic": f"▶️ {title}",
-                "score": score,
-                "platform": "youtube",
-                "traffic": max(0, 500000 - i * 10000),
-            })
+    def add(topic, platform, source, raw_score=0):
+        key = normalize(topic)
+        if key in seen or len(key) < 5: return False
+        seen.add(key)
+        emoji = PLATFORM_EMOJI.get(platform, "🔥")
+        all_trends.append({"_raw": topic, "topic": f"{emoji} {topic}", "platform": platform, "source": source, "raw_score": raw_score})
+        return True
 
-    # 2. YouTube RSS creator signals
-    rss_topics = fetch_youtube_rss_topics()
-    for t in rss_topics:
-        key = t.lower()
-        if key not in seen:
-            seen.add(key)
-            all_trends.append({
-                "topic": f"▶️ {t}",
-                "score": "rising",
-                "platform": "youtube",
-                "traffic": 0,
-            })
+    # 1. YouTube API
+    yt_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
+    if yt_key and yt_key not in ("", "PLACEHOLDER"):
+        print("\n[YouTube Data API v3]")
+        for t in fetch_youtube_api(yt_key): add(t, "youtube", "youtube_api")
+    else:
+        print("\n[YouTube API] No YOUTUBE_API_KEY — skipping. Add it for best results.")
 
-    # 3. Google Trends (strong signal, cross-platform)
-    gt = fetch_google_trends()
-    print(f"  ✓ Google Trends: {len(gt)} topics")
-    for i, t in enumerate(gt):
-        key = t["topic"].lower()
-        if key not in seen:
-            seen.add(key)
-            platform = guess_platform(t["topic"])
-            emoji = PLATFORM_EMOJI[platform]
-            all_trends.append({
-                "topic": f'{emoji} {t["topic"]}',
-                "score": assign_score(t["traffic"], i, max(len(gt), 1)),
-                "platform": platform,
-                "traffic": t["traffic"],
-            })
+    # 2. Reddit
+    print("\n[Reddit]")
+    for r in fetch_reddit_trending(): add(r["topic"], r["platform"], "reddit", r["raw_score"])
 
-    # 4. Pad with curated fallbacks if needed (date-seeded for consistency)
-    FALLBACK_POOL = [
-        # YouTube-focused (weighted higher)
-        ("I Tried This For 30 Days — Here's What Happened", "youtube"),
-        ("The Truth About YouTube Shorts in 2026", "youtube"),
-        ("My Studio Setup Tour (Full Breakdown)", "youtube"),
-        ("Reacting to Viral TikToks So You Don't Have To", "youtube"),
-        ("The Ultimate Productivity Setup for Creators", "youtube"),
-        ("Honest Review: Best Cameras for YouTube 2026", "youtube"),
-        ("Day in the Life: Full-Time YouTuber", "youtube"),
-        ("How I Hit 100K Subscribers (What Actually Worked)", "youtube"),
-        ("Speed Code Challenge: Build an App in 1 Hour", "youtube"),
-        ("Minimalist Apartment Tour — NYC on a Budget", "youtube"),
-        # Social/cross-platform
-        ("GRWM morning routines", "tiktok"),
-        ("Street style lookbooks", "instagram"),
-        ("AI music generation tools", "youtube"),
-        ("#BookTok dark academia", "tiktok"),
-        ("Coffee shop aesthetic reels", "instagram"),
-        ("#FitnessTok home workouts", "tiktok"),
-        ("Golden hour photography", "instagram"),
-        ("Silent vlog trend", "tiktok"),
-        ("Meal prep aesthetic reels", "instagram"),
-        ("Lo-fi study setups", "youtube"),
-        ("#CleanTok deep cleaning", "tiktok"),
-        ("Sunset drone cinematography", "instagram"),
-        ("Budget travel hacks", "youtube"),
-        ("#NailTok chrome art", "tiktok"),
-        ("Cottagecore baking reels", "instagram"),
-        ("Car detailing ASMR", "youtube"),
-        ("Thrift flip challenges", "tiktok"),
-        ("#OOTD street fashion", "instagram"),
-        ("Tiny house living tours", "youtube"),
-        ("Skincare routine layers", "tiktok"),
-        ("Studio apartment hacks", "instagram"),
-        ("3D printing oddities", "youtube"),
-        ("Analog photography revival", "tiktok"),
-        ("Pet rescue stories", "instagram"),
-        ("Micro-adventure weekends", "youtube"),
-        ("#HairTok curtain bangs", "tiktok"),
-        ("Cafe hopping vlogs", "instagram"),
-        ("Retro gaming nostalgia", "youtube"),
-        ("Storytime animated shorts", "tiktok"),
-        ("Vintage fashion hauls", "instagram"),
-    ]
+    # 3. Google Trends
+    print("\n[Google Trends RSS]")
+    for item in fetch_google_trends():
+        platform = guess_platform(item["topic"])
+        if platform == "youtube" and not any(k in item["topic"].lower() for k in ["youtube","video","stream","vlog","gameplay"]):
+            platform = "general"
+        add(item["topic"], platform, "google_trends", item["traffic"])
+    print(f"  Total Google Trends added: {sum(1 for t in all_trends if t['source']=='google_trends')}")
 
-    day_seed = int(today.replace("-", ""))
-    rng = random.Random(day_seed)
-    rng.shuffle(FALLBACK_POOL)
+    # 4. YouTube RSS
+    print("\n[YouTube RSS (creator feeds)]")
+    for t in fetch_youtube_rss(): add(t, "youtube", "youtube_rss")
+    print(f"  Total RSS added: {sum(1 for t in all_trends if t['source']=='youtube_rss')}")
 
-    needed = max(0, 30 - len(all_trends))
+    # 5. HTML scrape (only if thin)
+    if len(all_trends) < 20:
+        print("\n[YouTube HTML scrape — fallback]")
+        for t in fetch_youtube_html(): add(t, "youtube", "youtube_html")
+
+    real_count = len(all_trends)
+    print(f"\n  Real trends collected: {real_count}")
+
+    # 6. Curated fallbacks
+    needed = max(0, 25 - real_count)
     if needed > 0:
-        print(f"  ⚠ Only {len(all_trends)} real trends, padding with {needed} curated fallbacks")
-        scores = ["hot", "rising", "warm"]
-        for i, (topic, plat) in enumerate(FALLBACK_POOL[:needed]):
-            key = topic.lower()
-            if key not in seen:
-                seen.add(key)
-                emoji = PLATFORM_EMOJI.get(plat, "🔥")
-                all_trends.append({
-                    "topic": f"{emoji} {topic}",
-                    "score": scores[i % 3],
-                    "platform": plat,
-                    "traffic": 0,
-                })
+        print(f"  ⚠  Padding with {needed} curated fallbacks")
+        rng = random.Random(int(today.replace("-", "")))
+        pool = list(FALLBACK_POOL); rng.shuffle(pool)
+        for topic, plat in pool:
+            if needed <= 0: break
+            if add(topic, plat, "fallback"): needed -= 1
 
-    # Sort: hot first, then by traffic
-    score_order = {"hot": 0, "rising": 1, "warm": 2}
-    all_trends.sort(key=lambda t: (score_order.get(t["score"], 3), -t.get("traffic", 0)))
+    # Score
+    total = len(all_trends)
+    for i, t in enumerate(all_trends):
+        t["score"] = compute_score(t["_raw"], i, total, t["source"], t.get("raw_score", 0), yesterday_map)
 
-    # Remove internal traffic field
-    for t in all_trends:
-        t.pop("traffic", None)
+    # Sort
+    SCORE_ORDER  = {"hot":0,"rising":1,"warm":2}
+    SOURCE_ORDER = {"youtube_api":0,"reddit":1,"google_trends":1,"youtube_rss":2,"youtube_html":3,"fallback":4}
+    all_trends.sort(key=lambda t: (SCORE_ORDER.get(t["score"],3), SOURCE_ORDER.get(t["source"],5), -t.get("raw_score",0)))
+
+    sources = {}
+    for t in all_trends: sources[t["source"]] = sources.get(t["source"], 0) + 1
 
     output = {
-        "date": today,
+        "date":       today,
         "updated_at": datetime.now(timezone.utc).isoformat(),
-        "count": len(all_trends),
-        "trends": all_trends,
+        "count":      len(all_trends),
+        "sources":    sources,
+        "trends":     [{"topic": t["topic"], "score": t["score"], "platform": t["platform"]} for t in all_trends],
     }
-
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
-    print(f"  ✅ Wrote {len(all_trends)} trends to {OUTPUT}")
-    print(f"  📅 Date: {today}")
-
+    print(f"\n  ✅ Wrote {len(all_trends)} trends → {OUTPUT}")
+    print(f"  📊 Sources: {sources}")
 
 if __name__ == "__main__":
     main()
