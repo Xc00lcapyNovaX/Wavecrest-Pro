@@ -10,6 +10,25 @@ const db = require('../db');
 const router = express.Router();
 
 const isNonEmpty = (value) => typeof value === 'string' && value.trim().length > 0;
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+
+// Simple in-memory brute-force guard for login (resets on server restart; good enough for serverless)
+const loginAttempts = new Map();
+const MAX_ATTEMPTS = 10;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const entry = loginAttempts.get(ip) || { count: 0, resetAt: now + WINDOW_MS };
+  if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + WINDOW_MS; }
+  entry.count++;
+  loginAttempts.set(ip, entry);
+  return entry.count <= MAX_ATTEMPTS;
+}
+
+function clearLoginAttempts(ip) {
+  loginAttempts.delete(ip);
+}
 const baseUrl = process.env.BASE_URL;
 const googleConfigured = isNonEmpty(process.env.GOOGLE_CLIENT_ID) && isNonEmpty(process.env.GOOGLE_CLIENT_SECRET);
 const githubConfigured = isNonEmpty(process.env.GITHUB_CLIENT_ID) && isNonEmpty(process.env.GITHUB_CLIENT_SECRET);
@@ -100,8 +119,11 @@ router.post('/signup', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required.' });
     }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters.' });
     }
     if (await db.findUserByEmail(email)) {
       return res.status(409).json({ error: 'Email already registered.' });
@@ -121,10 +143,15 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
   try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required.' });
+    }
+
+    if (!checkLoginRateLimit(ip)) {
+      return res.status(429).json({ error: 'Too many login attempts. Please try again in 15 minutes.' });
     }
 
     const user = await db.findUserByEmail(email);
@@ -137,6 +164,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
+    clearLoginAttempts(ip); // reset on successful login
     req.session.userId = user.id;
     res.json({ message: 'Logged in.', user: sanitize(user) });
   } catch (err) {
