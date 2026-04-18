@@ -79,7 +79,7 @@
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="password" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+      <input type="password" id="password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
     </div>
     <button type="submit" class="btn-primary">Create Account</button>
   </form>
@@ -106,8 +106,8 @@ async function emailSignup(e) {
     });
     const data = await res.json();
     if (!res.ok) return showError(data.error);
-    showSuccess('Account created! Redirecting...');
-    setTimeout(() => window.location.href = '/dashboard.html', 800);
+    showSuccess('Account created! Check your email to verify your address. Redirecting...');
+    setTimeout(() => window.location.href = '/dashboard.html', 1500);
   } catch (err) {
     showError('Network error. Is the server running?');
   }
@@ -115,16 +115,11 @@ async function emailSignup(e) {
 
 async function oauthSignup(provider) {
   hideMessages();
-  // Google and GitHub use real Passport OAuth redirect
-  if (provider === 'google' || provider === 'github') {
-    window.location.href = `/api/auth/${provider}`;
-    return;
-  }
-  // Apple + Microsoft: still mock (requires paid dev accounts)
-  const email = prompt(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in\n\nEnter your email:`);
+  const email = prompt('Mock ' + provider + ' OAuth\n\nEnter the email to sign up with:');
   if (!email) return;
+
   try {
-    const res = await fetch(API + `/api/auth/${provider}/callback`, {
+    const res = await fetch(API + '/api/auth/' + provider + '/callback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

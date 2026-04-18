@@ -3,32 +3,19 @@
  */
 const express = require('express');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const db = require('../db');
+const { sendVerificationEmail, sendMagicLink } = require('../email');
 const router = express.Router();
 
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
 const isNonEmpty = (value) => typeof value === 'string' && value.trim().length > 0;
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
-
-// Simple in-memory brute-force guard for login (resets on server restart; good enough for serverless)
-const loginAttempts = new Map();
-const MAX_ATTEMPTS = 10;
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-
-function checkLoginRateLimit(ip) {
-  const now = Date.now();
-  const entry = loginAttempts.get(ip) || { count: 0, resetAt: now + WINDOW_MS };
-  if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + WINDOW_MS; }
-  entry.count++;
-  loginAttempts.set(ip, entry);
-  return entry.count <= MAX_ATTEMPTS;
-}
-
-function clearLoginAttempts(ip) {
-  loginAttempts.delete(ip);
-}
 const baseUrl = process.env.BASE_URL;
 const googleConfigured = isNonEmpty(process.env.GOOGLE_CLIENT_ID) && isNonEmpty(process.env.GOOGLE_CLIENT_SECRET);
 const githubConfigured = isNonEmpty(process.env.GITHUB_CLIENT_ID) && isNonEmpty(process.env.GITHUB_CLIENT_SECRET);
@@ -119,11 +106,8 @@ router.post('/signup', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required.' });
     }
-    if (!isValidEmail(email)) {
-      return res.status(400).json({ error: 'Please enter a valid email address.' });
-    }
-    if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
     if (await db.findUserByEmail(email)) {
       return res.status(409).json({ error: 'Email already registered.' });
@@ -133,25 +117,32 @@ router.post('/signup', async (req, res) => {
     const user = await db.createUser({ email, passwordHash, name });
     req.session.userId = user.id;
 
+    // Send verification email (non-blocking — don't fail signup if email fails)
+    try {
+      const token = generateToken();
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      await db.createEmailToken({ userId: user.id, email, token, type: 'verify', expiresAt });
+      await sendVerificationEmail({ to: email, token, baseUrl });
+    } catch (emailErr) {
+      console.error('[Auth] Failed to send verification email:', emailErr.message);
+    }
+
     res.status(201).json({
-      message: 'Account created successfully.',
+      message: 'Account created! Check your email to verify your address.',
       user: sanitize(user),
+      emailSent: true,
     });
   } catch (err) {
+    console.error('[Auth] Signup error:', err.message);
     res.status(500).json({ error: 'Server error.' });
   }
 });
 
 router.post('/login', async (req, res) => {
-  const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
   try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required.' });
-    }
-
-    if (!checkLoginRateLimit(ip)) {
-      return res.status(429).json({ error: 'Too many login attempts. Please try again in 15 minutes.' });
     }
 
     const user = await db.findUserByEmail(email);
@@ -164,7 +155,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
-    clearLoginAttempts(ip); // reset on successful login
     req.session.userId = user.id;
     res.json({ message: 'Logged in.', user: sanitize(user) });
   } catch (err) {
@@ -316,6 +306,91 @@ router.post('/beta-signup', async (req, res) => {
   }
 });
 
+// ── Magic link request ─────────────────────────────────────────────────────
+router.post('/magic-link', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Valid email required.' });
+    }
+
+    // Find or create user
+    let user = await db.findUserByEmail(email);
+    if (!user) {
+      user = await db.createUser({ email, name: email.split('@')[0], provider: 'email' });
+    }
+
+    const token = generateToken();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    await db.createEmailToken({ userId: user.id, email, token, type: 'magic', expiresAt });
+    await sendMagicLink({ to: email, token, baseUrl });
+
+    res.json({ message: 'Sign-in link sent! Check your email.' });
+  } catch (err) {
+    console.error('[Auth] Magic link error:', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ── Verify token (both email verification + magic link) ────────────────────
+router.get('/verify-token', async (req, res) => {
+  try {
+    const { token, type } = req.query;
+    if (!token || !type) {
+      return res.status(400).json({ error: 'Token and type required.' });
+    }
+
+    const record = await db.findEmailToken(token);
+
+    if (!record) return res.status(400).json({ error: 'Invalid or expired link.' });
+    if (record.type !== type) return res.status(400).json({ error: 'Invalid link type.' });
+    if (record.used_at) return res.status(400).json({ error: 'This link has already been used.' });
+    if (new Date() > new Date(record.expires_at)) {
+      return res.status(400).json({ error: 'This link has expired. Please request a new one.' });
+    }
+
+    await db.consumeEmailToken(record.id);
+
+    if (type === 'verify') {
+      await db.markEmailVerified(record.user_id);
+      return res.json({ message: 'Email verified successfully!', type: 'verify' });
+    }
+
+    if (type === 'magic') {
+      const user = await db.findUserById(record.user_id);
+      if (!user) return res.status(400).json({ error: 'User not found.' });
+      await db.markEmailVerified(user.id);
+      req.session.userId = user.id;
+      return res.json({ message: 'Signed in!', type: 'magic', user: sanitize(user) });
+    }
+
+    res.status(400).json({ error: 'Unknown token type.' });
+  } catch (err) {
+    console.error('[Auth] Verify token error:', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ── Resend verification email ──────────────────────────────────────────────
+router.post('/resend-verification', async (req, res) => {
+  try {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated.' });
+    const user = await db.findUserById(req.session.userId);
+    if (!user) return res.status(401).json({ error: 'User not found.' });
+    if (user.email_verified) return res.status(400).json({ error: 'Email already verified.' });
+
+    const token = generateToken();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await db.createEmailToken({ userId: user.id, email: user.email, token, type: 'verify', expiresAt });
+    await sendVerificationEmail({ to: user.email, token, baseUrl });
+
+    res.json({ message: 'Verification email resent.' });
+  } catch (err) {
+    console.error('[Auth] Resend verification error:', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 function sanitize(user) {
   return {
     id: user.id,
@@ -324,6 +399,7 @@ function sanitize(user) {
     avatar_url: user.avatar_url,
     plan: user.plan,
     is_beta: user.is_beta || false,
+    email_verified: user.email_verified || false,
     provider: user.provider,
     created_at: user.created_at,
   };

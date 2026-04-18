@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png" />
+<title>Verify — Wavecrest Pro</title>
+<link rel="preload" href="/css/glass.css" as="style">
+<link rel="stylesheet" href="/css/glass.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;--mesh-1:rgba(0,113,227,.12);--mesh-2:rgba(48,209,88,.08)}
+  .logo{font-size:1.4rem;font-weight:700;margin-bottom:40px;text-decoration:none;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .card{padding:48px;width:100%;max-width:420px;text-align:center}
+  .icon{font-size:3rem;margin-bottom:20px}
+  h1{font-size:1.5rem;font-weight:700;margin-bottom:10px}
+  p{color:var(--muted);line-height:1.6;margin-bottom:24px;font-size:.95rem}
+  .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn{display:inline-block;padding:14px 28px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s}
+  .btn:hover{opacity:.85}
+  .btn-ghost{background:transparent;border:1px solid var(--card-border);color:var(--muted);margin-left:12px}
+  .btn-ghost:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+</style>
+</head>
+<body class="ambient-mesh">
+
+<a href="/" class="logo">Wavecrest <span>Pro</span></a>
+
+<div class="card glass-strong">
+  <!-- Loading state -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <h1>Verifying...</h1>
+    <p>Just a moment while we process your link.</p>
+  </div>
+
+  <!-- Success: email verified -->
+  <div id="verified" style="display:none">
+    <div class="icon">✅</div>
+    <h1>Email verified!</h1>
+    <p>Your email address has been confirmed. You're all set to use Wavecrest Pro.</p>
+    <a href="/dashboard.html" class="btn">Go to Dashboard</a>
+  </div>
+
+  <!-- Success: magic link (signed in) -->
+  <div id="signedin" style="display:none">
+    <div class="icon">🌊</div>
+    <h1>You're signed in!</h1>
+    <p>Welcome back. Redirecting you to your dashboard...</p>
+  </div>
+
+  <!-- Error state -->
+  <div id="error" style="display:none">
+    <div class="icon">❌</div>
+    <h1 id="errorTitle">Link invalid</h1>
+    <p id="errorMsg">This link may have expired or already been used.</p>
+    <a href="/signin.html" class="btn">Sign In</a>
+    <a href="/signup.html" class="btn btn-ghost">Sign Up</a>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+async function verify() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  const type = params.get('type');
+
+  if (!token || !type) {
+    return showError('Missing link parameters.', 'Invalid link');
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/verify-token?token=${encodeURIComponent(token)}&type=${encodeURIComponent(type)}`, {
+      credentials: 'include',
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      return showError(data.error || 'Something went wrong.');
+    }
+
+    document.getElementById('loading').style.display = 'none';
+
+    if (type === 'verify') {
+      document.getElementById('verified').style.display = 'block';
+    } else if (type === 'magic') {
+      document.getElementById('signedin').style.display = 'block';
+      setTimeout(() => {
+        const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+        window.location.href = dest;
+      }, 1500);
+    }
+  } catch (err) {
+    showError('Network error. Please try again.');
+  }
+}
+
+function showError(msg, title = 'Link invalid') {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('errorTitle').textContent = title;
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('error').style.display = 'block';
+}
+
+verify();
+</script>
+</body>
+</html>

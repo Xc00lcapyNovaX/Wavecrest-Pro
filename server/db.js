@@ -228,6 +228,38 @@ db.logUsage = async (userId, endpoint) => {
   await pool.query('INSERT INTO usage_log (user_id, endpoint) VALUES ($1, $2)', [userId, endpoint]);
 };
 
+// ── Email Tokens ───────────────────────────────────
+db.createEmailToken = async ({ userId, email, token, type, expiresAt }) => {
+  // Invalidate any existing unused tokens of same type for this email
+  await pool.query(
+    `UPDATE email_tokens SET used_at = NOW() WHERE email = $1 AND type = $2 AND used_at IS NULL`,
+    [email.toLowerCase(), type]
+  );
+  const { rows } = await pool.query(
+    `INSERT INTO email_tokens (user_id, email, token, type, expires_at)
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [userId || null, email.toLowerCase(), token, type, expiresAt]
+  );
+  return rows[0];
+};
+
+db.findEmailToken = async (token) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM email_tokens WHERE token = $1`, [token]
+  );
+  return rows[0] || null;
+};
+
+db.consumeEmailToken = async (tokenId) => {
+  await pool.query(
+    `UPDATE email_tokens SET used_at = NOW() WHERE id = $1`, [tokenId]
+  );
+};
+
+db.markEmailVerified = async (userId) => {
+  await pool.query(`UPDATE users SET email_verified = true WHERE id = $1`, [userId]);
+};
+
 // ── API Keys (BYOAK) ──────────────────────────────
 db.saveApiKey = async (userId, service, key) => {
   const { rows } = await pool.query(

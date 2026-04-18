@@ -76,17 +76,37 @@
 
   <div class="divider">or sign in with email</div>
 
-  <form id="loginForm" onsubmit="emailLogin(event)">
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-    </div>
-    <button type="submit" class="btn-primary">Sign In</button>
-  </form>
+  <!-- Email/password form -->
+  <div id="passwordView">
+    <form id="loginForm" onsubmit="emailLogin(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-primary">Sign In</button>
+    </form>
+    <p style="text-align:center;margin-top:16px;font-size:.88rem;color:#86868b">
+      No password? <a href="#" onclick="showMagicView()" style="color:#0071e3;text-decoration:none">Send me a sign-in link</a>
+    </p>
+  </div>
+
+  <!-- Magic link form -->
+  <div id="magicView" style="display:none">
+    <form id="magicForm" onsubmit="requestMagicLink(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="magicEmail" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <button type="submit" class="btn-primary">Send Sign-In Link</button>
+    </form>
+    <p style="text-align:center;margin-top:16px;font-size:.88rem;color:#86868b">
+      <a href="#" onclick="showPasswordView()" style="color:#0071e3;text-decoration:none">← Back to password</a>
+    </p>
+  </div>
 
   <p class="footer-link">Don't have an account? <a href="signup.html">Sign up</a></p>
 </div>
@@ -151,6 +171,38 @@ function oauthLogin(provider) {
     const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
     setTimeout(() => window.location.href = dest, 800);
   }).catch(() => showError('Network error.'));
+}
+
+async function requestMagicLink(e) {
+  e.preventDefault();
+  hideMessages();
+  const email = document.getElementById('magicEmail').value;
+  try {
+    const res = await fetch(API + '/api/auth/magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) return showError(data.error);
+    showSuccess('Check your email — a sign-in link is on its way!');
+    document.getElementById('magicForm').reset();
+  } catch (err) {
+    showError('Network error. Is the server running?');
+  }
+}
+
+function showMagicView() {
+  document.getElementById('passwordView').style.display = 'none';
+  document.getElementById('magicView').style.display = 'block';
+  hideMessages();
+}
+
+function showPasswordView() {
+  document.getElementById('magicView').style.display = 'none';
+  document.getElementById('passwordView').style.display = 'block';
+  hideMessages();
 }
 
 function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
