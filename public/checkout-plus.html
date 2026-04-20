@@ -471,7 +471,7 @@
 
 <nav>
   <div class="inner">
-    <a href="index.html" class="logo">Wavecrest<span> Pro</span></a>
+    <a href="/" class="logo">Wavecrest<span> Pro</span></a>
     <a href="index.html#pricing" class="back-link">All Plans</a>
   </div>
 </nav>
@@ -532,7 +532,7 @@
         <div class="live-dashboard" data-rows="11" data-locked="3"></div>
       </div>
       <div class="lock-footer">
-        <p>Unlock unlimited results with <a href="checkout-pro.html">Pro</a></p>
+        <p>Unlock unlimited results with <a href="/checkout?plan=pro">Pro</a></p>
       </div>
     </div>
   </section>
@@ -601,10 +601,10 @@
   <!-- Upsell -->
   <div class="upsell">
     <p>Need unlimited searches and real-time alerts?</p>
-    <a href="checkout-pro.html">Upgrade to Pro — Free during beta</a>
+    <a href="/checkout?plan=pro">Upgrade to Pro — Free during beta</a>
   </div>
 
-  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
+  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="/signin" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
 
 </div>
 
@@ -784,7 +784,7 @@ document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observ
       body: JSON.stringify({email: email.value.trim(), name: name ? name.value.trim() : ''})
     }).then(function(r){return r.json()}).then(function(data){
       if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = 'Get Free Beta Access'; return; }
-      window.location.href = '/dashboard.html?subscribed=plus&beta=true';
+      window.location.href = '/dashboard?subscribed=plus&beta=true';
     }).catch(function(){
       alert('Something went wrong. Please try again.');
       btn.disabled = false; btn.textContent = 'Get Free Beta Access';

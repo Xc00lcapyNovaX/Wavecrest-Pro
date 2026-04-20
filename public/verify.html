@@ -42,7 +42,7 @@
     <div class="icon">✅</div>
     <h1>Email verified!</h1>
     <p>Your email address has been confirmed. You're all set to use Wavecrest Pro.</p>
-    <a href="/dashboard.html" class="btn">Go to Dashboard</a>
+    <a href="/dashboard" class="btn">Go to Dashboard</a>
   </div>
 
   <!-- Success: magic link (signed in) -->
@@ -57,8 +57,8 @@
     <div class="icon">❌</div>
     <h1 id="errorTitle">Link invalid</h1>
     <p id="errorMsg">This link may have expired or already been used.</p>
-    <a href="/signin.html" class="btn">Sign In</a>
-    <a href="/signup.html" class="btn btn-ghost">Sign Up</a>
+    <a href="/signin" class="btn">Sign In</a>
+    <a href="/signup" class="btn btn-ghost">Sign Up</a>
   </div>
 </div>
 
@@ -91,7 +91,7 @@ async function verify() {
     } else if (type === 'magic') {
       document.getElementById('signedin').style.display = 'block';
       setTimeout(() => {
-        const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+        const dest = data.user && data.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard';
         window.location.href = dest;
       }, 1500);
     }

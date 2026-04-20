@@ -67,7 +67,7 @@
   <form onsubmit="emailSignup(event)">
     <div class="form-group">
       <label>Name</label>
-      <input type="text" id="name" placeholder="Your name" autocomplete="name">
+      <input type="text" id="name" placeholder="Your name" autocomplete="name" required>
     </div>
     <div class="form-group">
       <label>Email</label>
@@ -103,7 +103,7 @@ async function emailSignup(e) {
     const data = await res.json();
     if (!res.ok) return showError(data.error);
     showSuccess('Account created! Check your email to verify your address. Redirecting...');
-    setTimeout(() => window.location.href = '/dashboard';, 1500);
+    setTimeout(() => { window.location.href = '/dashboard'; }, 1500);
   } catch (err) {
     showError('Network error. Is the server running?');
   }

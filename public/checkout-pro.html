@@ -139,7 +139,7 @@
 
 <nav>
   <div class="inner">
-    <a href="index.html" class="logo">Wavecrest <span>Pro</span></a>
+    <a href="/" class="logo">Wavecrest <span>Pro</span></a>
     <a href="index.html#pricing" class="back-link">All Plans</a>
   </div>
 </nav>
@@ -275,10 +275,10 @@
   <!-- Upsell -->
   <div class="upsell">
     <p>Need API access and multi-project dashboards?</p>
-    <a href="checkout-max.html">Upgrade to Max — Free during beta →</a>
+    <a href="/checkout?plan=max">Upgrade to Max — Free during beta →</a>
   </div>
 
-  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
+  <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="/signin" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
 
 </div>
 
@@ -471,7 +471,7 @@ document.querySelectorAll('.live-dashboard').forEach(function(el){dashObs.observ
         btn.disabled = false; btn.textContent = 'Get Free Beta Access';
         return;
       }
-      window.location.href = '/dashboard.html?subscribed=pro&beta=true';
+      window.location.href = '/dashboard?subscribed=pro&beta=true';
     }).catch(function(){
       alert('Something went wrong. Please try again.');
       btn.disabled = false; btn.textContent = 'Get Free Beta Access';

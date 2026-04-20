@@ -35,7 +35,7 @@ router.post('/create-checkout', requireAuth, async (req, res) => {
     }
 
     if (plan === 'enterprise') {
-      return res.json({ message: 'Enterprise plan — contact sales.', redirect: '/checkout-enterprise.html' });
+      return res.json({ message: 'Enterprise plan — contact sales.', redirect: '/checkout?plan=enterprise' });
     }
 
     // ── Real Stripe ──
@@ -51,8 +51,8 @@ router.post('/create-checkout', requireAuth, async (req, res) => {
         mode: 'subscription',
         customer_email: user.email,
         line_items: lineItems,
-        success_url: `${process.env.BASE_URL || 'http://localhost:3000'}/dashboard.html?session_id={CHECKOUT_SESSION_ID}&subscribed=${plan}`,
-        cancel_url: `${process.env.BASE_URL || 'http://localhost:3000'}/checkout-${plan}.html?cancelled=true`,
+        success_url: `${process.env.BASE_URL || 'http://localhost:3000'}/dashboard?session_id={CHECKOUT_SESSION_ID}&subscribed=${plan}`,
+        cancel_url: `${process.env.BASE_URL || 'http://localhost:3000'}/checkout?plan=${plan}&cancelled=true`,
         metadata: { userId: user.id, plan },
       };
 
@@ -113,7 +113,7 @@ router.get('/mock-complete', async (req, res) => {
     });
 
     if (req.session) req.session.userId = userId;
-    res.redirect(`/dashboard.html?subscribed=${plan}`);
+    res.redirect(`/dashboard?subscribed=${plan}`);
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
   }
@@ -231,7 +231,7 @@ router.post('/portal', requireAuth, async (req, res) => {
     if (stripe && user.stripe_customer_id) {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: user.stripe_customer_id,
-        return_url: `${process.env.BASE_URL || 'http://localhost:3000'}/dashboard.html`,
+        return_url: `${process.env.BASE_URL || 'http://localhost:3000'}/dashboard`,
       });
       return res.json({ url: portalSession.url });
     }
@@ -260,7 +260,7 @@ router.get('/mock-portal', (req, res) => {
     <body><div class="card">
       <h2>Billing Portal</h2>
       <p>This is a mock billing portal. In production, this would be Stripe's hosted customer portal where you can manage your subscription.</p>
-      <a href="/dashboard.html">← Back to Dashboard</a>
+      <a href="/dashboard">← Back to Dashboard</a>
     </div></body></html>
   `);
 });

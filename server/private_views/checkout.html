@@ -44,19 +44,19 @@
   </div>
 
   <div class="plan-cards">
-    <div class="plan-card selected" onclick="selectPlan(this,'free')">
+    <div class="plan-card selected" data-plan="free" onclick="selectPlan(this,'free')">
       <div class="plan-card-left"><h3>Free</h3><p>5 searches/day · 1 platform</p></div>
       <div class="plan-card-price">$0<span>always free</span></div>
     </div>
-    <div class="plan-card" onclick="selectPlan(this,'plus')">
+    <div class="plan-card" data-plan="plus" onclick="selectPlan(this,'plus')">
       <div class="plan-card-left"><h3>Plus</h3><p>50 searches · CSV · Alerts</p></div>
       <div class="plan-card-price" style="color:var(--accent3)">$9.99<span style="color:var(--muted)">/mo · <strong style="color:var(--accent3)">$0 beta</strong></span></div>
     </div>
-    <div class="plan-card" onclick="selectPlan(this,'pro')">
+    <div class="plan-card" data-plan="pro" onclick="selectPlan(this,'pro')">
       <div class="plan-card-left"><h3>Pro</h3><p>Unlimited · AI Ideas · Filters</p></div>
       <div class="plan-card-price" style="color:var(--accent)">$24.99<span style="color:var(--muted)">/mo · <strong style="color:var(--accent)">$0 beta</strong></span></div>
     </div>
-    <div class="plan-card" onclick="selectPlan(this,'max')">
+    <div class="plan-card" data-plan="max" onclick="selectPlan(this,'max')">
       <div class="plan-card-left"><h3>Max</h3><p>API · 90-day history · Priority</p></div>
       <div class="plan-card-price" style="color:var(--accent2)">$99.99<span style="color:var(--muted)">/mo · <strong style="color:var(--accent2)">$0 beta</strong></span></div>
     </div>
@@ -84,7 +84,7 @@ function proceed() {
 const params = new URLSearchParams(window.location.search);
 const pre = params.get('plan');
 if (pre) {
-  const el = document.querySelector(`.plan-card[onclick*="${pre}"]`);
+  const el = document.querySelector(`.plan-card[data-plan="${pre}"]`);
   if (el) {
     document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');

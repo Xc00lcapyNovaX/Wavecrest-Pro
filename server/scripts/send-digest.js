@@ -164,7 +164,7 @@ async function run() {
         ],
         footer: { text: 'Wavecrest Pro · wavecrest.pro' },
         timestamp: new Date().toISOString(),
-        url: `${BASE_URL}/dashboard.html`,
+        url: `${BASE_URL}/dashboard`,
       }]
     };
 

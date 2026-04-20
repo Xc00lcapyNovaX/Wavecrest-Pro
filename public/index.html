@@ -872,10 +872,11 @@ const FALLBACK = [
       if(d&&d.trends&&d.trends.length){
         trendPool=d.trends.map(t=>({topic:t.topic,score:t.score||'warm',platform:t.platform||'General'}));
         buildTicker();buildDashboard();
-      } else { trendPool=FALLBACK; }
+      } else { trendPool=FALLBACK; buildTicker(); buildDashboard(); }
     })
-    .catch(()=>{trendPool=FALLBACK;});
-  trendPool=FALLBACK;
+    .catch(()=>{ trendPool=FALLBACK; buildTicker(); buildDashboard(); });
+  // Show fallback immediately so the page isn't blank while fetch is in-flight
+  buildTicker(); buildDashboard();
 })();
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
