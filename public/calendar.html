@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png" />
+<title>Trend Calendar — Wavecrest Pro</title>
+<link rel="stylesheet" href="/css/glass.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* Nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:var(--glass-nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:100}
+  .logo{font-size:1.2rem;font-weight:700;text-decoration:none;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .btn-sm{padding:8px 16px;border-radius:980px;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:.82rem;cursor:pointer;transition:background .2s;text-decoration:none;display:inline-block}
+  .btn-sm:hover{background:rgba(255,255,255,.06)}
+  .plan-badge{padding:4px 12px;border-radius:980px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .plan-free{background:rgba(255,255,255,.08);color:var(--muted)}
+  .plan-plus{background:rgba(0,113,227,.15);color:var(--blue)}
+  .plan-pro{background:rgba(48,209,88,.15);color:var(--green)}
+  .plan-max{background:rgba(255,159,10,.15);color:var(--orange)}
+  .plan-teams,.plan-enterprise{background:rgba(175,130,255,.15);color:#af82ff}
+
+  /* Layout */
+  .container{max-width:1000px;margin:0 auto;padding:40px 24px}
+
+  /* Calendar header */
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .cal-month{font-size:1.4rem;font-weight:700}
+  .cal-nav{display:flex;gap:8px}
+  .cal-nav button{width:36px;height:36px;border-radius:50%;border:1px solid var(--card-border);background:transparent;color:var(--text);font-size:1rem;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center}
+  .cal-nav button:hover{background:rgba(255,255,255,.06)}
+  .cal-nav button:disabled{opacity:.3;cursor:default}
+
+  /* Calendar grid */
+  .cal-grid{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
+  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--card-border)}
+  .cal-weekday{padding:12px 0;text-align:center;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
+  .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-right:1px solid var(--card-border);border-bottom:1px solid var(--card-border);cursor:default;transition:background .15s;position:relative;min-height:64px}
+  .cal-day:nth-child(7n){border-right:none}
+  .cal-day.has-data{cursor:pointer}
+  .cal-day.has-data:hover{background:rgba(255,255,255,.04)}
+  .cal-day.selected{background:rgba(0,113,227,.1);border-color:rgba(0,113,227,.2)}
+  .cal-day.today .cal-day-num{background:var(--blue);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+  .cal-day.empty{background:rgba(0,0,0,.2);cursor:default}
+  .cal-day-num{font-size:.9rem;font-weight:500;color:var(--text)}
+  .cal-day.empty .cal-day-num{color:rgba(255,255,255,.12)}
+  .cal-day.has-data .cal-day-num{color:var(--text)}
+  .cal-day:not(.has-data):not(.empty) .cal-day-num{color:var(--muted)}
+  .cal-dot{width:6px;height:6px;border-radius:50%}
+  .dot-hot{background:var(--red)}
+  .dot-rising{background:var(--green)}
+  .dot-warm{background:var(--orange)}
+  .cal-dots{display:flex;gap:3px;align-items:center}
+
+  /* Legend */
+  .legend{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+
+  /* Trend panel */
+  .trend-panel{margin-top:32px}
+  .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .panel-date{font-size:1.1rem;font-weight:700}
+  .panel-stats{display:flex;gap:12px;font-size:.82rem;color:var(--muted)}
+  .panel-stat span{color:var(--text);font-weight:600}
+
+  /* Filter pills */
+  .filter-pills{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .pill{padding:6px 14px;border-radius:980px;border:1px solid var(--card-border);background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .15s}
+  .pill:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+  .pill.active{border-color:var(--blue);color:var(--blue);background:rgba(0,113,227,.08)}
+
+  /* Trend list */
+  .trend-list{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;overflow:hidden}
+  .trend-row{display:grid;grid-template-columns:28px minmax(0,1fr) 100px auto;align-items:center;column-gap:12px;padding:14px 20px;border-bottom:1px solid var(--card-border);transition:background .15s}
+  .trend-row:last-child{border-bottom:none}
+  .trend-row:hover{background:rgba(255,255,255,.03)}
+  .trend-rank{font-size:.78rem;font-weight:600;color:var(--muted);text-align:right}
+  .trend-topic{font-weight:500;min-width:0;line-height:1.35}
+  .trend-platform{font-size:.78rem;color:var(--muted);text-transform:capitalize}
+  .tag{padding:4px 10px;border-radius:980px;font-size:.7rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+  .tag-hot{background:rgba(255,69,58,.15);color:var(--red)}
+  .tag-rising{background:rgba(48,209,88,.15);color:var(--green)}
+  .tag-warm{background:rgba(255,159,10,.15);color:var(--orange)}
+
+  /* Empty/loading states */
+  .state-box{padding:60px 24px;text-align:center;color:var(--muted);font-size:.9rem;line-height:1.6}
+  .state-box .icon{font-size:2rem;margin-bottom:12px}
+  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+  .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:8px}
+  .skel-row{height:50px;margin-bottom:1px;border-radius:0}
+  .skel-row:first-child{border-radius:16px 16px 0 0}
+  .skel-row:last-child{border-radius:0 0 16px 16px}
+
+  @media(max-width:600px){
+    nav{padding:12px 16px}
+    .container{padding:24px 16px}
+    .cal-day{min-height:48px}
+    .cal-weekday{font-size:.62rem;padding:8px 0}
+    .trend-row{grid-template-columns:24px minmax(0,1fr) auto;column-gap:8px;padding:12px 14px}
+    .trend-platform{display:none}
+  }
+</style>
+</head>
+<body class="ambient-mesh">
+
+<nav>
+  <a href="/" class="logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-right" id="navRight">
+    <a href="/dashboard" class="btn-sm">Dashboard</a>
+    <button class="btn-sm" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Calendar -->
+  <div class="cal-header">
+    <div class="cal-month" id="calMonth">Loading…</div>
+    <div class="cal-nav">
+      <button id="prevBtn" onclick="changeMonth(-1)" title="Previous month">‹</button>
+      <button id="nextBtn" onclick="changeMonth(1)" title="Next month">›</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-hot"></div> Hot</div>
+    <div class="legend-item"><div class="legend-dot dot-rising"></div> Rising</div>
+    <div class="legend-item"><div class="legend-dot dot-warm"></div> Warm</div>
+    <div class="legend-item" style="color:var(--muted);font-size:.72rem">· Click any highlighted day to see its trends</div>
+  </div>
+
+  <div class="cal-grid">
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Sun</div>
+      <div class="cal-weekday">Mon</div>
+      <div class="cal-weekday">Tue</div>
+      <div class="cal-weekday">Wed</div>
+      <div class="cal-weekday">Thu</div>
+      <div class="cal-weekday">Fri</div>
+      <div class="cal-weekday">Sat</div>
+    </div>
+    <div class="cal-days" id="calDays">
+      <div class="state-box" style="grid-column:1/-1;padding:40px"><div class="icon">📅</div>Loading calendar…</div>
+    </div>
+  </div>
+
+  <!-- Trend panel (shown when a date is selected) -->
+  <div class="trend-panel" id="trendPanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-date" id="panelDate"></div>
+      <div class="panel-stats" id="panelStats"></div>
+    </div>
+    <div class="filter-pills" id="filterPills"></div>
+    <div id="panelList"></div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let availableDates = new Set();   // set of date strings
+let dateScores = {};              // { "2026-04-20": { hot, rising, warm, total } }
+let selectedDate = null;
+let currentYear, currentMonth;
+let panelTrends = [];
+let panelFilter = '';
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = String(str || '');
+  return d.innerHTML;
+}
+
+async function init() {
+  const res = await fetch(API + '/api/auth/me', { credentials: 'include' });
+  if (res.status === 401) { window.location.href = '/signin'; return; }
+  try {
+    const me = await res.json();
+    const plan = me.user?.plan || 'free';
+    document.getElementById('navRight').insertAdjacentHTML('afterbegin',
+      `<span class="plan-badge plan-${plan}">${plan}</span>`);
+  } catch (e) {}
+
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth(); // 0-indexed
+
+  await loadDates();
+  renderCalendar();
+
+  // Auto-select today or most recent date with data
+  const today = toDateStr(now);
+  if (availableDates.has(today)) {
+    selectDate(today);
+  } else {
+    const sorted = [...availableDates].sort().reverse();
+    if (sorted.length) selectDate(sorted[0]);
+  }
+}
+
+async function loadDates() {
+  try {
+    const res = await fetch(API + '/api/trends/dates', { credentials: 'include' });
+    const data = await res.json();
+    // dates is now an array of { date, total, hot, rising, warm }
+    availableDates = new Set();
+    dateScores = {};
+    (data.dates || []).forEach(d => {
+      const key = typeof d === 'string' ? d : d.date;
+      availableDates.add(key);
+      if (typeof d === 'object') dateScores[key] = d;
+    });
+  } catch (e) { availableDates = new Set(); dateScores = {}; }
+}
+
+function toDateStr(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function renderCalendar() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+  const today = toDateStr(new Date());
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const now = new Date();
+
+  // Prev/Next button state
+  const minDate = [...availableDates].sort()[0];
+  const maxDate = [...availableDates].sort().reverse()[0];
+  document.getElementById('prevBtn').disabled = currentYear * 12 + currentMonth <= (minDate ? parseInt(minDate.slice(0,4)) * 12 + parseInt(minDate.slice(5,7)) - 1 : 0);
+  document.getElementById('nextBtn').disabled = currentYear > now.getFullYear() || (currentYear === now.getFullYear() && currentMonth >= now.getMonth());
+
+  const grid = document.getElementById('calDays');
+  let html = '';
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="cal-day empty"><span class="cal-day-num"></span></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasData = availableDates.has(dateStr);
+    const isToday = dateStr === today;
+    const isSelected = dateStr === selectedDate;
+    const isFuture = dateStr > today;
+
+    let cls = 'cal-day';
+    if (hasData) cls += ' has-data';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    if (isFuture) cls += ' empty';
+
+    let dots = '';
+    if (hasData) {
+      const sc = dateScores[dateStr] || {};
+      let dotHtml = '';
+      if (sc.hot    > 0) dotHtml += '<div class="cal-dot dot-hot"></div>';
+      if (sc.rising > 0) dotHtml += '<div class="cal-dot dot-rising"></div>';
+      if (sc.warm   > 0) dotHtml += '<div class="cal-dot dot-warm"></div>';
+      if (!dotHtml)       dotHtml  = '<div class="cal-dot" style="background:var(--blue)"></div>';
+      dots = `<div class="cal-dots">${dotHtml}</div>`;
+    }
+
+    const onclick = hasData && !isFuture ? `onclick="selectDate('${dateStr}')"` : '';
+    html += `<div class="${cls}" ${onclick}><span class="cal-day-num">${d}</span>${dots}</div>`;
+  }
+
+  // Fill remaining cells to complete the last row
+  const totalCells = firstDay + daysInMonth;
+  const remainder = totalCells % 7;
+  if (remainder !== 0) {
+    for (let i = 0; i < 7 - remainder; i++) {
+      html += '<div class="cal-day empty"><span class="cal-day-num"></span></div>';
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  renderCalendar();
+}
+
+async function selectDate(dateStr) {
+  selectedDate = dateStr;
+  panelFilter = '';
+  renderCalendar();
+
+  const panel = document.getElementById('trendPanel');
+  const list  = document.getElementById('panelList');
+  panel.style.display = 'block';
+
+  const d = new Date(dateStr + 'T12:00:00Z');
+  document.getElementById('panelDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('panelStats').innerHTML = '';
+  document.getElementById('filterPills').innerHTML = '';
+
+  list.innerHTML = `
+    <div class="trend-list">
+      <div class="skel-row skeleton"></div>
+      <div class="skel-row skeleton"></div>
+      <div class="skel-row skeleton"></div>
+      <div class="skel-row skeleton"></div>
+      <div class="skel-row skeleton"></div>
+    </div>`;
+
+  try {
+    const res = await fetch(`${API}/api/trends?date=${dateStr}&limit=100`, { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+
+    panelTrends = data.trends || [];
+
+    // Stats
+    const hot    = panelTrends.filter(t => t.score === 'hot').length;
+    const rising = panelTrends.filter(t => t.score === 'rising').length;
+    const warm   = panelTrends.filter(t => t.score === 'warm').length;
+    document.getElementById('panelStats').innerHTML =
+      `<span>🔥 <span>${hot}</span> hot</span>` +
+      `<span>📈 <span>${rising}</span> rising</span>` +
+      `<span>🌊 <span>${warm}</span> warm</span>` +
+      `<span style="margin-left:4px"><span>${panelTrends.length}</span> total</span>`;
+
+    // Platform filter pills
+    const platforms = [...new Set(panelTrends.map(t => t.platform).filter(Boolean))].sort();
+    let pillsHtml = `<button class="pill active" id="pill-all" onclick="setPanelFilter('')">All</button>`;
+    platforms.forEach(p => {
+      pillsHtml += `<button class="pill" id="pill-${p}" onclick="setPanelFilter('${p}')">${p.charAt(0).toUpperCase() + p.slice(1)}</button>`;
+    });
+    document.getElementById('filterPills').innerHTML = pillsHtml;
+
+    renderPanelList();
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (err) {
+    list.innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${esc(err.message)}</div>`;
+  }
+}
+
+function setPanelFilter(platform) {
+  panelFilter = platform;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  const activeId = platform ? `pill-${platform}` : 'pill-all';
+  const activeEl = document.getElementById(activeId);
+  if (activeEl) activeEl.classList.add('active');
+  renderPanelList();
+}
+
+function renderPanelList() {
+  const list = document.getElementById('panelList');
+  let items = panelTrends;
+  if (panelFilter) items = items.filter(t => t.platform === panelFilter);
+
+  if (!items.length) {
+    list.innerHTML = '<div class="state-box"><div class="icon">🔍</div>No trends for this filter.</div>';
+    return;
+  }
+
+  list.innerHTML = '<div class="trend-list">' +
+    items.map((t, i) => {
+      const scoreClass = ['hot','rising','warm'].includes(t.score) ? t.score : 'warm';
+      return `<div class="trend-row">
+        <span class="trend-rank">${i + 1}</span>
+        <span class="trend-topic">${esc(t.topic)}</span>
+        <span class="trend-platform">${esc(t.platform || '')}</span>
+        <span class="tag tag-${scoreClass}">${esc(t.score).toUpperCase()}</span>
+      </div>`;
+    }).join('') +
+  '</div>';
+}
+
+async function logout() {
+  try { await fetch(API + '/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch (e) {}
+  window.location.href = '/signin';
+}
+
+init().catch(err => {
+  document.getElementById('calDays').innerHTML = `<div class="state-box" style="grid-column:1/-1"><div class="icon">⚠️</div>${esc(err.message)}</div>`;
+});
+</script>
+</body>
+</html>

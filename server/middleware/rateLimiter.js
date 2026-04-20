@@ -23,7 +23,7 @@ async function rateLimiter(req, res, next) {
         plan: user.plan,
         limit,
         used,
-        upgrade_url: '/checkout-pro.html',
+        upgrade_url: '/checkout?plan=pro',
       });
     }
 

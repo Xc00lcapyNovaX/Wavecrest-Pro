@@ -37,22 +37,22 @@ db.findUserById = async (id) => {
 
 db.findUserByProvider = async (provider, providerId) => {
   const { rows } = await pool.query(
-    'SELECT * FROM users WHERE provider = $1 AND id = $2', [provider, providerId]
+    'SELECT * FROM users WHERE provider = $1 AND provider_id = $2', [provider, providerId]
   );
   return rows[0] || null;
 };
 
 db.createUser = async ({ email, passwordHash, name, provider = 'email', providerId, avatarUrl }) => {
   const { rows } = await pool.query(
-    `INSERT INTO users (email, password_hash, name, avatar_url, provider, plan)
-     VALUES ($1, $2, $3, $4, $5, 'free') RETURNING *`,
-    [email.toLowerCase(), passwordHash || null, name || email.split('@')[0], avatarUrl || null, provider]
+    `INSERT INTO users (email, password_hash, name, avatar_url, provider, provider_id, plan)
+     VALUES ($1, $2, $3, $4, $5, $6, 'free') RETURNING *`,
+    [email.toLowerCase(), passwordHash || null, name || email.split('@')[0], avatarUrl || null, provider, providerId || null]
   );
   return rows[0];
 };
 
 db.updateUser = async (id, fields) => {
-  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id', 'is_beta'];
+  const allowed = ['plan', 'name', 'avatar_url', 'password_hash', 'stripe_customer_id', 'is_beta', 'provider_id'];
   const sets = [];
   const vals = [];
   let i = 1;
@@ -194,8 +194,9 @@ db.getTrends = async ({ date, platform, score, limit = 30, offset = 0 }) => {
   const w = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const countRes = await pool.query(`SELECT COUNT(*) AS total FROM trends ${w}`, vals);
   vals.push(limit); vals.push(offset);
+  const scoreOrder = `CASE score WHEN 'hot' THEN 0 WHEN 'rising' THEN 1 WHEN 'warm' THEN 2 ELSE 3 END`;
   const { rows } = await pool.query(
-    `SELECT * FROM trends ${w} ORDER BY id DESC LIMIT $${i} OFFSET $${i + 1}`, vals
+    `SELECT * FROM trends ${w} ORDER BY ${scoreOrder}, id DESC LIMIT $${i} OFFSET $${i + 1}`, vals
   );
   return {
     trends: rows.map(r => ({ ...r, fetched_at: r.fetched_at instanceof Date ? r.fetched_at.toISOString().slice(0, 10) : String(r.fetched_at) })),
@@ -265,6 +266,95 @@ db.consumeEmailToken = async (tokenId) => {
 
 db.markEmailVerified = async (userId) => {
   await pool.query(`UPDATE users SET email_verified = true WHERE id = $1`, [userId]);
+};
+
+// ── User API Keys ──────────────────────────────────
+db.createUserApiKey = async (userId, label) => {
+  const crypto = require('crypto');
+  const raw = 'wcp_' + crypto.randomBytes(28).toString('hex');
+  const hash = crypto.createHash('sha256').update(raw).digest('hex');
+  const prefix = raw.slice(0, 12);
+  // One key per user — upsert
+  await pool.query(`DELETE FROM user_api_keys WHERE user_id = $1`, [userId]);
+  const { rows } = await pool.query(
+    `INSERT INTO user_api_keys (user_id, key_hash, key_prefix, label) VALUES ($1, $2, $3, $4) RETURNING *`,
+    [userId, hash, prefix, label || 'Default']
+  );
+  return { ...rows[0], raw_key: raw }; // raw only returned once
+};
+
+db.getUserApiKey = async (userId) => {
+  const { rows } = await pool.query(`SELECT * FROM user_api_keys WHERE user_id = $1`, [userId]);
+  return rows[0] || null;
+};
+
+db.findUserByApiKey = async (rawKey) => {
+  const crypto = require('crypto');
+  const hash = crypto.createHash('sha256').update(rawKey).digest('hex');
+  const { rows } = await pool.query(
+    `SELECT u.*, uk.id AS key_id FROM users u
+     JOIN user_api_keys uk ON uk.user_id = u.id
+     WHERE uk.key_hash = $1`, [hash]
+  );
+  if (rows[0]) {
+    // Update last_used async
+    pool.query(`UPDATE user_api_keys SET last_used = NOW() WHERE id = $1`, [rows[0].key_id]).catch(() => {});
+  }
+  return rows[0] || null;
+};
+
+db.deleteUserApiKey = async (userId) => {
+  await pool.query(`DELETE FROM user_api_keys WHERE user_id = $1`, [userId]);
+};
+
+// ── Referrals ──────────────────────────────────────
+db.ensureReferralCode = async (userId) => {
+  const { rows } = await pool.query(`SELECT referral_code FROM users WHERE id = $1`, [userId]);
+  if (rows[0]?.referral_code) return rows[0].referral_code;
+  // Generate a short readable code
+  const code = require('crypto').randomBytes(4).toString('hex').toUpperCase();
+  await pool.query(`UPDATE users SET referral_code = $1 WHERE id = $2`, [code, userId]);
+  return code;
+};
+
+db.findUserByReferralCode = async (code) => {
+  const { rows } = await pool.query(`SELECT * FROM users WHERE referral_code = $1`, [code.toUpperCase()]);
+  return rows[0] || null;
+};
+
+db.applyReferral = async (referrerId, refereeId) => {
+  // Record referral (idempotent)
+  const { rows } = await pool.query(
+    `INSERT INTO referrals (referrer_id, referee_id) VALUES ($1, $2) ON CONFLICT (referee_id) DO NOTHING RETURNING *`,
+    [referrerId, refereeId]
+  );
+  if (!rows[0]) return; // already referred
+  // Give both users +10 bonus searches
+  await pool.query(`UPDATE users SET bonus_searches = COALESCE(bonus_searches, 0) + 10, referred_by = $1 WHERE id = $2`, [referrerId, refereeId]);
+  await pool.query(`UPDATE users SET bonus_searches = COALESCE(bonus_searches, 0) + 10 WHERE id = $1`, [referrerId]);
+  await pool.query(`UPDATE referrals SET rewarded_at = NOW() WHERE referrer_id = $1 AND referee_id = $2`, [referrerId, refereeId]);
+};
+
+db.getReferralStats = async (userId) => {
+  const { rows } = await pool.query(
+    `SELECT r.*, u.email AS referee_email, u.plan AS referee_plan, u.created_at AS referee_joined
+     FROM referrals r JOIN users u ON u.id = r.referee_id
+     WHERE r.referrer_id = $1 ORDER BY r.created_at DESC`, [userId]
+  );
+  const { rows: user } = await pool.query(`SELECT referral_code, bonus_searches FROM users WHERE id = $1`, [userId]);
+  return { referrals: rows, code: user[0]?.referral_code, bonus_searches: user[0]?.bonus_searches || 0 };
+};
+
+// ── Discord Webhook ────────────────────────────────
+db.setDiscordWebhook = async (userId, url) => {
+  await pool.query(`UPDATE users SET discord_webhook_url = $1 WHERE id = $2`, [url, userId]);
+};
+
+db.getDiscordWebhookUsers = async () => {
+  const { rows } = await pool.query(
+    `SELECT id, email, name, discord_webhook_url FROM users WHERE discord_webhook_url IS NOT NULL AND discord_webhook_url != ''`
+  );
+  return rows;
 };
 
 // ── Saved Trends (Bookmarks) ──────────────────────
@@ -339,6 +429,112 @@ db.saveApiKey = async (userId, service, key) => {
 
 db.getApiKeys = async (userId) => {
   const { rows } = await pool.query('SELECT * FROM api_keys WHERE user_id = $1', [userId]);
+  return rows;
+};
+
+db.deleteApiKey = async (id, userId) => {
+  const { rows } = await pool.query(
+    'DELETE FROM api_keys WHERE id = $1 AND user_id = $2 RETURNING id',
+    [id, userId]
+  );
+  return rows[0] || null;
+};
+
+// ── Trend Votes ───────────────────────────────────────
+// Returns { hot, cold, userVote } for a trend
+db.getVoteCounts = async (trendId, userId = null) => {
+  const { rows } = await pool.query(
+    `SELECT vote, COUNT(*) as count FROM trend_votes WHERE trend_id = $1 GROUP BY vote`,
+    [trendId]
+  );
+  const counts = { hot: 0, cold: 0, userVote: null };
+  rows.forEach(r => { counts[r.vote] = parseInt(r.count, 10); });
+  if (userId) {
+    const { rows: uv } = await pool.query(
+      `SELECT vote FROM trend_votes WHERE trend_id = $1 AND user_id = $2`,
+      [trendId, userId]
+    );
+    counts.userVote = uv[0]?.vote || null;
+  }
+  return counts;
+};
+
+// Returns { action: 'added'|'switched'|'removed', vote, hot, cold }
+db.castVote = async (userId, trendId, topic, vote) => {
+  // Check existing
+  const { rows: existing } = await pool.query(
+    `SELECT id, vote FROM trend_votes WHERE user_id = $1 AND trend_id = $2`,
+    [userId, trendId]
+  );
+  let action;
+  if (existing.length && existing[0].vote === vote) {
+    // Same vote → toggle off
+    await pool.query(`DELETE FROM trend_votes WHERE user_id = $1 AND trend_id = $2`, [userId, trendId]);
+    action = 'removed';
+  } else if (existing.length) {
+    // Different vote → switch
+    await pool.query(
+      `UPDATE trend_votes SET vote = $1 WHERE user_id = $2 AND trend_id = $3`,
+      [vote, userId, trendId]
+    );
+    action = 'switched';
+  } else {
+    // New vote
+    await pool.query(
+      `INSERT INTO trend_votes (user_id, trend_id, topic, vote) VALUES ($1, $2, $3, $4)`,
+      [userId, trendId, topic, vote]
+    );
+    action = 'added';
+  }
+  const counts = await db.getVoteCounts(trendId, userId);
+  return { action, ...counts };
+};
+
+// Batch-fetch vote counts for multiple trends (used by dashboard)
+db.getVoteCountsBatch = async (trendIds, userId = null) => {
+  if (!trendIds.length) return {};
+  const { rows } = await pool.query(
+    `SELECT trend_id, vote, COUNT(*) as count FROM trend_votes
+     WHERE trend_id = ANY($1) GROUP BY trend_id, vote`,
+    [trendIds]
+  );
+  const map = {};
+  rows.forEach(r => {
+    if (!map[r.trend_id]) map[r.trend_id] = { hot: 0, cold: 0, userVote: null };
+    map[r.trend_id][r.vote] = parseInt(r.count, 10);
+  });
+  if (userId) {
+    const { rows: uv } = await pool.query(
+      `SELECT trend_id, vote FROM trend_votes WHERE trend_id = ANY($1) AND user_id = $2`,
+      [trendIds, userId]
+    );
+    uv.forEach(r => {
+      if (!map[r.trend_id]) map[r.trend_id] = { hot: 0, cold: 0, userVote: null };
+      map[r.trend_id].userVote = r.vote;
+    });
+  }
+  return map;
+};
+
+// ── Feedback ──────────────────────────────────────────
+db.saveFeedback = async ({ userId, visitorId, type, title, body, pageUrl, userAgent }) => {
+  const { rows } = await pool.query(
+    `INSERT INTO feedback (user_id, visitor_id, type, title, body, page_url, user_agent)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [userId || null, visitorId || null, type, title, body || '', pageUrl || '', userAgent || '']
+  );
+  return rows[0];
+};
+
+db.getFeedback = async ({ type, status, limit = 50, offset = 0 } = {}) => {
+  let q = `SELECT f.*, u.email as user_email, u.name as user_name
+           FROM feedback f LEFT JOIN users u ON f.user_id = u.id WHERE 1=1`;
+  const params = [];
+  if (type) { params.push(type); q += ` AND f.type = $${params.length}`; }
+  if (status) { params.push(status); q += ` AND f.status = $${params.length}`; }
+  params.push(limit, offset);
+  q += ` ORDER BY f.created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
+  const { rows } = await pool.query(q, params);
   return rows;
 };
 

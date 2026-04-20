@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png" />
+<title>Admin — Wavecrest Pro</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--card-border);position:sticky;top:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);z-index:100}
+  .logo{font-size:1.1rem;font-weight:700;color:var(--text)}
+  .logo span{color:var(--blue)}
+  .badge{padding:3px 10px;border-radius:980px;font-size:.68rem;font-weight:700;text-transform:uppercase;background:rgba(255,69,58,.12);color:var(--red);margin-left:10px;letter-spacing:.06em}
+  .container{max-width:1100px;margin:0 auto;padding:36px 24px}
+
+  /* Auth gate */
+  .auth-gate{max-width:400px;margin:120px auto;text-align:center}
+  .auth-gate h2{font-size:1.3rem;margin-bottom:12px}
+  .auth-gate p{color:var(--muted);font-size:.9rem;margin-bottom:24px}
+  .auth-gate input{width:100%;padding:14px 16px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:1rem;margin-bottom:12px}
+  .auth-gate button{width:100%;padding:14px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-weight:600;font-size:.95rem;cursor:pointer}
+
+  /* Grid */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+  .stat-card{background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:20px}
+  .stat-card .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .stat-card .value{font-size:2rem;font-weight:700}
+  .stat-card .sub{font-size:.8rem;color:var(--muted);margin-top:4px}
+  .beta-progress{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin:10px 0 6px}
+  .beta-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
+
+  /* Plan breakdown */
+  .plan-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:12px 0;gap:2px}
+  .plan-seg{height:100%;border-radius:2px;transition:width .4s}
+  .plan-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .plan-item{font-size:.8rem;display:flex;align-items:center;gap:5px}
+  .plan-dot{width:8px;height:8px;border-radius:50%}
+
+  /* Tables */
+  .section{margin-bottom:36px}
+  .section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px;font-weight:600}
+  table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:14px;overflow:hidden;border:1px solid var(--card-border)}
+  th{padding:12px 16px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--card-border)}
+  td{padding:12px 16px;font-size:.85rem;border-bottom:1px solid rgba(255,255,255,.04)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .tag{padding:3px 9px;border-radius:980px;font-size:.68rem;font-weight:700;text-transform:uppercase}
+  .tag-free{background:rgba(255,255,255,.06);color:var(--muted)}
+  .tag-plus{background:rgba(0,113,227,.12);color:var(--blue)}
+  .tag-pro{background:rgba(48,209,88,.12);color:var(--green)}
+  .tag-max{background:rgba(255,159,10,.12);color:var(--orange)}
+  .tag-teams,.tag-enterprise{background:rgba(175,130,255,.12);color:#af82ff}
+  .tag-hot{background:rgba(255,69,58,.12);color:var(--red)}
+  .tag-rising{background:rgba(48,209,88,.12);color:var(--green)}
+
+  /* Pipeline bars */
+  .pipe-bar{display:flex;gap:3px;align-items:center}
+  .pipe-seg{height:14px;border-radius:2px;min-width:2px}
+
+  /* Search */
+  .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .search-bar input,.search-bar select{padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:.88rem}
+  .search-bar input{flex:1;min-width:200px}
+  .search-bar button{padding:10px 20px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-weight:600;cursor:pointer;font-size:.88rem}
+
+  /* Plan editor */
+  .plan-select{padding:4px 8px;border-radius:6px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.8rem;cursor:pointer}
+  .plan-save{padding:4px 10px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-size:.78rem;font-weight:600;cursor:pointer;margin-left:6px}
+
+  /* Misc */
+  .loading{color:var(--muted);text-align:center;padding:40px;font-size:.9rem}
+  .ts{color:var(--muted);font-size:.75rem}
+  @media(max-width:600px){nav{padding:12px 16px}.container{padding:20px 14px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div><span class="logo">Wavecrest <span>Pro</span></span><span class="badge">Admin</span></div>
+  <div id="genAt" class="ts"></div>
+</nav>
+
+<!-- Auth gate -->
+<div class="auth-gate" id="authGate">
+  <h2>🔐 Admin Access</h2>
+  <p>Enter your admin secret to continue.</p>
+  <input type="password" id="secretInput" placeholder="Admin secret" onkeydown="if(event.key==='Enter')login()">
+  <button onclick="login()">Access Dashboard</button>
+  <p id="authError" style="color:var(--red);font-size:.85rem;margin-top:12px;display:none">Wrong secret.</p>
+</div>
+
+<!-- Dashboard -->
+<div class="container" id="dashboard" style="display:none">
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Total Users</div>
+      <div class="value" id="statUsers">—</div>
+      <div class="sub" id="statDau"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Beta Spots</div>
+      <div class="value" id="statBeta">—</div>
+      <div class="beta-progress"><div class="beta-fill" id="betaFill" style="width:0%"></div></div>
+      <div class="sub" id="statBetaSub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Plan Breakdown</div>
+      <div class="plan-bar" id="planBar"></div>
+      <div class="plan-list" id="planList"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Trend Pipeline</div>
+      <div class="value" id="statTrends">—</div>
+      <div class="sub" id="statTrendSub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Today's DAU</div>
+      <div class="value" id="statDauVal">—</div>
+      <div class="sub">active users today</div>
+    </div>
+  </div>
+
+  <!-- Recent Signups -->
+  <div class="section">
+    <div class="section-title">Recent Signups</div>
+    <table>
+      <thead>
+        <tr><th>Email</th><th>Name</th><th>Plan</th><th>Provider</th><th>Beta</th><th>Joined</th></tr>
+      </thead>
+      <tbody id="signupTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Trend Pipeline -->
+  <div class="section">
+    <div class="section-title">Trend Pipeline — Last 14 Days</div>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Total</th><th>Hot</th><th>Rising</th><th>Warm</th><th>Breakdown</th></tr>
+      </thead>
+      <tbody id="pipelineTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- User Search -->
+  <div class="section">
+    <div class="section-title">User Search</div>
+    <div class="search-bar">
+      <input type="text" id="userQuery" placeholder="Search by email or name…" onkeydown="if(event.key==='Enter')searchUsers()">
+      <select id="planFilter">
+        <option value="">All plans</option>
+        <option value="free">Free</option>
+        <option value="plus">Plus</option>
+        <option value="pro">Pro</option>
+        <option value="max">Max</option>
+        <option value="teams">Teams</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+      <button onclick="searchUsers()">Search</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Email</th><th>Plan</th><th>Provider</th><th>Verified</th><th>Digest</th><th>Joined</th><th>Change Plan</th></tr>
+      </thead>
+      <tbody id="userTable"><tr><td colspan="7" class="loading">Run a search above.</td></tr></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const API = window.location.origin;
+let adminSecret = sessionStorage.getItem('wc_admin_secret') || '';
+
+function esc(s) {
+  const d = document.createElement('div'); d.textContent = String(s||''); return d.innerHTML;
+}
+
+function ts(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+async function login() {
+  const input = document.getElementById('secretInput');
+  adminSecret = input.value.trim();
+  sessionStorage.setItem('wc_admin_secret', adminSecret);
+  await loadDashboard();
+}
+
+async function apiFetch(path) {
+  const res = await fetch(API + path + (path.includes('?') ? '&' : '?') + 'secret=' + encodeURIComponent(adminSecret));
+  if (res.status === 401) { showAuthGate('Wrong secret.'); throw new Error('Unauthorized'); }
+  return res.json();
+}
+
+function showAuthGate(err) {
+  document.getElementById('authGate').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  if (err) { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = err; }
+}
+
+async function loadDashboard() {
+  try {
+    const data = await apiFetch('/api/admin/stats');
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('genAt').textContent = 'Updated ' + new Date(data.generated_at).toLocaleTimeString();
+    renderStats(data);
+    renderSignups(data.recent_signups);
+    renderPipeline(data.trend_pipeline);
+  } catch (e) {
+    if (e.message !== 'Unauthorized') showAuthGate(e.message);
+  }
+}
+
+const PLAN_COLORS = { free:'#636366', plus:'#0071e3', pro:'#30d158', max:'#ff9f0a', teams:'#af82ff', enterprise:'#af82ff' };
+
+function renderStats(data) {
+  document.getElementById('statUsers').textContent = data.users.total.toLocaleString();
+  document.getElementById('statDauVal').textContent = data.dau;
+  document.getElementById('statDau').textContent = `${data.dau} active today`;
+
+  // Beta spots
+  const beta  = data.users.beta || 0;
+  const limit = data.users.beta_limit || 500;
+  const pct   = Math.min(100, Math.round((beta / limit) * 100));
+  document.getElementById('statBeta').textContent = `${beta} / ${limit}`;
+  document.getElementById('betaFill').style.width = pct + '%';
+  document.getElementById('statBetaSub').textContent = `${limit - beta} spots remaining`;
+
+  // Pipeline
+  const latest = data.trend_pipeline[0];
+  if (latest) {
+    document.getElementById('statTrends').textContent = latest.total;
+    document.getElementById('statTrendSub').textContent = latest.date + ' · latest run';
+  }
+
+  // Plan bar
+  const total = data.users.total || 1;
+  const plans = data.users.by_plan;
+  const order = ['free','plus','pro','max','teams','enterprise'];
+  let barHtml = '';
+  let listHtml = '';
+  order.forEach(p => {
+    const count = plans[p] || 0;
+    if (!count) return;
+    const pct = Math.max(2, Math.round((count / total) * 100));
+    barHtml += `<div class="plan-seg" style="width:${pct}%;background:${PLAN_COLORS[p]}"></div>`;
+    listHtml += `<div class="plan-item"><div class="plan-dot" style="background:${PLAN_COLORS[p]}"></div>${p}: <strong>${count}</strong></div>`;
+  });
+  document.getElementById('planBar').innerHTML = barHtml;
+  document.getElementById('planList').innerHTML = listHtml;
+}
+
+function renderSignups(users) {
+  const tbody = document.getElementById('signupTable');
+  if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" class="loading">No users yet.</td></tr>'; return; }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.name || '—')}</td>
+      <td><span class="tag tag-${u.plan}">${u.plan}</span></td>
+      <td>${esc(u.provider)}</td>
+      <td>${u.is_beta ? '✓' : '—'}</td>
+      <td class="ts">${ts(u.created_at)}</td>
+    </tr>`).join('');
+}
+
+function renderPipeline(pipeline) {
+  const tbody = document.getElementById('pipelineTable');
+  if (!pipeline.length) { tbody.innerHTML = '<tr><td colspan="6" class="loading">No data.</td></tr>'; return; }
+  tbody.innerHTML = pipeline.map(p => {
+    const max = p.total || 1;
+    const barHtml = `
+      <div class="pipe-bar">
+        <div class="pipe-seg" style="width:${Math.round((p.hot/max)*80)}px;background:var(--red)"></div>
+        <div class="pipe-seg" style="width:${Math.round((p.rising/max)*80)}px;background:var(--green)"></div>
+        <div class="pipe-seg" style="width:${Math.round((p.warm/max)*80)}px;background:var(--orange)"></div>
+      </div>`;
+    return `<tr>
+      <td>${esc(p.date)}</td>
+      <td><strong>${p.total}</strong></td>
+      <td style="color:var(--red)">${p.hot}</td>
+      <td style="color:var(--green)">${p.rising}</td>
+      <td style="color:var(--orange)">${p.warm}</td>
+      <td>${barHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function searchUsers() {
+  const q = document.getElementById('userQuery').value.trim();
+  const plan = document.getElementById('planFilter').value;
+  const tbody = document.getElementById('userTable');
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">Searching…</td></tr>';
+  try {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (plan) params.set('plan', plan);
+    const data = await apiFetch('/api/admin/users?' + params.toString());
+    if (!data.users.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="loading">No users found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.users.map(u => `
+      <tr>
+        <td>${esc(u.email)}</td>
+        <td><span class="tag tag-${u.plan}">${u.plan}</span></td>
+        <td>${esc(u.provider)}</td>
+        <td>${u.email_verified ? '✓' : '—'}</td>
+        <td>${u.digest_enabled !== false ? '✓' : '—'}</td>
+        <td class="ts">${ts(u.created_at)}</td>
+        <td>
+          <select class="plan-select" id="plan-${esc(u.id)}">
+            ${['free','plus','pro','max','teams','enterprise'].map(p => `<option value="${p}"${p===u.plan?' selected':''}>${p}</option>`).join('')}
+          </select>
+          <button class="plan-save" onclick="changePlan('${esc(u.id)}')">Save</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    if (e.message !== 'Unauthorized') tbody.innerHTML = `<tr><td colspan="7" class="loading" style="color:var(--red)">${esc(e.message)}</td></tr>`;
+  }
+}
+
+async function changePlan(userId) {
+  const plan = document.getElementById('plan-' + userId)?.value;
+  if (!plan) return;
+  try {
+    const res = await fetch(`${API}/api/admin/users/${userId}/plan?secret=${encodeURIComponent(adminSecret)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Failed'); return; }
+    // Update tag in place
+    const row = document.getElementById('plan-' + userId)?.closest('tr');
+    if (row) row.cells[1].innerHTML = `<span class="tag tag-${plan}">${plan}</span>`;
+  } catch (e) { alert(e.message); }
+}
+
+// Auto-login if secret is cached
+if (adminSecret) loadDashboard();
+</script>
+</body>
+</html>

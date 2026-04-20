@@ -141,6 +141,82 @@ DO $$ BEGIN
   ALTER TABLE users ADD COLUMN digest_token TEXT UNIQUE;
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN discord_webhook_url TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+CREATE TABLE IF NOT EXISTS user_api_keys (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  key_hash   TEXT NOT NULL UNIQUE,
+  key_prefix VARCHAR(12) NOT NULL,
+  label      TEXT DEFAULT 'Default',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_used  TIMESTAMPTZ,
+  UNIQUE(user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_api_keys_hash ON user_api_keys(key_hash);
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN referral_code VARCHAR(12) UNIQUE;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN referred_by UUID REFERENCES users(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN bonus_searches INTEGER DEFAULT 0;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+CREATE TABLE IF NOT EXISTS referrals (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referrer_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  referee_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  rewarded_at  TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(referee_id)
+);
+CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN provider_id TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+-- ── Trend votes (hot/cold per user per trend) ─────────
+CREATE TABLE IF NOT EXISTS trend_votes (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  trend_id   INTEGER NOT NULL,
+  topic      TEXT,
+  vote       VARCHAR(4) NOT NULL CHECK (vote IN ('hot','cold')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, trend_id)
+);
+CREATE INDEX IF NOT EXISTS idx_trend_votes_trend ON trend_votes(trend_id);
+CREATE INDEX IF NOT EXISTS idx_trend_votes_user  ON trend_votes(user_id);
+
+-- ── User feedback (bugs + feature requests) ───────────
+CREATE TABLE IF NOT EXISTS feedback (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID REFERENCES users(id) ON DELETE SET NULL,
+  visitor_id  TEXT,
+  type        VARCHAR(10) NOT NULL CHECK (type IN ('bug','feature','other')),
+  title       TEXT NOT NULL,
+  body        TEXT,
+  page_url    TEXT,
+  user_agent  TEXT,
+  status      VARCHAR(20) DEFAULT 'open',
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_feedback_type   ON feedback(type);
+CREATE INDEX IF NOT EXISTS idx_feedback_status ON feedback(status);
 `;
 
 (async () => {

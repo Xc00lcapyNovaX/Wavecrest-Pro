@@ -7,6 +7,7 @@
 <title>Dashboard — Wavecrest Pro</title>
 <link rel="preload" href="/css/glass.css" as="style">
   <link rel="stylesheet" href="/css/glass.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3;--green:#30d158;--red:#ff453a;--orange:#ff9f0a}
@@ -73,11 +74,96 @@
   .filter-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;align-items:center}
   .filter-divider{width:1px;height:20px;background:var(--card-border);margin:0 4px}
 
+  /* ── Vote buttons ── */
+  .vote-pair{display:flex;align-items:center;gap:4px}
+  .btn-vote{
+    display:inline-flex;align-items:center;gap:4px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+    border-radius:8px;padding:4px 9px;font-size:.72rem;font-weight:600;
+    cursor:pointer;color:var(--muted);transition:background .15s,border-color .15s,color .15s,transform .12s;
+    line-height:1;
+  }
+  .btn-vote:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);transform:scale(1.08)}
+  .btn-vote.voted-hot{background:rgba(255,69,58,.12);border-color:rgba(255,69,58,.3);color:var(--red)}
+  .btn-vote.voted-cold{background:rgba(41,151,255,.12);border-color:rgba(41,151,255,.3);color:var(--blue)}
+  .btn-vote .v-count{font-size:.68rem;opacity:.7;min-width:8px;text-align:center}
+
   /* ── Bookmark button ── */
   .btn-bookmark{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;font-size:1rem;line-height:1;transition:transform .15s,opacity .15s;opacity:.4}
   .btn-bookmark:hover{opacity:1;transform:scale(1.15)}
   .btn-bookmark.saved{opacity:1;filter:drop-shadow(0 0 4px rgba(255,159,10,.6))}
-  .trend-row{display:grid;grid-template-columns:minmax(0,1fr) 90px auto 32px;align-items:center;column-gap:12px;padding:16px 20px;border-bottom:1px solid var(--card-border);transition:background .15s}
+  .trend-row{display:grid;grid-template-columns:minmax(0,1fr) 90px auto auto 24px 32px;align-items:center;column-gap:12px;padding:16px 20px;border-bottom:1px solid var(--card-border);transition:background .15s}
+
+  /* ── Floating feedback bubble ── */
+  .feedback-bubble{
+    position:fixed;bottom:28px;right:28px;z-index:500;
+    width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(30,30,32,.85);border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.25rem;
+    box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);
+    transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s;
+  }
+  .feedback-bubble:hover{transform:scale(1.12);box-shadow:0 12px 40px rgba(0,0,0,.5);background:rgba(40,40,44,.95)}
+  .feedback-bubble.pulse::after{
+    content:'';position:absolute;inset:-4px;border-radius:50%;
+    border:2px solid rgba(41,151,255,.5);animation:fb-pulse 1.8s ease-out;
+  }
+  @keyframes fb-pulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+
+  /* ── Feedback modal overlay ── */
+  .feedback-overlay{
+    position:fixed;inset:0;z-index:490;background:rgba(0,0,0,.6);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:flex;align-items:flex-end;justify-content:flex-end;
+    padding:0 28px 90px;opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .feedback-overlay.open{opacity:1;pointer-events:all}
+  .feedback-modal{
+    width:360px;border-radius:20px;padding:28px;
+    background:rgba(22,22,24,.92);border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    box-shadow:0 24px 64px rgba(0,0,0,.6);
+    transform:translateY(24px) scale(.96);opacity:0;
+    transition:transform .3s cubic-bezier(.16,1,.3,1),opacity .25s ease;
+  }
+  .feedback-overlay.open .feedback-modal{transform:translateY(0) scale(1);opacity:1}
+  .fb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .fb-header h3{font-size:1rem;font-weight:700}
+  .fb-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;border-radius:6px;line-height:1;transition:color .2s,background .2s}
+  .fb-close:hover{color:var(--text);background:rgba(255,255,255,.08)}
+  .fb-tabs{display:flex;gap:8px;margin-bottom:20px}
+  .fb-tab{
+    flex:1;padding:8px 0;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);color:var(--muted);font-size:.8rem;font-weight:600;
+    cursor:pointer;transition:all .15s;text-align:center;
+  }
+  .fb-tab:hover{background:rgba(255,255,255,.08);color:var(--text)}
+  .fb-tab.active-bug{background:rgba(255,69,58,.12);border-color:rgba(255,69,58,.3);color:var(--red)}
+  .fb-tab.active-feature{background:rgba(41,151,255,.12);border-color:rgba(41,151,255,.3);color:var(--blue)}
+  .fb-tab.active-other{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:var(--text)}
+  .fb-field{margin-bottom:14px}
+  .fb-field label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+  .fb-field input,.fb-field textarea{
+    width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);color:var(--text);font-size:.88rem;outline:none;
+    font-family:inherit;transition:border-color .2s;resize:none;
+  }
+  .fb-field input:focus,.fb-field textarea:focus{border-color:rgba(41,151,255,.5)}
+  .fb-submit{
+    width:100%;padding:12px;border:none;border-radius:12px;font-size:.9rem;font-weight:600;
+    cursor:pointer;transition:opacity .2s,transform .15s;
+    background:linear-gradient(135deg,var(--blue),rgba(191,90,242,.9));color:#fff;
+  }
+  .fb-submit:hover:not(:disabled){opacity:.88;transform:scale(1.02)}
+  .fb-submit:disabled{opacity:.4;cursor:not-allowed}
+  .fb-success{text-align:center;padding:20px 0;display:none}
+  .fb-success-icon{font-size:2.4rem;margin-bottom:10px;animation:pop-in .4s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes pop-in{0%{transform:scale(0)}100%{transform:scale(1)}}
+  .fb-success p{color:var(--muted);font-size:.88rem}
+  .fb-char{font-size:.7rem;color:var(--muted);text-align:right;margin-top:4px}
 
   /* ── Saved section ── */
   .saved-section{margin-bottom:32px}
@@ -167,6 +253,61 @@
   .tier-pro{background:rgba(48,209,88,.12);color:var(--green)}
   .tier-max{background:rgba(255,159,10,.12);color:var(--orange)}
 
+  /* ── Trend History ── */
+  .history-section{margin-bottom:32px}
+  .history-controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .history-controls input{flex:1;min-width:180px;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:.88rem;outline:none}
+  .history-controls input:focus{border-color:var(--blue)}
+  .history-controls select{padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.88rem;outline:none;cursor:pointer}
+  .history-controls button{padding:10px 20px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-weight:600;font-size:.88rem;cursor:pointer;white-space:nowrap}
+  .history-controls button:hover{opacity:.85}
+  .history-chart-wrap{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:24px;position:relative;min-height:200px}
+  .history-empty{padding:40px;text-align:center;color:var(--muted);font-size:.9rem}
+  .history-meta{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+  .history-stat{font-size:.8rem;color:var(--muted)}
+  .history-stat strong{color:var(--text)}
+
+  /* ── Onboarding modal ── */
+  .onboard-overlay{
+    position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    opacity:0;pointer-events:none;transition:opacity .3s ease;
+  }
+  .onboard-overlay.open{opacity:1;pointer-events:all}
+  .onboard-modal{
+    width:100%;max-width:480px;border-radius:24px;padding:40px 36px;
+    background:rgba(18,18,20,.96);border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    box-shadow:0 32px 80px rgba(0,0,0,.7);
+    transform:translateY(20px) scale(.97);opacity:0;
+    transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .3s ease;
+  }
+  .onboard-overlay.open .onboard-modal{transform:translateY(0) scale(1);opacity:1}
+  .onboard-step{display:none}
+  .onboard-step.active{display:block}
+  .onboard-icon{font-size:2.8rem;margin-bottom:16px;text-align:center}
+  .onboard-modal h2{font-size:1.4rem;font-weight:700;margin-bottom:10px;text-align:center}
+  .onboard-modal p{color:var(--muted);font-size:.92rem;line-height:1.6;text-align:center;margin-bottom:24px}
+  .onboard-steps-viz{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+  .ob-step-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+  .ob-day{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:980px;white-space:nowrap}
+  .ob-day.free{background:rgba(255,255,255,.1);color:var(--muted)}
+  .ob-day.plus{background:rgba(0,113,227,.15);color:var(--blue)}
+  .ob-day.pro{background:rgba(48,209,88,.15);color:var(--green)}
+  .ob-day.max{background:rgba(255,159,10,.15);color:var(--orange)}
+  .ob-day.teams{background:rgba(175,130,255,.15);color:#af82ff}
+  .ob-step-text{font-size:.85rem;flex:1}
+  .ob-step-text strong{color:var(--text)}
+  .ob-step-text span{color:var(--muted);font-size:.78rem}
+  .onboard-dots{display:flex;gap:6px;justify-content:center;margin-bottom:24px}
+  .onboard-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .2s,width .2s}
+  .onboard-dot.active{background:var(--blue);width:18px;border-radius:3px}
+  .onboard-btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;background:linear-gradient(135deg,var(--blue),rgba(191,90,242,.9));color:#fff}
+  .onboard-btn:hover{opacity:.88;transform:scale(1.02)}
+  .onboard-skip{display:block;text-align:center;margin-top:14px;font-size:.8rem;color:var(--muted);cursor:pointer;transition:color .2s}
+  .onboard-skip:hover{color:var(--text)}
+
   /* ── Mobile ── */
   @media(max-width:768px){
     nav{padding:12px 16px;flex-wrap:wrap;gap:8px}
@@ -175,8 +316,9 @@
     .container{padding:24px 16px}
     .search-bar{flex-direction:column}
     .search-bar input,.search-bar select,.search-bar button{width:100%}
-    .trend-row{grid-template-columns:minmax(0,1fr) auto auto;padding:12px 16px;row-gap:8px}
+    .trend-row{grid-template-columns:minmax(0,1fr) auto auto auto;padding:12px 16px;row-gap:8px}
     .trend-platform{display:none}
+    .vote-pair{display:none}
     .upgrade-banner{flex-direction:column;text-align:center;padding:20px}
     .upgrade-banner a{width:100%;text-align:center}
     .stat-card .value{font-size:1.4rem}
@@ -297,6 +439,15 @@
     <div id="crossPlatArea"></div>
   </div>
 
+  <!-- Trend History (Plus+) -->
+  <div class="history-section">
+    <div class="section-header">
+      <div class="section-title">📈 Trend History</div>
+      <span class="tier-badge tier-pro">Plus+</span>
+    </div>
+    <div id="historyArea"></div>
+  </div>
+
   <!-- Saved Trends -->
   <div class="saved-section" id="savedSection" style="display:none">
     <div class="section-header">
@@ -401,9 +552,20 @@
       </div>
       <div id="referralBonusBadge" style="margin-left:auto;display:none;background:rgba(48,209,88,.12);color:var(--green);border-radius:980px;padding:4px 12px;font-size:.78rem;font-weight:600"></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
       <input type="text" id="referralLink" readonly style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:.85rem;cursor:pointer" onclick="this.select()" placeholder="Loading your referral link…">
-      <button class="btn-sm" onclick="copyReferralLink()" style="background:var(--green);color:#fff;border:none">Copy Link</button>
+      <button class="btn-sm" onclick="copyReferralLink()" style="background:var(--green);color:#fff;border:none">Copy</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-sm" onclick="shareTwitter()" style="background:rgba(0,0,0,.4);border-color:rgba(255,255,255,.12);display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Share on X
+      </button>
+      <button class="btn-sm" onclick="shareWhatsApp()" style="background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2);color:#25d366;display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.994 0C5.377 0 0 5.373 0 12c0 2.122.554 4.112 1.523 5.836L0 24l6.32-1.492A11.935 11.935 0 0011.994 24C18.617 24 24 18.627 24 12S18.617 0 11.994 0zm.006 21.818a9.817 9.817 0 01-5.007-1.374l-.361-.214-3.741.981.998-3.648-.235-.374A9.791 9.791 0 012.182 12c0-5.414 4.406-9.818 9.818-9.818S21.818 6.586 21.818 12 17.414 21.818 12 21.818z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn-sm" onclick="nativeShare()" id="nativeShareBtn" style="display:none">🔗 Share</button>
     </div>
     <div id="referralStats" style="margin-top:12px;font-size:.82rem;color:var(--muted)"></div>
   </div>
@@ -429,12 +591,130 @@
   </div>
 </div>
 
+<!-- ── Onboarding modal ── -->
+<div class="onboard-overlay" id="onboardOverlay">
+  <div class="onboard-modal">
+    <!-- Step 1: Welcome -->
+    <div class="onboard-step active" id="obStep1">
+      <div class="onboard-icon">🌊</div>
+      <h2>Welcome to Wavecrest Pro</h2>
+      <p>You're in the beta — you have access to everything, for free. Here's what you need to know to get the most out of it.</p>
+      <div class="onboard-dots">
+        <div class="onboard-dot active" id="obDot1"></div>
+        <div class="onboard-dot" id="obDot2"></div>
+        <div class="onboard-dot" id="obDot3"></div>
+      </div>
+      <button class="onboard-btn" onclick="obNext(2)">Next →</button>
+      <span class="onboard-skip" onclick="obDismiss()">Skip intro</span>
+    </div>
+    <!-- Step 2: Staircase -->
+    <div class="onboard-step" id="obStep2">
+      <div class="onboard-icon">🚀</div>
+      <h2>Your 5-day unlock</h2>
+      <p>Each day you get access to the next plan tier — no card required. By Day 5 you'll have seen everything Wavecrest can do.</p>
+      <div class="onboard-steps-viz">
+        <div class="ob-step-row">
+          <div class="ob-day free">Day 1</div>
+          <div class="ob-step-text"><strong>Free</strong> <span>· 5 searches/day, basic dashboard</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div class="ob-day plus">Day 2</div>
+          <div class="ob-step-text"><strong>Plus</strong> <span>· 50 searches, CSV export, email alerts</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div class="ob-day pro">Day 3</div>
+          <div class="ob-step-text"><strong>Pro</strong> <span>· Unlimited searches, AI ideas, niche search</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div class="ob-day max">Day 4</div>
+          <div class="ob-step-text"><strong>Max</strong> <span>· Full API, cross-platform insights</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div class="ob-day teams">Day 5</div>
+          <div class="ob-step-text"><strong>Teams</strong> <span>· Shared workspace, Discord webhook</span></div>
+        </div>
+      </div>
+      <div class="onboard-dots">
+        <div class="onboard-dot" id="obDot1b"></div>
+        <div class="onboard-dot active" id="obDot2b"></div>
+        <div class="onboard-dot" id="obDot3b"></div>
+      </div>
+      <button class="onboard-btn" onclick="obNext(3)">Got it →</button>
+      <span class="onboard-skip" onclick="obDismiss()">Skip intro</span>
+    </div>
+    <!-- Step 3: Tips -->
+    <div class="onboard-step" id="obStep3">
+      <div class="onboard-icon">💡</div>
+      <h2>Three things to try today</h2>
+      <p style="margin-bottom:16px">Make the most of your first session:</p>
+      <div class="onboard-steps-viz" style="margin-bottom:24px">
+        <div class="ob-step-row">
+          <div style="font-size:1.2rem">🔥</div>
+          <div class="ob-step-text"><strong>Vote on trends</strong> <span>· Hit 🔥 or 🧊 on any trend card to shape what's shown</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div style="font-size:1.2rem">🔖</div>
+          <div class="ob-step-text"><strong>Bookmark a trend</strong> <span>· Save anything interesting with the bookmark button</span></div>
+        </div>
+        <div class="ob-step-row">
+          <div style="font-size:1.2rem">💬</div>
+          <div class="ob-step-text"><strong>Send feedback</strong> <span>· Hit the bubble in the corner — we read every single one</span></div>
+        </div>
+      </div>
+      <div class="onboard-dots">
+        <div class="onboard-dot" id="obDot1c"></div>
+        <div class="onboard-dot" id="obDot2c"></div>
+        <div class="onboard-dot active" id="obDot3c"></div>
+      </div>
+      <button class="onboard-btn" onclick="obDismiss()">Let's go 🌊</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Floating feedback bubble ── -->
+<button class="feedback-bubble" id="feedbackBubble" onclick="openFeedback()" title="Send feedback" aria-label="Open feedback">
+  💬
+</button>
+
+<!-- ── Feedback modal ── -->
+<div class="feedback-overlay" id="fbOverlay">
+  <div class="feedback-modal" role="dialog" aria-modal="true" aria-label="Send feedback">
+    <div class="fb-header">
+      <h3>Send Feedback</h3>
+      <button class="fb-close" onclick="closeFeedback()" aria-label="Close">✕</button>
+    </div>
+    <div id="fbForm">
+      <div class="fb-tabs">
+        <button class="fb-tab active-bug" id="fbTab-bug" onclick="selectFeedbackType('bug')">🐛 Bug</button>
+        <button class="fb-tab" id="fbTab-feature" onclick="selectFeedbackType('feature')">✨ Feature</button>
+        <button class="fb-tab" id="fbTab-other" onclick="selectFeedbackType('other')">💭 Other</button>
+      </div>
+      <div class="fb-field">
+        <label for="fbTitle">Summary</label>
+        <input type="text" id="fbTitle" placeholder="What's on your mind?" maxlength="200" autocomplete="off">
+      </div>
+      <div class="fb-field">
+        <label for="fbBody">Details <span style="font-size:.65rem;text-transform:none;letter-spacing:0;opacity:.6">(optional)</span></label>
+        <textarea id="fbBody" rows="4" placeholder="Steps to reproduce, expected behavior, or anything else useful…" maxlength="500"></textarea>
+        <div class="fb-char" id="fbCharCount">0 / 500</div>
+      </div>
+      <button class="fb-submit" id="fbSubmitBtn" onclick="submitFeedback()">Send Feedback</button>
+    </div>
+    <div class="fb-success" id="fbSuccess">
+      <div class="fb-success-icon">✅</div>
+      <h3 style="margin-bottom:6px">Got it, thank you!</h3>
+      <p>Your feedback helps shape Wavecrest Pro.</p>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = window.location.origin;
 let dashboardData = null;
 let currentPlatform = '';
 let currentScore = '';
 let savedTrends = []; // [{id, trend_id, topic, ...}]
+let voteMap = {};     // { [trendId]: { hot, cold, userVote } }
 
 // HTML escaping to prevent XSS
 function esc(str) {
@@ -453,9 +733,17 @@ async function loadDashboard() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to load');
     dashboardData = data;
+    // Pre-fetch vote counts for all visible trends
+    const trendIds = (data.trends?.items || []).filter(t => !t.locked && t.id).map(t => t.id);
+    if (trendIds.length) {
+      fetch(API + '/api/feedback/votes?trend_ids=' + trendIds.join(','), { credentials: 'include' })
+        .then(r => r.json()).then(d => { if (d.votes) { voteMap = d.votes; renderTrends(); } })
+        .catch(() => {});
+    }
     render();
     renderByoak();
     checkSubscriptionToast();
+    maybeShowOnboarding();
   } catch (err) {
     const message = err.message || 'Failed to load dashboard. Is the server running?';
     showError(message);
@@ -550,6 +838,9 @@ function render() {
   // Max features
   loadCrossPlatform();
 
+  // Trend history chart UI
+  renderHistoryUI();
+
   // Trends + bookmarks
   renderTrends();
   loadSavedTrends();
@@ -625,16 +916,28 @@ function renderTrends() {
     var scoreClass = ['hot','rising','warm','locked'].includes(t.score) ? t.score : 'warm';
     var isSaved = savedTrends.some(function(s) { return s.trend_id === t.id; });
     var savedRecord = savedTrends.find(function(s) { return s.trend_id === t.id; });
+    var voteData = voteMap[t.id] || { hot: 0, cold: 0, userVote: null };
     var bookmarkBtn = t.locked ? '' :
       '<button class="btn-bookmark ' + (isSaved ? 'saved' : '') + '" ' +
       'onclick="toggleBookmark(event,' + t.id + ',\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\',\'' + esc(t.platform||'general') + '\',\'' + esc(t.score||'warm') + '\',\'' + (savedRecord ? savedRecord.id : '') + '\')" ' +
       'title="' + (isSaved ? 'Remove bookmark' : 'Save trend') + '">' +
       (isSaved ? '🔖' : '🤍') + '</button>';
+    var voteButtons = t.locked ? '<span></span>' :
+      '<div class="vote-pair" id="vp-' + t.id + '">' +
+        '<button class="btn-vote' + (voteData.userVote === 'hot' ? ' voted-hot' : '') + '" ' +
+          'onclick="castVote(event,' + t.id + ',\'hot\',\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\')" title="This is 🔥">' +
+          '🔥 <span class="v-count">' + (voteData.hot || '') + '</span></button>' +
+        '<button class="btn-vote' + (voteData.userVote === 'cold' ? ' voted-cold' : '') + '" ' +
+          'onclick="castVote(event,' + t.id + ',\'cold\',\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\')" title="Not feeling it 🧊">' +
+          '🧊 <span class="v-count">' + (voteData.cold || '') + '</span></button>' +
+      '</div>';
+    var historyBtn = t.locked ? '' :
+      '<button class="btn-bookmark" onclick="viewTrendHistory(\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\')" title="View history" style="font-size:.8rem;opacity:.35">📈</button>';
     return '<div class="trend-row ' + (t.locked ? 'locked' : '') + '">' +
-      '<span class="trend-topic">' + esc(t.topic) + '</span>' +
+      '<span class="trend-topic" style="cursor:pointer" onclick="viewTrendHistory(\'' + esc(t.topic).replace(/'/g,'\\&#39;') + '\')" title="View history">' + esc(t.topic) + '</span>' +
       '<span class="trend-platform">' + esc(t.platform || '') + '</span>' +
       '<span class="tag tag-' + scoreClass + '">' + esc(t.score).toUpperCase() + '</span>' +
-      bookmarkBtn + '</div>';
+      voteButtons + historyBtn + bookmarkBtn + '</div>';
   }).join('');
 }
 
@@ -1019,12 +1322,20 @@ async function loadReferral() {
     if (!res.ok) return;
     document.getElementById('referralLink').value = data.referral_url;
     var stats = document.getElementById('referralStats');
-    stats.textContent = data.total_referred + ' friend' + (data.total_referred === 1 ? '' : 's') + ' referred';
-    if (data.total_referred > 0) stats.textContent += ' · ' + data.referrals.filter(function(r) { return r.rewarded_at; }).length + ' rewarded';
+    var rewarded = data.referrals.filter(function(r) { return r.rewarded_at; }).length;
+    if (data.total_referred === 0) {
+      stats.innerHTML = 'Share your link — you both get <strong style="color:var(--green)">+10 bonus searches</strong> when they join.';
+    } else {
+      stats.textContent = data.total_referred + ' friend' + (data.total_referred === 1 ? '' : 's') + ' referred · ' + rewarded + ' rewarded';
+    }
     if (data.bonus_searches > 0) {
       var badge = document.getElementById('referralBonusBadge');
-      badge.textContent = '+' + data.bonus_searches + ' bonus searches';
+      badge.textContent = '+' + data.bonus_searches + ' bonus';
       badge.style.display = 'block';
+    }
+    // Show native share on supported devices
+    if (navigator.share) {
+      document.getElementById('nativeShareBtn').style.display = 'inline-flex';
     }
   } catch (e) { /* non-fatal */ }
 }
@@ -1033,9 +1344,36 @@ function copyReferralLink() {
   var link = document.getElementById('referralLink').value;
   if (!link) return;
   navigator.clipboard.writeText(link).then(function() {
-    var btn = event.target; btn.textContent = 'Copied!';
-    setTimeout(function() { btn.textContent = 'Copy Link'; }, 2000);
+    var btn = event.target; btn.textContent = 'Copied! ✓';
+    btn.style.background = 'rgba(48,209,88,.2)';
+    setTimeout(function() { btn.textContent = 'Copy'; btn.style.background = ''; }, 2000);
   });
+}
+
+function shareTwitter() {
+  var link = document.getElementById('referralLink').value;
+  if (!link) return;
+  var text = encodeURIComponent('I\'ve been using Wavecrest Pro to catch trends before they go viral on YouTube & TikTok 👀\n\nBeta is free right now — check it out:');
+  window.open('https://x.com/intent/post?text=' + text + '&url=' + encodeURIComponent(link), '_blank', 'width=550,height=420');
+}
+
+function shareWhatsApp() {
+  var link = document.getElementById('referralLink').value;
+  if (!link) return;
+  var text = encodeURIComponent('I\'ve been using this tool to find trending topics before they peak — it\'s free during beta: ' + link);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+async function nativeShare() {
+  var link = document.getElementById('referralLink').value;
+  if (!link || !navigator.share) return;
+  try {
+    await navigator.share({
+      title: 'Wavecrest Pro — Catch trends before they peak',
+      text: 'I\'ve been using Wavecrest Pro to spot viral trends early. Free during beta:',
+      url: link,
+    });
+  } catch(e) { /* user cancelled */ }
 }
 
 // ── API Key ──
@@ -1200,6 +1538,337 @@ async function toggleDigest() {
     window.history.replaceState({}, '', '/dashboard');
   }
 })();
+
+// ── Trend History ──
+var historyChart = null;
+
+function renderHistoryUI() {
+  var area = document.getElementById('historyArea');
+  var plan = dashboardData.user.effective_plan || dashboardData.user.plan;
+  if (plan === 'free') {
+    area.innerHTML = '<div class="locked-feature glass-strong"><div class="lock-icon">📈</div><h3>Trend History</h3><p>See how any topic has trended over the last 7, 14, or 30 days — track momentum and spot patterns before they peak.</p><a href="/checkout?plan=plus">Upgrade to Plus →</a></div>';
+    return;
+  }
+  var maxDays = ['pro','max','teams','enterprise'].includes(plan) ? 90 : ['plus'].includes(plan) ? 14 : 7;
+  area.innerHTML =
+    '<div class="history-controls">' +
+      '<input type="text" id="historyTopic" placeholder="Search a topic… e.g. AI art, fitness" onkeydown="if(event.key===\'Enter\')fetchHistory()">' +
+      '<select id="historyDays">' +
+        '<option value="7">7 days</option>' +
+        (maxDays >= 14 ? '<option value="14">14 days</option>' : '') +
+        (maxDays >= 30 ? '<option value="30">30 days</option>' : '') +
+        (maxDays >= 90 ? '<option value="90">90 days</option>' : '') +
+      '</select>' +
+      '<button onclick="fetchHistory()">View History</button>' +
+    '</div>' +
+    '<div id="historyChartArea"><div class="history-chart-wrap"><div class="history-empty">Enter a topic above to see its trend history over time.</div></div></div>';
+}
+
+async function fetchHistory() {
+  var topic = (document.getElementById('historyTopic') || {}).value;
+  if (!topic || !topic.trim()) return;
+  topic = topic.trim();
+  var days = parseInt((document.getElementById('historyDays') || {}).value || 7);
+  var area = document.getElementById('historyChartArea');
+  area.innerHTML = '<div class="history-chart-wrap"><div class="history-empty">Loading history…</div></div>';
+
+  try {
+    var res = await fetch(API + '/api/trends/history?topic=' + encodeURIComponent(topic) + '&days=' + days, { credentials: 'include' });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+
+    var dates = Object.keys(data.history).sort();
+    if (!dates.length) {
+      area.innerHTML = '<div class="history-chart-wrap"><div class="history-empty">No history found for "' + esc(topic) + '" in the last ' + days + ' days. Try a broader term.</div></div>';
+      return;
+    }
+
+    // Build per-platform datasets
+    var platforms = ['youtube','tiktok','instagram','reddit','general'];
+    var platColors = {
+      youtube:   { border:'rgba(255,69,58,.8)',  bg:'rgba(255,69,58,.08)'  },
+      tiktok:    { border:'rgba(41,151,255,.8)',  bg:'rgba(41,151,255,.08)' },
+      instagram: { border:'rgba(175,130,255,.8)', bg:'rgba(175,130,255,.08)'},
+      reddit:    { border:'rgba(255,159,10,.8)',  bg:'rgba(255,159,10,.08)' },
+      general:   { border:'rgba(134,134,139,.7)', bg:'rgba(134,134,139,.05)'},
+    };
+    var totalByDate = dates.map(function(d) {
+      return (data.history[d] || []).length;
+    });
+
+    // Count platforms per date
+    var usedPlatforms = new Set();
+    dates.forEach(function(d) {
+      (data.history[d] || []).forEach(function(t) { usedPlatforms.add(t.platform || 'general'); });
+    });
+
+    var datasets = [];
+    // Total line
+    datasets.push({
+      label: 'Total appearances',
+      data: totalByDate,
+      borderColor: 'rgba(41,151,255,.9)',
+      backgroundColor: 'rgba(41,151,255,.08)',
+      fill: true,
+      tension: .4,
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+    });
+    // Per-platform lines
+    usedPlatforms.forEach(function(plat) {
+      var c = platColors[plat] || platColors.general;
+      datasets.push({
+        label: plat.charAt(0).toUpperCase() + plat.slice(1),
+        data: dates.map(function(d) {
+          return (data.history[d] || []).filter(function(t) { return (t.platform || 'general') === plat; }).length;
+        }),
+        borderColor: c.border,
+        backgroundColor: c.bg,
+        fill: false,
+        tension: .4,
+        borderWidth: 1.5,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+        borderDash: [4,3],
+      });
+    });
+
+    // Stats
+    var totalAppearances = totalByDate.reduce(function(a,b){return a+b;},0);
+    var peak = Math.max.apply(null, totalByDate);
+    var peakDate = dates[totalByDate.indexOf(peak)];
+
+    area.innerHTML = '<div class="history-chart-wrap">' +
+      '<canvas id="historyCanvas" style="max-height:260px"></canvas>' +
+      '<div class="history-meta">' +
+        '<div class="history-stat">Total appearances: <strong>' + totalAppearances + '</strong></div>' +
+        '<div class="history-stat">Peak day: <strong>' + peakDate + ' (' + peak + ')</strong></div>' +
+        '<div class="history-stat">Platforms: <strong>' + Array.from(usedPlatforms).join(', ') + '</strong></div>' +
+      '</div>' +
+    '</div>';
+
+    // Destroy old chart if exists
+    if (historyChart) { historyChart.destroy(); historyChart = null; }
+
+    var ctx = document.getElementById('historyCanvas').getContext('2d');
+    historyChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: dates, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            labels: { color: 'rgba(255,255,255,.5)', font: { size: 11 }, boxWidth: 12, padding: 16 }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(22,22,24,.95)',
+            borderColor: 'rgba(255,255,255,.1)',
+            borderWidth: 1,
+            titleColor: '#f5f5f7',
+            bodyColor: '#86868b',
+            padding: 12,
+          },
+        },
+        scales: {
+          x: {
+            ticks: { color: 'rgba(255,255,255,.35)', font: { size: 10 }, maxRotation: 0 },
+            grid: { color: 'rgba(255,255,255,.04)' },
+          },
+          y: {
+            ticks: { color: 'rgba(255,255,255,.35)', font: { size: 10 }, stepSize: 1 },
+            grid: { color: 'rgba(255,255,255,.04)' },
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    area.innerHTML = '<div class="history-chart-wrap"><div class="history-empty" style="color:var(--red)">' + esc(err.message) + '</div></div>';
+  }
+}
+
+// Allow clicking a trend topic to view its history
+function viewTrendHistory(topic) {
+  var input = document.getElementById('historyTopic');
+  if (!input) return;
+  input.value = topic;
+  input.closest('.history-section') || document.querySelector('.history-section');
+  document.querySelector('.history-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(fetchHistory, 400);
+}
+
+// ── Onboarding ──
+var obCurrentStep = 1;
+
+function obNext(step) {
+  document.getElementById('obStep' + obCurrentStep).classList.remove('active');
+  obCurrentStep = step;
+  document.getElementById('obStep' + step).classList.add('active');
+}
+
+function obDismiss() {
+  document.getElementById('onboardOverlay').classList.remove('open');
+  try { localStorage.setItem('wc_onboarded', '1'); } catch(e) {}
+}
+
+function maybeShowOnboarding() {
+  try {
+    if (localStorage.getItem('wc_onboarded')) return;
+  } catch(e) { return; }
+  // Small delay so the dashboard renders first
+  setTimeout(function() {
+    document.getElementById('onboardOverlay').classList.add('open');
+  }, 900);
+}
+
+// ── Vote casting ──
+async function castVote(e, trendId, vote, topic) {
+  e.stopPropagation();
+  var prev = voteMap[trendId] || { hot: 0, cold: 0, userVote: null };
+  var isSame = prev.userVote === vote;
+
+  // Optimistic update
+  var next = { hot: prev.hot, cold: prev.cold, userVote: isSame ? null : vote };
+  if (isSame) {
+    next[vote] = Math.max(0, prev[vote] - 1);
+  } else {
+    next[vote] = prev[vote] + 1;
+    if (prev.userVote) next[prev.userVote] = Math.max(0, prev[prev.userVote] - 1);
+  }
+  voteMap[trendId] = next;
+  updateVotePair(trendId, next);
+
+  try {
+    var res = await fetch(API + '/api/feedback/vote', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trend_id: trendId, topic: topic, vote: vote })
+    });
+    var data = await res.json();
+    if (res.ok) {
+      voteMap[trendId] = { hot: data.hot, cold: data.cold, userVote: data.userVote };
+      updateVotePair(trendId, voteMap[trendId]);
+    } else {
+      // Revert on error
+      voteMap[trendId] = prev;
+      updateVotePair(trendId, prev);
+    }
+  } catch (err) {
+    voteMap[trendId] = prev;
+    updateVotePair(trendId, prev);
+  }
+}
+
+function updateVotePair(trendId, v) {
+  var pair = document.getElementById('vp-' + trendId);
+  if (!pair) return;
+  var btns = pair.querySelectorAll('.btn-vote');
+  if (btns.length < 2) return;
+  // Hot button
+  btns[0].className = 'btn-vote' + (v.userVote === 'hot' ? ' voted-hot' : '');
+  btns[0].querySelector('.v-count').textContent = v.hot || '';
+  // Cold button
+  btns[1].className = 'btn-vote' + (v.userVote === 'cold' ? ' voted-cold' : '');
+  btns[1].querySelector('.v-count').textContent = v.cold || '';
+}
+
+// ── Feedback modal ──
+var fbType = 'bug';
+
+function openFeedback() {
+  document.getElementById('fbOverlay').classList.add('open');
+  document.getElementById('fbTitle').focus();
+  // Pulse the bubble
+  var bubble = document.getElementById('feedbackBubble');
+  bubble.classList.add('pulse');
+  setTimeout(function() { bubble.classList.remove('pulse'); }, 1800);
+}
+
+function closeFeedback() {
+  document.getElementById('fbOverlay').classList.remove('open');
+}
+
+function selectFeedbackType(type) {
+  fbType = type;
+  document.querySelectorAll('.fb-tab').forEach(function(t) {
+    t.className = 'fb-tab';
+  });
+  var active = document.getElementById('fbTab-' + type);
+  if (active) active.classList.add('active-' + type);
+}
+
+async function submitFeedback() {
+  var title = document.getElementById('fbTitle').value.trim();
+  var body  = document.getElementById('fbBody').value.trim();
+  if (!title || title.length < 3) {
+    document.getElementById('fbTitle').focus();
+    document.getElementById('fbTitle').style.borderColor = 'var(--red)';
+    setTimeout(function() { document.getElementById('fbTitle').style.borderColor = ''; }, 1500);
+    return;
+  }
+  var btn = document.getElementById('fbSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  try {
+    var res = await fetch(API + '/api/feedback/submit', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: fbType, title: title, body: body, page_url: window.location.href })
+    });
+    var data = await res.json();
+    if (res.ok || res.status === 201) {
+      // Show success state
+      document.getElementById('fbForm').style.display = 'none';
+      document.getElementById('fbSuccess').style.display = 'block';
+      // Reset and auto-close after delay
+      setTimeout(function() {
+        closeFeedback();
+        setTimeout(function() {
+          document.getElementById('fbForm').style.display = 'block';
+          document.getElementById('fbSuccess').style.display = 'none';
+          document.getElementById('fbTitle').value = '';
+          document.getElementById('fbBody').value = '';
+          document.getElementById('fbCharCount').textContent = '0 / 500';
+          btn.disabled = false; btn.textContent = 'Send Feedback';
+          selectFeedbackType('bug');
+        }, 400);
+      }, 2400);
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.');
+      btn.disabled = false; btn.textContent = 'Send Feedback';
+    }
+  } catch (err) {
+    alert('Connection error. Please try again.');
+    btn.disabled = false; btn.textContent = 'Send Feedback';
+  }
+}
+
+// Char counter
+document.addEventListener('DOMContentLoaded', function() {
+  var bodyEl = document.getElementById('fbBody');
+  var counter = document.getElementById('fbCharCount');
+  if (bodyEl && counter) {
+    bodyEl.addEventListener('input', function() {
+      counter.textContent = bodyEl.value.length + ' / 500';
+    });
+  }
+  // Close overlay on backdrop click
+  var overlay = document.getElementById('fbOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeFeedback();
+    });
+  }
+  // Escape key closes modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeFeedback();
+  });
+  // Init first tab as active
+  selectFeedbackType('bug');
+});
 
 // Boot
 loadDashboard();

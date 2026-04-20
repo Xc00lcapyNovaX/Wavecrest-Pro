@@ -5,6 +5,13 @@ function requireAuth(req, res, next) {
   if (req.session && req.session.userId) {
     return next();
   }
+  // HTML page requests → redirect to /signin
+  // API requests → return JSON 401
+  const acceptsHtml = (req.headers.accept || '').includes('text/html');
+  const isApiPath   = req.path.startsWith('/api/');
+  if (acceptsHtml && !isApiPath) {
+    return res.redirect(302, '/signin?next=' + encodeURIComponent(req.originalUrl));
+  }
   return res.status(401).json({ error: 'Not authenticated. Please sign in.' });
 }
 
