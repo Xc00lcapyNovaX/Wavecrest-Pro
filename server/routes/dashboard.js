@@ -4,6 +4,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/requireAuth');
+const { getCurrentTier, PLAN_RANK } = require('../middleware/gatekeeper');
 const router = express.Router();
 
 // ── GET /api/dashboard — main dashboard data ──────
@@ -27,9 +28,21 @@ router.get('/', requireAuth, async (req, res) => {
     const sub = await db.findSubscription(user.id);
     const { remaining, limit } = await db.checkRateLimit(user.id, user.plan);
 
-    // Determine what's locked
-    const isFreePlan = user.plan === 'free';
-    const isPlusPlan = user.plan === 'plus';
+    // ── Trial progression via gatekeeper engine ────────────────────────
+    // Use user.created_at as the authoritative join date for authenticated users.
+    // Falls back to cookie-based gatekeeper tier if created_at is unavailable.
+    const joinDate   = user.created_at || new Date().toISOString();
+    const tierInfo   = getCurrentTier(joinDate) || { tier: 'free', day: 1 };
+    const planRank   = (p) => PLAN_RANK[p] ?? 0;
+
+    // Effective plan = highest of: paid plan, trial/rotation tier
+    const trialPlan    = tierInfo.tier;
+    const effectivePlan = planRank(user.plan) >= planRank(trialPlan) ? user.plan : trialPlan;
+    const trialActive   = planRank(trialPlan) > planRank(user.plan);
+
+    // Determine what's locked based on effectivePlan
+    const isFreePlan = effectivePlan === 'free';
+    const isPlusPlan = effectivePlan === 'plus';
     const lockedCount = isFreePlan ? Math.floor(trends.length * 0.3) : (isPlusPlan ? Math.floor(trends.length * 0.15) : 0);
 
     const visibleTrends = trends.map((t, i) => {
@@ -43,22 +56,31 @@ router.get('/', requireAuth, async (req, res) => {
       user: {
         id: user.id, name: user.name, email: user.email,
         plan: user.plan, avatar_url: user.avatar_url,
+        effective_plan: effectivePlan,
+        trial_day: tierInfo.day,      // 1-indexed
+        trial_plan: trialPlan,
+        trial_phase: tierInfo.phase,  // 'staircase' | 'rotation'
+        trial_week: tierInfo.week,    // rotation week (null during staircase)
+        trial_active: trialActive,
+        trial_expired: tierInfo.trialExpired,
         is_beta: user.is_beta || false,
         email_verified: user.email_verified || false,
         digest_enabled: user.digest_enabled !== false,
+        discord_connected: !!user.discord_webhook_url,
+        discord_webhook_preview: user.discord_webhook_url || null,
       },
       subscription: sub ? {
         plan: sub.plan, status: sub.status,
         period_end: sub.current_period_end, trial_end: sub.trial_end,
       } : null,
-      usage: { remaining, limit, plan: user.plan },
+      usage: { remaining, limit, plan: effectivePlan },
       trends: { date: displayDate, total, items: visibleTrends, locked_count: lockedCount },
       features: {
-        niche_search: ['pro', 'max', 'teams', 'enterprise'].includes(user.plan),
-        export_csv: user.plan !== 'free',
-        api_access: ['max', 'teams', 'enterprise'].includes(user.plan),
-        alerts: user.plan !== 'free',
-        history_days: { free: 0, plus: 7, pro: 30, max: 90, teams: 90, enterprise: -1 }[user.plan] || 0,
+        niche_search: ['pro', 'max', 'teams', 'enterprise'].includes(effectivePlan),
+        export_csv: effectivePlan !== 'free',
+        api_access: ['max', 'teams', 'enterprise'].includes(effectivePlan),
+        alerts: effectivePlan !== 'free',
+        history_days: { free: 0, plus: 7, pro: 30, max: 90, teams: 90, enterprise: -1 }[effectivePlan] || 0,
       },
     });
   } catch (err) {
@@ -142,6 +164,51 @@ router.delete('/saved/:id', requireAuth, async (req, res) => {
   }
 });
 
+// ── Discord Webhook ────────────────────────────────
+router.post('/discord-webhook', requireAuth, async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (url && !url.startsWith('https://discord.com/api/webhooks/') && !url.startsWith('https://discordapp.com/api/webhooks/')) {
+      return res.status(400).json({ error: 'Invalid Discord webhook URL.' });
+    }
+    await db.setDiscordWebhook(req.session.userId, url || null);
+    res.json({ message: url ? 'Webhook saved.' : 'Webhook removed.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+router.post('/discord-webhook/test', requireAuth, async (req, res) => {
+  try {
+    const user = await db.findUserById(req.session.userId);
+    if (!user?.discord_webhook_url) return res.status(400).json({ error: 'No webhook URL saved.' });
+    await sendDiscordMessage(user.discord_webhook_url, {
+      embeds: [{
+        title: '🌊 Wavecrest Pro — Test Notification',
+        description: 'Your Discord webhook is connected! You\'ll receive daily trend alerts here every morning.',
+        color: 0x0071e3,
+        footer: { text: 'Wavecrest Pro · wavecrest.pro' },
+        timestamp: new Date().toISOString(),
+      }]
+    });
+    res.json({ message: 'Test message sent!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send test message. Check your webhook URL.' });
+  }
+});
+
+async function sendDiscordMessage(webhookUrl, payload) {
+  const res = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Discord error ${res.status}: ${text}`);
+  }
+}
+
 // ── BYOAK routes ───────────────────────────────────
 router.get('/api-keys', requireAuth, async (req, res) => {
   try {
@@ -184,6 +251,42 @@ router.delete('/api-keys/:id', requireAuth, async (req, res) => {
     const deleted = await db.deleteApiKey(req.params.id, req.session.userId);
     if (!deleted) return res.status(404).json({ error: 'Key not found.' });
     res.json({ message: 'API key deleted.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ── User API Key management ────────────────────────
+router.get('/my-api-key', requireAuth, async (req, res) => {
+  try {
+    const key = await db.getUserApiKey(req.session.userId);
+    res.json({ key: key ? { prefix: key.key_prefix, label: key.label, created_at: key.created_at, last_used: key.last_used } : null });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+router.post('/my-api-key', requireAuth, async (req, res) => {
+  try {
+    const user = await db.findUserById(req.session.userId);
+    if (!['plus','pro','max','teams','enterprise'].includes(user?.plan)) {
+      return res.status(403).json({ error: 'API key access requires Plus plan or higher.' });
+    }
+    const result = await db.createUserApiKey(req.session.userId, req.body.label);
+    res.json({
+      message: 'API key created. Save this — it will not be shown again.',
+      key: result.raw_key,
+      prefix: result.key_prefix,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+router.delete('/my-api-key', requireAuth, async (req, res) => {
+  try {
+    await db.deleteUserApiKey(req.session.userId);
+    res.json({ message: 'API key revoked.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
   }

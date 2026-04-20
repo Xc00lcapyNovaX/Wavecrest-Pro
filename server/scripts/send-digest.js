@@ -133,6 +133,60 @@ async function run() {
     }
 
     console.log(`\n  📧 Digest complete: ${sent} sent, ${failed} failed, ${skipped} skipped`);
+
+    // ── Discord webhooks ──────────────────────────────
+    console.log('\n  🎮 Sending Discord notifications…');
+    const { rows: discordUsers } = await client.query(
+      `SELECT id, email, discord_webhook_url FROM users WHERE discord_webhook_url IS NOT NULL AND discord_webhook_url != ''`
+    );
+    console.log(`  ✓ ${discordUsers.length} Discord webhook subscribers`);
+
+    const hot    = trends.filter(t => t.score === 'hot');
+    const rising = trends.filter(t => t.score === 'rising');
+    const scoreEmoji = s => s === 'hot' ? '🔥' : s === 'rising' ? '📈' : '🌊';
+    const scoreColor = { hot: 0xff453a, rising: 0x30d158, warm: 0xff9f0a };
+
+    const topTrends = [...hot.slice(0,5), ...rising.slice(0,3)].slice(0,8);
+    const trendLines = topTrends.map(t => `${scoreEmoji(t.score)} **${t.topic}** · ${t.platform}`).join('\n');
+    const displayDate = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+    const payload = {
+      username: 'Wavecrest Pro',
+      avatar_url: 'https://wavecrest.pro/favicon.png',
+      embeds: [{
+        title: `🌊 Daily Trend Briefing — ${displayDate}`,
+        description: trendLines || 'No trending topics detected today.',
+        color: hot.length > 0 ? scoreColor.hot : scoreColor.rising,
+        fields: [
+          { name: '🔥 Hot', value: String(hot.length), inline: true },
+          { name: '📈 Rising', value: String(rising.length), inline: true },
+          { name: '📊 Total', value: String(trends.length), inline: true },
+        ],
+        footer: { text: 'Wavecrest Pro · wavecrest.pro' },
+        timestamp: new Date().toISOString(),
+        url: `${BASE_URL}/dashboard.html`,
+      }]
+    };
+
+    let dSent = 0, dFailed = 0;
+    for (const u of discordUsers) {
+      try {
+        if (DRY_RUN) { console.log(`  [DRY] Would ping Discord for: ${u.email}`); continue; }
+        const r = await fetch(u.discord_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        console.log(`  ✓ Discord sent for ${u.email}`);
+        dSent++;
+        await new Promise(r => setTimeout(r, 100));
+      } catch (err) {
+        console.error(`  ✗ Discord failed for ${u.email}: ${err.message}`);
+        dFailed++;
+      }
+    }
+    console.log(`\n  🎮 Discord complete: ${dSent} sent, ${dFailed} failed`);
   } finally {
     client.release();
     await pool.end();

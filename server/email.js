@@ -60,7 +60,7 @@ function btnStyle() {
 // ── Verification email ─────────────────────────────────────────────────────
 
 async function sendVerificationEmail({ to, token, baseUrl }) {
-  const link = `${baseUrl}/verify.html?token=${token}&type=verify`;
+  const link = `${baseUrl}/verify?token=${token}&type=verify`;
   const html = baseTemplate(`
     <h2 style="margin:0 0 12px;font-size:1.4rem;font-weight:700">Verify your email</h2>
     <p style="margin:0 0 8px;color:#adadb8;line-height:1.6">Thanks for signing up! Click the button below to confirm your email address and activate your Wavecrest Pro account.</p>
@@ -78,7 +78,7 @@ async function sendVerificationEmail({ to, token, baseUrl }) {
 // ── Magic link email ───────────────────────────────────────────────────────
 
 async function sendMagicLink({ to, token, baseUrl }) {
-  const link = `${baseUrl}/verify.html?token=${token}&type=magic`;
+  const link = `${baseUrl}/verify?token=${token}&type=magic`;
   const html = baseTemplate(`
     <h2 style="margin:0 0 12px;font-size:1.4rem;font-weight:700">Your sign-in link</h2>
     <p style="margin:0 0 8px;color:#adadb8;line-height:1.6">Click the button below to sign in to Wavecrest Pro. No password needed.</p>
@@ -162,7 +162,7 @@ async function sendDailyDigest({ to, name, trends, date, baseUrl, unsubscribeTok
     </table>
 
     <div style="text-align:center;margin-top:28px">
-      <a href="${baseUrl}/dashboard.html" style="${btnStyle()}">Open Dashboard →</a>
+      <a href="${baseUrl}/dashboard" style="${btnStyle()}">Open Dashboard →</a>
     </div>
 
     <p style="margin:28px 0 0;font-size:.78rem;color:#636366;text-align:center">

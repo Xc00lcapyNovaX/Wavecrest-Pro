@@ -55,7 +55,7 @@ router.get('/search', requireAuth, async (req, res) => {
       return res.status(403).json({
         error: 'Niche search requires Pro plan or higher.',
         current_plan: user.plan,
-        upgrade_url: '/checkout-pro.html',
+        upgrade_url: '/checkout?plan=pro',
       });
     }
 
@@ -127,7 +127,7 @@ router.get('/predictions', requireAuth, rateLimiter, async (req, res) => {
       return res.status(403).json({
         error: 'Trend predictions require Pro plan or higher.',
         current_plan: user.plan,
-        upgrade_url: '/checkout-pro.html',
+        upgrade_url: '/checkout?plan=pro',
         preview: [
           { topic: '██████████', momentum: '???', prediction: 'Upgrade to Pro to unlock AI predictions' },
         ],
@@ -212,7 +212,7 @@ router.get('/hooks', requireAuth, async (req, res) => {
       return res.status(403).json({
         error: 'Content hooks require Pro plan or higher.',
         current_plan: user.plan,
-        upgrade_url: '/checkout-pro.html',
+        upgrade_url: '/checkout?plan=pro',
       });
     }
 
@@ -291,7 +291,7 @@ router.get('/cross-platform', requireAuth, rateLimiter, async (req, res) => {
       return res.status(403).json({
         error: 'Cross-platform insights require Max plan or higher.',
         current_plan: user.plan,
-        upgrade_url: '/checkout-max.html',
+        upgrade_url: '/checkout?plan=max',
         preview: {
           message: 'See which trends are crossing platforms and where they started',
           sample: { topic: '██████', platforms: ['youtube → tiktok → instagram'], first_seen: '????' },
@@ -369,6 +369,92 @@ function daysBetween(dateA, dateB) {
   const b = new Date(dateB);
   return Math.round(Math.abs(b - a) / (1000 * 60 * 60 * 24));
 }
+
+// ── GET /api/trends/ideas — AI content ideas via Claude (Pro+) ──────────
+router.get('/ideas', requireAuth, rateLimiter, async (req, res) => {
+  try {
+    const user = await db.findUserById(req.session.userId);
+    if (!user) return res.status(401).json({ error: 'Not authenticated.' });
+    if (!['pro', 'max', 'teams', 'enterprise'].includes(user.plan)) {
+      return res.status(403).json({
+        error: 'Content ideas require Pro plan or higher.',
+        upgrade_url: '/checkout?plan=pro',
+      });
+    }
+
+    const { topic, platform = 'youtube' } = req.query;
+    if (!topic || topic.trim().length < 2) {
+      return res.status(400).json({ error: 'Topic required (min 2 chars).' });
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: 'AI idea generation is not configured.' });
+    }
+
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    await db.logUsage(user.id, '/api/trends/ideas');
+
+    const t = topic.trim();
+    const platformLabel = { youtube: 'YouTube', tiktok: 'TikTok', instagram: 'Instagram', all: 'any platform' }[platform] || platform;
+
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{
+        role: 'user',
+        content: `You are a viral content strategist. The topic "${t}" is trending on ${platformLabel}.
+
+Generate exactly 5 content ideas. For each idea output ONLY this JSON format, one per line (no markdown, no extra text):
+{"title":"...","format":"...","hook":"...","why":"..."}
+
+Rules:
+- title: compelling video/post title (under 70 chars)
+- format: e.g. "YouTube Short", "TikTok POV", "Instagram Carousel", "Long-form video"
+- hook: opening line or visual that grabs attention in the first 3 seconds
+- why: one sentence on why this will perform well right now
+
+Output 5 lines of JSON only.`,
+      }],
+    });
+
+    const raw = message.content[0].text.trim();
+    const ideas = raw.split('\n')
+      .map(line => { try { return JSON.parse(line.trim()); } catch { return null; } })
+      .filter(Boolean)
+      .slice(0, 5);
+
+    if (!ideas.length) {
+      return res.status(500).json({ error: 'Failed to parse AI response. Try again.' });
+    }
+
+    res.json({ topic: t, platform, ideas });
+  } catch (err) {
+    console.error('[Ideas]', err.message);
+    res.status(500).json({ error: 'Server error generating ideas.' });
+  }
+});
+
+// ── GET /api/trends/dates — all dates that have trend data (with score breakdown) ──
+router.get('/dates', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await db.pool.query(`
+      SELECT
+        fetched_at::text AS date,
+        COUNT(*)::int                                           AS total,
+        SUM(CASE WHEN score='hot'    THEN 1 ELSE 0 END)::int   AS hot,
+        SUM(CASE WHEN score='rising' THEN 1 ELSE 0 END)::int   AS rising,
+        SUM(CASE WHEN score='warm'   THEN 1 ELSE 0 END)::int   AS warm
+      FROM trends
+      GROUP BY fetched_at
+      ORDER BY fetched_at DESC
+    `);
+    res.json({ dates: rows });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
 
 // ── POST /api/trends/seed — called by GitHub Actions after daily update ──
 router.post('/seed', async (req, res) => {

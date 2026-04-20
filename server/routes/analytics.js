@@ -17,7 +17,7 @@ async function requirePro(req, res, next) {
       return res.status(403).json({
         error: 'Analytics requires Pro plan or higher.',
         current_plan: user.plan,
-        upgrade_url: '/checkout-pro.html',
+        upgrade_url: '/checkout?plan=pro',
       });
     }
     req.user = user;

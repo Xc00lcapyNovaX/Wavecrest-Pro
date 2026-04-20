@@ -1,5 +1,5 @@
 /**
- * Auth routes — email/password + real Google/GitHub OAuth + mock Apple/Microsoft
+ * Auth routes — email/password + real Google/GitHub/Apple OAuth
  */
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
+const AppleStrategy = require('passport-apple');
 const db = require('../db');
 const { sendVerificationEmail, sendMagicLink } = require('../email');
 const router = express.Router();
@@ -15,10 +16,16 @@ function generateToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+function isValidEmail(email) {
+  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
 const isNonEmpty = (value) => typeof value === 'string' && value.trim().length > 0;
 const baseUrl = process.env.BASE_URL;
 const googleConfigured = isNonEmpty(process.env.GOOGLE_CLIENT_ID) && isNonEmpty(process.env.GOOGLE_CLIENT_SECRET);
 const githubConfigured = isNonEmpty(process.env.GITHUB_CLIENT_ID) && isNonEmpty(process.env.GITHUB_CLIENT_SECRET);
+const appleConfigured = isNonEmpty(process.env.APPLE_CLIENT_ID) && isNonEmpty(process.env.APPLE_TEAM_ID) &&
+  isNonEmpty(process.env.APPLE_KEY_ID) && isNonEmpty(process.env.APPLE_PRIVATE_KEY);
 
 if (!isNonEmpty(baseUrl)) {
   throw new Error('[Auth] BASE_URL is required.');
@@ -37,6 +44,7 @@ if (process.env.NODE_ENV === 'production') {
 
 console.log(`[Auth] Google OAuth: ${googleConfigured ? 'ON' : 'OFF'}`);
 console.log(`[Auth] GitHub OAuth: ${githubConfigured ? 'ON' : 'OFF'}`);
+console.log(`[Auth] Apple OAuth:  ${appleConfigured ? 'ON' : 'OFF'}`);
 console.log(`[Auth] BASE_URL: ${baseUrl}`);
 
 // Passport setup
@@ -94,6 +102,51 @@ if (githubConfigured) {
   }));
 }
 
+if (appleConfigured) {
+  passport.use(new AppleStrategy({
+    clientID:         process.env.APPLE_CLIENT_ID,
+    teamID:           process.env.APPLE_TEAM_ID,
+    keyID:            process.env.APPLE_KEY_ID,
+    // Vercel stores multiline secrets with literal \n — normalise them
+    privateKeyString: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    callbackURL:      `${baseUrl}/api/auth/apple/callback`,
+    passReqToCallback: false,
+  }, async (accessToken, refreshToken, idToken, profile, done) => {
+    try {
+      const sub   = idToken?.sub;
+      // Apple only sends email on the FIRST authorisation — store it then
+      const email = idToken?.email || profile?.email;
+
+      if (!sub) return done(new Error('No subject from Apple'));
+
+      // Look up by provider first (works on repeat logins without email)
+      let user = await db.findUserByProvider('apple', sub);
+      if (!user && email) user = await db.findUserByEmail(email);
+
+      if (!user) {
+        if (!email) return done(new Error('No email received from Apple — please try again'));
+        const firstName  = profile?.name?.firstName || '';
+        const lastName   = profile?.name?.lastName  || '';
+        const displayName = (firstName + ' ' + lastName).trim() || email.split('@')[0];
+        user = await db.createUser({
+          email,
+          name:       displayName,
+          provider:   'apple',
+          providerId: sub,
+        });
+      } else if (!user.provider_id) {
+        // Backfill provider_id if missing (e.g. account created via email before Apple link)
+        await db.updateUser(user.id, { provider_id: sub });
+      }
+
+      done(null, user);
+    } catch (err) {
+      console.error('[Auth] Apple strategy error:', err.message);
+      done(err);
+    }
+  }));
+}
+
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try { done(null, await db.findUserById(id)); }
@@ -116,6 +169,14 @@ router.post('/signup', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await db.createUser({ email, passwordHash, name });
     req.session.userId = user.id;
+
+    // Apply referral if ref code provided
+    if (req.body.ref) {
+      try {
+        const referrer = await db.findUserByReferralCode(req.body.ref);
+        if (referrer && referrer.id !== user.id) await db.applyReferral(referrer.id, user.id);
+      } catch (e) { /* non-fatal */ }
+    }
 
     // Send verification email (non-blocking — don't fail signup if email fails)
     try {
@@ -194,22 +255,22 @@ router.get('/me', async (req, res) => {
 // Google OAuth is now strict real OAuth only. No mock fallback route.
 router.get('/google', (req, res, next) => {
   if (!googleConfigured) {
-    return res.redirect('/signin.html?error=google_not_configured');
+    return res.redirect('/signin?error=google_not_configured');
   }
   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
   if (!googleConfigured) {
-    return res.redirect('/signin.html?error=google_not_configured');
+    return res.redirect('/signin?error=google_not_configured');
   }
-  passport.authenticate('google', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
+  passport.authenticate('google', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
     if (err) {
       console.error('[Auth] Google OAuth callback error:', err.message);
-      return res.redirect('/signin.html?error=oauth_failed');
+      return res.redirect('/signin?error=oauth_failed');
     }
     req.session.userId = req.user.id;
-    const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+    const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
     return res.redirect(dest);
   });
 });
@@ -218,27 +279,48 @@ router.get('/github', (req, res, next) => {
   if (githubConfigured) {
     passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
   } else {
-    res.redirect('/signin.html?error=github_not_configured');
+    res.redirect('/signin?error=github_not_configured');
   }
 });
 
 router.get('/github/callback', (req, res, next) => {
   if (githubConfigured) {
-    passport.authenticate('github', { failureRedirect: '/signin.html?error=oauth_failed' })(req, res, (err) => {
+    passport.authenticate('github', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
       if (err) {
         console.error('[Auth] GitHub OAuth callback error:', err.message);
-        return res.redirect('/signin.html?error=oauth_failed');
+        return res.redirect('/signin?error=oauth_failed');
       }
       req.session.userId = req.user.id;
-      const dest = req.user.is_beta ? '/dashboard.html?beta_login=true' : '/dashboard.html';
+      const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
       return res.redirect(dest);
     });
   } else {
-    res.redirect('/signin.html?error=github_not_configured');
+    res.redirect('/signin?error=github_not_configured');
   }
 });
 
-['apple', 'microsoft', 'github'].forEach((provider) => {
+// ── Apple OAuth (real) ─────────────────────────────────────────────────────
+// Apple uses GET to initiate and POST for the callback (unlike Google/GitHub)
+router.get('/apple', (req, res, next) => {
+  if (!appleConfigured) return res.redirect('/signin?error=oauth_not_configured');
+  passport.authenticate('apple')(req, res, next);
+});
+
+router.post('/apple/callback', (req, res, next) => {
+  if (!appleConfigured) return res.redirect('/signin?error=oauth_not_configured');
+  passport.authenticate('apple', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
+    if (err) {
+      console.error('[Auth] Apple OAuth callback error:', err.message);
+      return res.redirect('/signin?error=oauth_failed');
+    }
+    req.session.userId = req.user.id;
+    const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
+    return res.redirect(dest);
+  });
+});
+
+// ── Fallback mock for unconfigured providers (GitHub only if keys missing) ──
+['github'].forEach((provider) => {
   if (provider === 'github' && githubConfigured) return;
 
   router.post(`/${provider}/callback`, async (req, res) => {
@@ -262,9 +344,30 @@ router.get('/github/callback', (req, res, next) => {
   });
 });
 
+// ── Beta gate helper ───────────────────────────────────────────────────────
+const BETA_LIMIT = parseInt(process.env.BETA_USER_LIMIT || '500', 10);
+
+async function checkBetaGate() {
+  if (process.env.BETA_CLOSED === 'true') {
+    return { closed: true, reason: 'The beta is now closed. Follow us for launch updates!' };
+  }
+  const { rows } = await db.pool.query("SELECT COUNT(*) AS n FROM users WHERE is_beta = true");
+  const count = parseInt(rows[0].n, 10);
+  if (count >= BETA_LIMIT) {
+    return { closed: true, reason: `All ${BETA_LIMIT} beta spots are taken. We'll notify you at launch!` };
+  }
+  return { closed: false, spotsLeft: BETA_LIMIT - count };
+}
+
 router.post('/beta-signup', async (req, res) => {
   try {
-    const { email, name, niche, platform } = req.body;
+    // ── Beta gate: check before anything else ──────────────────────────────
+    const gate = await checkBetaGate();
+    if (gate.closed) {
+      return res.status(403).json({ error: gate.reason, beta_closed: true });
+    }
+
+    const { email, name, niche, platform, ref } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'Email is required.' });
     }
@@ -289,8 +392,16 @@ router.post('/beta-signup', async (req, res) => {
     user.plan = 'pro';
     user.is_beta = true;
 
+    // Apply referral if ref code provided
+    if (ref) {
+      try {
+        const referrer = await db.findUserByReferralCode(ref);
+        if (referrer && referrer.id !== user.id) await db.applyReferral(referrer.id, user.id);
+      } catch (e) { /* non-fatal */ }
+    }
+
     if (niche || platform) {
-      console.log(`[Beta] New signup: ${email} | niche: ${niche || 'none'} | platform: ${platform || 'all'}`);
+      console.log(`[Beta] New signup: ${email} | niche: ${niche || 'none'} | platform: ${platform || 'all'} | ref: ${ref || 'none'}`);
     }
 
     req.session.userId = user.id;
@@ -299,6 +410,7 @@ router.post('/beta-signup', async (req, res) => {
       message: 'Welcome to the Wavecrest Pro beta!',
       user: sanitize(user),
       beta: true,
+      spots_left: gate.spotsLeft - 1,
     });
   } catch (err) {
     console.error('[Beta Signup]', err.message);
@@ -391,18 +503,37 @@ router.post('/resend-verification', async (req, res) => {
   }
 });
 
+// ── Referral stats ─────────────────────────────────────────────────────────
+router.get('/referral', async (req, res) => {
+  try {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated.' });
+    const code = await db.ensureReferralCode(req.session.userId);
+    const stats = await db.getReferralStats(req.session.userId);
+    const baseUrl = process.env.BASE_URL || 'https://wavecrest.pro';
+    res.json({
+      code,
+      referral_url: `${baseUrl}/signup?ref=${code}`,
+      referrals: stats.referrals,
+      total_referred: stats.referrals.length,
+      bonus_searches: stats.bonus_searches,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 // ── Unsubscribe from digest (one-click, no login required) ────────────────
 router.get('/unsubscribe', async (req, res) => {
   try {
     const { token } = req.query;
-    if (!token) return res.redirect('/dashboard.html?error=invalid_unsubscribe');
+    if (!token) return res.redirect('/dashboard?error=invalid_unsubscribe');
     const user = await db.findUserByDigestToken(token);
-    if (!user) return res.redirect('/dashboard.html?error=invalid_unsubscribe');
+    if (!user) return res.redirect('/dashboard?error=invalid_unsubscribe');
     await db.setDigestEnabled(user.id, false);
-    return res.redirect('/dashboard.html?unsubscribed=1');
+    return res.redirect('/dashboard?unsubscribed=1');
   } catch (err) {
     console.error('[Auth] Unsubscribe error:', err.message);
-    res.redirect('/dashboard.html?error=unsubscribe_failed');
+    res.redirect('/dashboard?error=unsubscribe_failed');
   }
 });
 

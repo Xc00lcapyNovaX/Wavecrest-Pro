@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<title>You've Unlocked — Wavecrest Pro</title>
+<link rel="stylesheet" href="/css/glass.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#000;--fg:#f5f5f7;--muted:#86868b;--blue:#0071e3;--accent:#2997ff;--accent2:#bf5af2;--accent3:#30d158;--orange:#ff9f0a}
+  body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;--mesh-1:rgba(48,209,88,.12);--mesh-2:rgba(41,151,255,.1)}
+
+  nav{position:fixed;top:0;left:0;right:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(0,0,0,.8);border-bottom:1px solid rgba(255,255,255,.07);z-index:100}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:52px;max-width:1080px;margin:0 auto;padding:0 24px}
+  .logo{font-size:1.1rem;font-weight:700;color:var(--fg);text-decoration:none}
+  .logo span{opacity:.5;font-weight:300}
+  .nav-link{font-size:.85rem;color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:8px;transition:color .2s,background .2s}
+  .nav-link:hover{color:var(--fg);background:rgba(255,255,255,.06)}
+
+  .unlock-wrap{max-width:600px;width:100%;position:relative;margin-top:40px}
+  .day-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 18px;border-radius:980px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    margin-bottom:28px;border:1px solid rgba(255,255,255,.1);
+  }
+  .confetti-wrap{font-size:3.2rem;margin-bottom:20px;animation:pop .6s cubic-bezier(.175,.885,.32,1.275) both}
+  @keyframes pop{0%{transform:scale(0) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:700;letter-spacing:-.04em;line-height:1.05;margin-bottom:14px}
+  .gtext{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .subtitle{font-size:1.05rem;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto 36px}
+
+  .features-reveal{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px;text-align:left;
+  }
+  .feat-item{
+    display:flex;align-items:flex-start;gap:12px;padding:18px 16px;border-radius:14px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+    animation:slide-up .5s cubic-bezier(.16,1,.3,1) both;
+  }
+  .feat-item:nth-child(1){animation-delay:.1s}
+  .feat-item:nth-child(2){animation-delay:.2s}
+  .feat-item:nth-child(3){animation-delay:.3s}
+  .feat-item:nth-child(4){animation-delay:.4s}
+  @keyframes slide-up{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+  .feat-icon{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+  .feat-body h3{font-size:.88rem;font-weight:600;margin-bottom:3px}
+  .feat-body p{font-size:.78rem;color:var(--muted);line-height:1.45}
+
+  .next-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left}
+  .next-box p{font-size:.82rem;color:var(--muted)}
+  .next-box strong{color:var(--fg);display:block;font-size:.9rem;margin-bottom:3px}
+  .next-day-badge{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;white-space:nowrap}
+
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:980px;
+    font-size:.95rem;font-weight:600;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;text-decoration:none;transition:transform .2s,box-shadow .3s;
+  }
+  .btn-primary:hover{transform:scale(1.05);box-shadow:0 10px 40px rgba(41,151,255,.3);color:#fff}
+  .btn-ghost{
+    display:inline-flex;align-items:center;padding:14px 28px;border-radius:980px;
+    font-size:.95rem;font-weight:600;border:1.5px solid rgba(255,255,255,.14);color:var(--fg);
+    text-decoration:none;transition:border-color .2s,transform .2s;
+  }
+  .btn-ghost:hover{border-color:rgba(255,255,255,.3);transform:scale(1.04);color:var(--fg)}
+
+  .progress-bar{display:flex;gap:6px;justify-content:center;margin-top:40px;margin-bottom:8px}
+  .progress-step{height:4px;flex:1;max-width:60px;border-radius:4px;background:rgba(255,255,255,.1);transition:background .4s}
+  .progress-step.done{background:var(--accent3)}
+  .progress-step.active{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .progress-label{font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+
+  @media(max-width:520px){.features-reveal{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="ambient-mesh">
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">Wavecrest<span> Pro</span></a>
+    <div style="display:flex;gap:8px">
+      <a href="/dashboard" class="nav-link">Dashboard →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="unlock-wrap" id="unlock-wrap">
+  <!-- Populated by JS based on current path -->
+</div>
+
+<script>
+// ── Tier definitions ────────────────────────────────
+const TIERS = {
+  plus: {
+    day: 2,
+    emoji: '✨',
+    name: 'Plus',
+    color: 'var(--accent3)',
+    gradient: 'linear-gradient(135deg,#30d158,#0071e3)',
+    tagline: 'More data. More signal.',
+    description: "You've just leveled up to Plus. The noise is filtered. You've got more search power, fresh data, and your first taste of trend history.",
+    features: [
+      {icon:'🔍', title:'50 searches/day', body:'Double the free limit — plenty to explore every niche.'},
+      {icon:'📥', title:'CSV Export', body:'Download any trend set for offline analysis or content planning.'},
+      {icon:'🔔', title:'Email Digest', body:'Daily morning briefing of the hottest trends straight to your inbox.'},
+      {icon:'📅', title:'7-day History', body:'See how trends evolved this week. Spot patterns before competitors.'},
+    ],
+    next: {day: 3, tier: 'pro', name: 'Pro', badge: 'Unlimited + AI Ideas', badgeColor: 'rgba(41,151,255,.15)', badgeText: 'var(--accent)'},
+  },
+  pro: {
+    day: 3,
+    emoji: '⚡',
+    name: 'Pro',
+    color: 'var(--accent)',
+    gradient: 'linear-gradient(135deg,#2997ff,#bf5af2)',
+    tagline: 'Unlimited. AI-powered.',
+    description: "Pro is where it gets serious. No search limits, real AI content angles for every trend, and niche filtering so you only see what moves your audience.",
+    features: [
+      {icon:'♾️', title:'Unlimited Searches', body:'No daily cap. Explore as many trends, niches, and platforms as you want.'},
+      {icon:'✨', title:'AI Content Ideas', body:'5 hooks, titles, captions, and hashtag sets generated per trend.'},
+      {icon:'🎯', title:'Niche Filters', body:'Filter by fitness, tech, beauty, gaming, food, and more. Cut the noise.'},
+      {icon:'📊', title:'30-Day History', body:'A full month of trend data. See what peaked, what faded, what cyclically returns.'},
+    ],
+    next: {day: 4, tier: 'max', name: 'Max', badge: 'API Access + 90-day History', badgeColor: 'rgba(191,90,242,.15)', badgeText: 'var(--accent2)'},
+  },
+  max: {
+    day: 4,
+    emoji: '🔗',
+    name: 'Max',
+    color: 'var(--accent2)',
+    gradient: 'linear-gradient(135deg,#bf5af2,#ff9f0a)',
+    tagline: 'The full power layer.',
+    description: "Max unlocks everything Wavecrest has under the hood — the API, deep history, and advanced analytics so you can build your own systems on top of trend data.",
+    features: [
+      {icon:'🔑', title:'Full API Access', body:'Pull trend data into any tool, automation, or workflow via our REST API.'},
+      {icon:'📈', title:'90-Day History', body:"Three months of trend curves. Catch seasonal patterns before they repeat."},
+      {icon:'📊', title:'Advanced Analytics', body:'Engagement velocity charts, trend lifecycle curves, and cross-platform comparison.'},
+      {icon:'⚡', title:'Priority Support', body:'Dedicated email support with same-day response SLA.'},
+    ],
+    next: {day: 5, tier: 'teams', name: 'Teams', badge: 'Shared Workspace + Admin', badgeColor: 'rgba(255,159,10,.12)', badgeText: 'var(--orange)'},
+  },
+  teams: {
+    day: 5,
+    emoji: '👥',
+    name: 'Teams',
+    color: 'var(--orange)',
+    gradient: 'linear-gradient(135deg,#ff9f0a,#30d158)',
+    tagline: "You've climbed the whole staircase.",
+    description: "Day 5. Teams is the pinnacle — shared workspaces, Discord alerts for your whole crew, and every feature Wavecrest offers. This is what it looks like at full power.",
+    features: [
+      {icon:'🧑‍🤝‍🧑', title:'Shared Workspace', body:'Invite your team. Everyone sees the same trends, saved bookmarks, and briefings.'},
+      {icon:'🎮', title:'Discord Integration', body:'Push daily trend digests and alerts directly to your team's Discord server.'},
+      {icon:'🔐', title:'Role Permissions', body:'Admin, editor, and viewer roles with centralized billing.'},
+      {icon:'🏆', title:'Everything Unlocked', body:"API, AI ideas, 90-day history, unlimited searches — the whole stack."},
+    ],
+    next: null,
+  },
+};
+
+const PLANS = ['free','plus','pro','max','teams'];
+
+// Determine tier from URL path
+const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+const tierData = TIERS[path];
+
+if (!tierData) {
+  window.location.href = '/dashboard';
+}
+
+// Read gatekeeper tier from response header (injected by Express) or fallback
+const currentTierHeader = document.cookie.split(';').find(c => c.trim().startsWith('_wc_tier='));
+// We rely on the redirect protection — if we got here, we're allowed.
+
+function render(t) {
+  const wrap = document.getElementById('unlock-wrap');
+
+  // Update page title
+  document.title = `Day ${t.day}: ${t.name} Unlocked — Wavecrest Pro`;
+
+  // Progress dots
+  const progress = PLANS.slice(1).map((p, i) => {
+    const dayNum = i + 2;
+    const cls = dayNum < t.day ? 'done' : dayNum === t.day ? 'active' : '';
+    return `<div class="progress-step ${cls}"></div>`;
+  }).join('');
+
+  // Features
+  const features = t.features.map(f =>
+    `<div class="feat-item">
+      <div class="feat-icon">${f.icon}</div>
+      <div class="feat-body"><h3>${f.title}</h3><p>${f.body}</p></div>
+    </div>`
+  ).join('');
+
+  // Next day teaser
+  const nextBox = t.next ? `
+    <div class="next-box">
+      <div>
+        <strong>Tomorrow: ${t.next.name} unlocks automatically</strong>
+        <p>You don't need to do anything — come back tomorrow and your account upgrades itself.</p>
+      </div>
+      <span class="next-day-badge" style="background:${t.next.badgeColor};color:${t.next.badgeText}">${t.next.badge}</span>
+    </div>` :
+    `<div class="next-box" style="justify-content:center;text-align:center">
+      <div>
+        <strong>🎉 You've completed the Wavecrest staircase</strong>
+        <p>After beta, keep full access by subscribing. We'll email you 30 days before any billing starts.</p>
+      </div>
+    </div>`;
+
+  wrap.innerHTML = `
+    <div class="day-badge" style="background:linear-gradient(135deg,rgba(48,209,88,.08),rgba(41,151,255,.08));color:${t.color};border-color:${t.color}22">
+      <span>Day ${t.day}</span>
+      <span style="opacity:.4">|</span>
+      <span>${t.name} Plan</span>
+    </div>
+
+    <div class="confetti-wrap">${t.emoji}</div>
+
+    <h1>You've unlocked<br><span class="gtext">${t.name}.</span></h1>
+    <p class="subtitle">${t.description}</p>
+
+    <div class="features-reveal">${features}</div>
+
+    ${nextBox}
+
+    <div class="cta-row">
+      <a href="/dashboard" class="btn-primary">Go to Dashboard →</a>
+      <a href="/" class="btn-ghost">Back to Home</a>
+    </div>
+
+    <div class="progress-bar">${progress}</div>
+    <p class="progress-label">Day ${t.day} of 5 — ${5 - t.day + 1} day${5 - t.day === 0 ? '' : 's'} left in your trial</p>
+  `;
+}
+
+if (tierData) render(tierData);
+</script>
+</body>
+</html>

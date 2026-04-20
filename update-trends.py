@@ -73,6 +73,68 @@ def is_junk(title):
         return True
     return False
 
+# ─── YouTube title cleaner ────────────────────────────────────────────────────
+# Strips video-specific boilerplate so we store concepts, not video titles.
+
+_YT_SUFFIX_RE = re.compile(
+    r'\s*[\|\u2014\u2013]\s*.+$'            # everything after  |  —  –
+    r'|\s*\((?:'
+        r'official\s+(?:video|audio|music\s+video|lyric[s]?\s+video|visualizer|mv)'
+        r'|lyric[s]?\s+video|music\s+video|audio|visualizer|animated\s+video'
+        r'|full\s+video|hd|4k|remaster(?:ed)?|live\s+performance'
+        r'|feat\.?\s+[^)]+|ft\.?\s+[^)]+|explicit'
+        r'|track\s+\d+|ep\s+\d+|episode\s+\d+|season\s+\d+'
+    r')\)'
+    r'|\s+(?:official\s+)?(?:music\s+)?video$'
+    r'|\s+\|\s+.*$',
+    re.IGNORECASE,
+)
+
+_MUSIC_DASH_RE = re.compile(r'^(.+?)\s+[-\u2014]\s+(.+)$')
+
+def clean_youtube_title(raw: str) -> str:
+    """Return a clean concept string from a raw YouTube video title."""
+    t = raw.strip()
+
+    # Drop everything after a pipe or em/en-dash used as separator (e.g. "| Track 5")
+    t = re.sub(r'\s*[|\u2014\u2013].*$', '', t).strip()
+
+    # Strip trailing boilerplate parentheticals: (Official Video), (Lyric Video), (4K), etc.
+    t = _YT_SUFFIX_RE.sub('', t).strip()
+
+    # Strip prize/result suffixes common in challenge videos:
+    # "Last To Leave Grocery Store, Wins $250,000"  →  "Last To Leave Grocery Store"
+    t = re.sub(
+        r',\s*(?:wins?|gets?|earns?|loses?|takes?|prize[sd]?|reward[sd]?)\s+[\$£€][\d,\.]+[kKmMbB]?.*$',
+        '', t, flags=re.IGNORECASE
+    ).strip()
+
+    # Strip leading/trailing decorative non-ASCII (emoji, foreign brackets, etc.)
+    t = re.sub(r'^[\W\s]+', '', t).strip()
+    t = re.sub(r'[\W\s]+$', '', t).strip()
+
+    # Handle multi-segment "Artist - ForeignText - EnglishSong" patterns:
+    # Split on " - " and drop any segment where >40% of characters are non-ASCII.
+    def non_ascii_ratio(s):
+        return sum(1 for c in s if ord(c) > 127) / max(len(s), 1)
+
+    parts = [p.strip() for p in re.split(r'\s+-\s+', t)]
+    if len(parts) > 1:
+        clean_parts = [p for p in parts if non_ascii_ratio(p) <= 0.4]
+        if clean_parts:
+            t = ' - '.join(clean_parts)
+
+    # Remove any dangling open/close parentheses left after stripping
+    t = re.sub(r'\s*\([^)]*$', '', t).strip()   # unclosed (
+    t = re.sub(r'^\s*[^(]*\)', '', t).strip()    # leading )
+
+    # Collapse whitespace and cap length
+    t = re.sub(r'\s+', ' ', t).strip()
+    if len(t) > 80:
+        t = t[:77].rsplit(' ', 1)[0] + '…'
+
+    return t
+
 def load_yesterday():
     try:
         with open(OUTPUT, "r", encoding="utf-8") as f:
@@ -110,7 +172,8 @@ def fetch_youtube_api(api_key, region="US"):
             break
         found = 0
         for item in data.get("items", []):
-            t = item.get("snippet", {}).get("title", "").strip()
+            raw = item.get("snippet", {}).get("title", "").strip()
+            t = clean_youtube_title(raw)
             k = normalize(t)
             if t and k not in seen and not is_junk(t):
                 seen.add(k); titles.append(t); found += 1
@@ -122,12 +185,26 @@ def fetch_youtube_api(api_key, region="US"):
 # ─── Source 2: Reddit ─────────────────────────────────────────────────────────
 
 SUBREDDIT_MAP = {
+    # YouTube / video
     "videos": "youtube", "youtubers": "youtube", "gaming": "youtube",
-    "games": "youtube", "pcgaming": "youtube", "tiktokcringe": "tiktok",
-    "TikTokTrends": "tiktok", "Instagram": "instagram", "technology": "general",
-    "programming": "general", "worldnews": "general", "entertainment": "general",
-    "Music": "youtube", "movies": "general", "television": "general",
-    "comicbooks": "general", "sports": "general",
+    "games": "youtube", "pcgaming": "youtube", "leagueoflegends": "youtube",
+    "minecraft": "youtube", "livestreamfail": "youtube", "speedrun": "youtube",
+    "indiegaming": "youtube", "gamedev": "youtube",
+    # TikTok / short-form
+    "tiktokcringe": "tiktok", "TikTokTrends": "tiktok", "dankmemes": "tiktok",
+    "memes": "tiktok",
+    # Instagram
+    "Instagram": "instagram", "malefashionadvice": "instagram",
+    "femalefashionadvice": "instagram", "streetwear": "instagram",
+    "skincareaddiction": "instagram",
+    # General / news
+    "technology": "general", "programming": "general", "worldnews": "general",
+    "entertainment": "general", "Music": "youtube", "movies": "general",
+    "television": "general", "comicbooks": "general", "sports": "general",
+    "space": "general", "science": "general", "futurology": "general",
+    "artificial": "general", "ChatGPT": "general", "MachineLearning": "general",
+    "fitness": "instagram", "running": "general", "personalfinance": "general",
+    "investing": "general", "cryptocurrency": "general",
 }
 REDDIT_JUNK = [r"^\[", r"^AITA", r"^CMV", r"^ELI5", r"^Daily", r"^Weekly", r"^Monthly"]
 
@@ -161,7 +238,7 @@ def fetch_reddit_trending():
         for post in posts:
             d = post.get("data", {})
             if d.get("stickied") or d.get("pinned"): continue
-            if d.get("score", 0) < 300: continue
+            if d.get("score", 0) < 50: continue
             title = clean_reddit_title(d.get("title", "").strip())
             if not title or is_junk(title) or is_reddit_junk(title): continue
             key = normalize(title)
@@ -176,11 +253,11 @@ def fetch_reddit_trending():
 
 # ─── Source 3: Google Trends RSS ─────────────────────────────────────────────
 
-def fetch_google_trends(geo="US"):
+def fetch_google_trends_geo(geo):
     raw = fetch_url(f"https://trends.google.com/trending/rss?geo={geo}", headers={"User-Agent": "WavecrestBot/2.0"})
     trends = []
     if not raw:
-        print("  [warn] Google Trends RSS: no response"); return trends
+        print(f"  [warn] Google Trends RSS ({geo}): no response"); return trends
     try:
         root = ET.fromstring(raw)
         ns = {"ht": "https://trends.google.com/trending/rss"}
@@ -190,9 +267,21 @@ def fetch_google_trends(geo="US"):
             traffic = int(re.sub(r"[^\d]", "", el.text.strip() if el is not None else "0") or 0)
             if title and len(title) > 2:
                 trends.append({"topic": title, "traffic": traffic})
+        print(f"  ✓ Google Trends ({geo}): {len(trends)} topics")
     except Exception as e:
-        print(f"  [warn] Google Trends parse error: {e}")
+        print(f"  [warn] Google Trends ({geo}) parse error: {e}")
     return trends
+
+def fetch_google_trends(geo="US"):
+    seen, combined = set(), []
+    for region in ["US", "GB", "AU", "CA"]:
+        for item in fetch_google_trends_geo(region):
+            key = normalize(item["topic"])
+            if key not in seen:
+                seen.add(key)
+                combined.append(item)
+        time.sleep(0.3)
+    return combined
 
 
 # ─── Source 4: YouTube RSS creator feeds ─────────────────────────────────────
@@ -203,6 +292,15 @@ YT_RSS_FEEDS = [
     "https://www.youtube.com/feeds/videos.xml?channel_id=UC-lHJZR3Gqxm24_Vd_AJ5Yw",  # PewDiePie
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCam8T03EOFBsNdR0thrFHdQ",  # Veritasium
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCVjgV3uCgF8bnYPsqZFnFDA",  # MKBHD
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCo8bcnLyZH8tBIH9V1mLgqQ",  # Théo Joe
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCHnyfMqiRRG1u-2MsSQLbXA",  # Vsauce
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCR1IuLEqb6UEA_zQ81kwXfg",  # Linus Tech Tips
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ",  # The Try Guys
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UC7_YxT-KID8kRbqZo7MyscQ",  # Markiplier
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCpB959t8iPrxQWj7G6n0ctQ",  # SciShow
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCBJycsmduvYEL83R_U4JriQ",  # MKBHD backup
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UC0e3QhIYukixgh5VVpKHH9Q",  # Code Bullet
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCvJJ_dzjViJCoLf5uKUTwoA",  # CGPT explainers
 ]
 
 def fetch_youtube_rss():
@@ -213,10 +311,10 @@ def fetch_youtube_rss():
         try:
             root = ET.fromstring(raw)
             ns = {"atom": "http://www.w3.org/2005/Atom"}
-            for entry in root.findall(".//atom:entry", ns)[:4]:
+            for entry in root.findall(".//atom:entry", ns)[:6]:
                 el = entry.find("atom:title", ns)
                 if el is not None and el.text:
-                    t = unescape(el.text.strip())
+                    t = clean_youtube_title(unescape(el.text.strip()))
                     k = normalize(t)
                     if t and k not in seen and not is_junk(t) and len(t) > 10:
                         seen.add(k); topics.append(t)
@@ -234,7 +332,7 @@ def fetch_youtube_html():
         if not raw: continue
         for pattern in [r'"videoTitle"\s*:\s*"([^"]{12,120})"', r'"title":\{"runs":\[\{"text":"([^"]{12,120})"\}']:
             for m in re.finditer(pattern, raw):
-                t = unescape(m.group(1)).strip()
+                t = clean_youtube_title(unescape(m.group(1)).strip())
                 k = normalize(t)
                 if t and k not in seen and not is_junk(t):
                     seen.add(k); titles.append(t)
@@ -264,8 +362,8 @@ def compute_score(topic_raw, rank, total, source, raw_score=0, yesterday_map=Non
             prev_frac = yesterday_map[key] / max(len(yesterday_map), 1)
             if frac < prev_frac - 0.15:
                 pts += 0.8
-    if pts >= 5.5: return "hot"
-    if pts >= 3.5: return "rising"
+    if pts >= 4.0: return "hot"
+    if pts >= 2.5: return "rising"
     return "warm"
 
 
@@ -367,7 +465,7 @@ def main():
     print(f"  Total RSS added: {sum(1 for t in all_trends if t['source']=='youtube_rss')}")
 
     # 5. HTML scrape (only if thin)
-    if len(all_trends) < 20:
+    if len(all_trends) < 35:
         print("\n[YouTube HTML scrape — fallback]")
         for t in fetch_youtube_html(): add(t, "youtube", "youtube_html")
 
@@ -375,7 +473,7 @@ def main():
     print(f"\n  Real trends collected: {real_count}")
 
     # 6. Curated fallbacks
-    needed = max(0, 25 - real_count)
+    needed = max(0, 40 - real_count)
     if needed > 0:
         print(f"  ⚠  Padding with {needed} curated fallbacks")
         rng = random.Random(int(today.replace("-", "")))
