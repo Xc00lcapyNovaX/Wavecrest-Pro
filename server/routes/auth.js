@@ -319,30 +319,9 @@ router.post('/apple/callback', (req, res, next) => {
   });
 });
 
-// ── Fallback mock for unconfigured providers (GitHub only if keys missing) ──
-['github'].forEach((provider) => {
-  if (provider === 'github' && githubConfigured) return;
-
-  router.post(`/${provider}/callback`, async (req, res) => {
-    try {
-      const { email, name } = req.body;
-      if (!email) return res.status(400).json({ error: 'Email required for OAuth.' });
-      let user = await db.findUserByEmail(email);
-      if (!user) {
-        user = await db.createUser({
-          email,
-          name: name || email.split('@')[0],
-          provider,
-          providerId: `${provider}_${Date.now()}`,
-        });
-      }
-      req.session.userId = user.id;
-      res.json({ message: `Signed in with ${provider} (mock).`, user: sanitize(user) });
-    } catch (err) {
-      res.status(500).json({ error: 'Server error.' });
-    }
-  });
-});
+// Mock OAuth fallback removed: it allowed unauthenticated account takeover
+// by accepting any email. When GitHub OAuth isn't configured, the GET
+// initiator already redirects to /signin?error=oauth_not_configured.
 
 // ── Beta gate helper ───────────────────────────────────────────────────────
 const BETA_LIMIT = parseInt(process.env.BETA_USER_LIMIT || '500', 10);
@@ -523,10 +502,39 @@ router.get('/referral', async (req, res) => {
 });
 
 // ── Unsubscribe from digest (one-click, no login required) ────────────────
+// Rate-limited to stop brute-force token enumeration. Per-IP sliding window.
+const UNSUBSCRIBE_WINDOW_MS = 60 * 60 * 1000;
+const UNSUBSCRIBE_MAX = 10;
+const unsubscribeHits = new Map();
+
+function unsubscribeRateLimitOk(ip) {
+  const now = Date.now();
+  const hits = (unsubscribeHits.get(ip) || []).filter((t) => now - t < UNSUBSCRIBE_WINDOW_MS);
+  if (hits.length >= UNSUBSCRIBE_MAX) {
+    unsubscribeHits.set(ip, hits);
+    return false;
+  }
+  hits.push(now);
+  unsubscribeHits.set(ip, hits);
+  // opportunistic cleanup so the map doesn't grow unbounded
+  if (unsubscribeHits.size > 5000) {
+    for (const [k, v] of unsubscribeHits) {
+      if (!v.some((t) => now - t < UNSUBSCRIBE_WINDOW_MS)) unsubscribeHits.delete(k);
+    }
+  }
+  return true;
+}
+
 router.get('/unsubscribe', async (req, res) => {
   try {
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    if (!unsubscribeRateLimitOk(ip)) {
+      return res.status(429).send('Too many unsubscribe attempts. Try again later.');
+    }
     const { token } = req.query;
-    if (!token) return res.redirect('/dashboard?error=invalid_unsubscribe');
+    if (!token || typeof token !== 'string' || !/^[a-f0-9]{40}$/.test(token)) {
+      return res.redirect('/dashboard?error=invalid_unsubscribe');
+    }
     const user = await db.findUserByDigestToken(token);
     if (!user) return res.redirect('/dashboard?error=invalid_unsubscribe');
     await db.setDigestEnabled(user.id, false);

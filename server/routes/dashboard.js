@@ -215,7 +215,7 @@ router.get('/api-keys', requireAuth, async (req, res) => {
     const keys = await db.getApiKeys(req.session.userId);
     const masked = keys.map((k) => ({
       id: k.id, service: k.service,
-      key_preview: k.api_key.slice(0, 8) + '••••••••',
+      key_preview: (k.key_prefix || '') + '••••••••',
       created_at: k.created_at,
     }));
     res.json({ keys: masked });

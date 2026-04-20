@@ -418,18 +418,40 @@ db.ensureDigestToken = async (userId) => {
 };
 
 // ── API Keys (BYOAK) ──────────────────────────────
+// Keys are encrypted at rest with AES-256-GCM via lib/crypto.js.
+// Only a short prefix is stored plaintext for display ("sk-1234••••••••").
+const { encrypt: encryptSecret, decrypt: decryptSecret, isEncrypted } = require('./lib/crypto');
+
 db.saveApiKey = async (userId, service, key) => {
+  const ciphertext = encryptSecret(key);
+  const prefix = String(key).slice(0, 8);
   const { rows } = await pool.query(
-    `INSERT INTO api_keys (user_id, service, api_key) VALUES ($1, $2, $3)
-     ON CONFLICT (user_id, service) DO UPDATE SET api_key = $3 RETURNING *`,
-    [userId, service, key]
+    `INSERT INTO api_keys (user_id, service, api_key, key_prefix) VALUES ($1, $2, $3, $4)
+     ON CONFLICT (user_id, service) DO UPDATE SET api_key = $3, key_prefix = $4 RETURNING id, service, key_prefix, created_at`,
+    [userId, service, ciphertext, prefix]
   );
   return rows[0];
 };
 
+// Returns safe-to-expose fields only (no ciphertext). Use getDecryptedApiKey
+// for internal callers that need to sign outbound requests.
 db.getApiKeys = async (userId) => {
-  const { rows } = await pool.query('SELECT * FROM api_keys WHERE user_id = $1', [userId]);
+  const { rows } = await pool.query(
+    'SELECT id, service, key_prefix, created_at FROM api_keys WHERE user_id = $1',
+    [userId]
+  );
   return rows;
+};
+
+db.getDecryptedApiKey = async (userId, service) => {
+  const { rows } = await pool.query(
+    'SELECT api_key FROM api_keys WHERE user_id = $1 AND service = $2',
+    [userId, service]
+  );
+  if (!rows[0]) return null;
+  const blob = rows[0].api_key;
+  if (!isEncrypted(blob)) return blob;
+  return decryptSecret(blob);
 };
 
 db.deleteApiKey = async (id, userId) => {

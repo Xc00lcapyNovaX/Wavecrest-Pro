@@ -11,9 +11,11 @@ if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
   process.exit(1);
 }
 
+const connStr = process.env.DATABASE_URL || 'postgresql://localhost:5432/wavecrest';
+const needsSsl = process.env.NODE_ENV === 'production' || /sslmode=require|neon\.tech/.test(connStr);
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/wavecrest',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionString: connStr,
+  ssl: needsSsl ? { rejectUnauthorized: false } : false,
 });
 
 const schema = `
@@ -65,6 +67,11 @@ CREATE TABLE IF NOT EXISTS api_keys (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, service)
 );
+
+DO $$ BEGIN
+  ALTER TABLE api_keys ADD COLUMN key_prefix VARCHAR(12);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS usage_log (
   id        SERIAL PRIMARY KEY,

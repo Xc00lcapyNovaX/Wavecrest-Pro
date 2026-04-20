@@ -460,7 +460,11 @@ router.get('/dates', requireAuth, async (req, res) => {
 router.post('/seed', async (req, res) => {
   const secret = process.env.SEED_SECRET;
   const provided = req.headers['x-seed-secret'] || req.body?.secret;
-  if (secret && provided !== secret) {
+  if (!secret) {
+    console.error('[Seed webhook] SEED_SECRET not configured — refusing to seed.');
+    return res.status(503).json({ error: 'Seed endpoint not configured.' });
+  }
+  if (provided !== secret) {
     return res.status(401).json({ error: 'Unauthorized.' });
   }
   try {
