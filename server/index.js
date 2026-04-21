@@ -24,6 +24,7 @@ const passport     = require('passport');
 
 const { gatekeeper, requireTier, exposeTierHeader } = require('./middleware/gatekeeper');
 const { requireAuth } = require('./middleware/requireAuth');
+const correlationId = require('./middleware/correlationId');
 
 const app    = express();
 const PORT   = process.env.PORT || 3000;
@@ -110,6 +111,9 @@ app.use(exposeTierHeader);
 // ── Passport (OAuth) ──────────────────────────────────
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ── Correlation ID ────────────────────────────────────
+app.use(correlationId);
 
 // ── API routes ────────────────────────────────────────
 const authRouter   = require('./routes/auth');
@@ -209,8 +213,9 @@ app.use((req, res) => {
 
 // ── Global error handler ──────────────────────────────
 app.use((err, req, res, _next) => {
-  console.error('[Error]', err.stack || err.message);
-  res.status(500).json({ error: 'Internal server error' });
+  const id = req.correlationId || 'unknown';
+  console.error(`[Error] [${id}]`, err.stack || err.message);
+  res.status(500).json({ error: 'Internal server error', request_id: id });
 });
 
 // ── Startup: seed trends + warm cache ─────────────────

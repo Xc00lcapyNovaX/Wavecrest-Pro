@@ -30,6 +30,20 @@ async function requireApiKey(req, res, next) {
     });
   }
 
+  const { allowed, remaining, used } = await db.checkRateLimit(user.id, user.plan);
+  res.set('X-RateLimit-Limit',     limit === -1 ? 'unlimited' : String(limit));
+  res.set('X-RateLimit-Remaining', String(remaining));
+
+  if (!allowed) {
+    return res.status(429).json({
+      error: 'Daily API rate limit exceeded.',
+      plan: user.plan,
+      limit,
+      used,
+      upgrade_url: 'https://wavecrest.pro/checkout?plan=pro',
+    });
+  }
+
   req.apiUser = user;
   req.apiLimit = limit;
   next();
@@ -41,7 +55,7 @@ router.get('/trends', requireApiKey, async (req, res) => {
     const { date, platform, score, limit = '30', offset = '0' } = req.query;
     const today = new Date().toISOString().slice(0, 10);
     const parsedLimit = Math.max(1, Math.min(parseInt(limit, 10) || 30, 100));
-    const parsedOffset = Math.max(0, parseInt(offset, 10) || 0);
+    const parsedOffset = Math.max(0, Math.min(parseInt(offset, 10) || 0, 10000));
 
     let result = await db.getTrends({
       date: date || today,
@@ -79,7 +93,8 @@ router.get('/trends', requireApiKey, async (req, res) => {
 router.get('/trends/search', requireApiKey, async (req, res) => {
   try {
     const { q, platform, limit = '20' } = req.query;
-    if (!q || q.trim().length < 2) return res.status(400).json({ error: 'Query must be at least 2 characters.' });
+    if (!q || q.trim().length < 2)  return res.status(400).json({ error: 'Query must be at least 2 characters.' });
+    if (q.trim().length > 200)       return res.status(400).json({ error: 'Query too long (max 200 characters).' });
     if (!['pro', 'max', 'teams', 'enterprise'].includes(req.apiUser.plan)) {
       return res.status(403).json({ error: 'Search requires Pro plan or higher.' });
     }

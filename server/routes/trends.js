@@ -7,12 +7,22 @@ const fs = require('fs');
 const db = require('../db');
 const { requireAuth } = require('../middleware/requireAuth');
 const rateLimiter = require('../middleware/rateLimiter');
+const makeRateLimit = require('../middleware/inMemoryRateLimit');
+const { assertPlatform, assertScore, assertDate } = require('../middleware/validate');
 const router = express.Router();
+
+const datesRateLimit = makeRateLimit({ max: 60, windowMs: 60 * 1000, message: 'Too many requests. Slow down.' });
 
 // ── GET /api/trends — list today's trends ──────────
 router.get('/', requireAuth, rateLimiter, async (req, res) => {
   try {
     const { date, platform, score, limit = '30', offset = '0' } = req.query;
+    const platformErr = assertPlatform(platform);
+    const scoreErr    = assertScore(score);
+    const dateErr     = assertDate(date);
+    if (platformErr) return res.status(400).json({ error: platformErr });
+    if (scoreErr)    return res.status(400).json({ error: scoreErr });
+    if (dateErr)     return res.status(400).json({ error: dateErr });
     const targetDate = date || new Date().toISOString().slice(0, 10);
     const parsedLimit = Math.max(1, Math.min(parseInt(limit, 10) || 30, 100));
     const parsedOffset = Math.max(0, parseInt(offset, 10) || 0);
@@ -437,7 +447,7 @@ Output 5 lines of JSON only.`,
 });
 
 // ── GET /api/trends/dates — all dates that have trend data (with score breakdown) ──
-router.get('/dates', requireAuth, async (req, res) => {
+router.get('/dates', requireAuth, datesRateLimit, async (req, res) => {
   try {
     const { rows } = await db.pool.query(`
       SELECT
@@ -483,8 +493,17 @@ async function seedTrendsFromFile() {
   try {
     const data = JSON.parse(fs.readFileSync(trendsPath, 'utf-8'));
     if (data && data.trends && data.trends.length) {
-      await db.addTrends(data.trends, data.date);
-      console.log(`  ✓ Seeded ${data.trends.length} trends from trends.json (${data.date})`);
+      const VALID_SEED_SCORES = ['hot', 'rising', 'warm', 'cold'];
+      const validTrends = data.trends.filter(t => {
+        const ok = t && typeof t.topic === 'string' && t.topic.trim().length > 0 && VALID_SEED_SCORES.includes(t.score);
+        if (!ok) console.warn('[Seed] Skipping malformed trend entry:', JSON.stringify(t));
+        return ok;
+      });
+      if (validTrends.length !== data.trends.length) {
+        console.warn(`[Seed] Filtered ${data.trends.length - validTrends.length} malformed trend(s).`);
+      }
+      await db.addTrends(validTrends, data.date);
+      console.log(`  ✓ Seeded ${validTrends.length} trends from trends.json (${data.date})`);
     }
   } catch (err) {
     console.log('  ⚠ No trends.json found — run update-trends.py to generate');

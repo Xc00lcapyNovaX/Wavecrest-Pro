@@ -22,6 +22,27 @@ const PLANS = {
   enterprise: { name: 'Enterprise', price: null,   stripe_price: null },
 };
 
+// In-memory dedup: Stripe retries up to 3 days; keep IDs for 25 hours.
+const processedEvents = new Map();
+const EVENT_TTL_MS    = 25 * 60 * 60 * 1000;
+
+function isEventProcessed(eventId) {
+  const ts = processedEvents.get(eventId);
+  if (!ts) return false;
+  if (Date.now() - ts > EVENT_TTL_MS) { processedEvents.delete(eventId); return false; }
+  return true;
+}
+
+function markEventProcessed(eventId) {
+  processedEvents.set(eventId, Date.now());
+  if (processedEvents.size > 5000) {
+    const cutoff = Date.now() - EVENT_TTL_MS;
+    for (const [id, ts] of processedEvents) {
+      if (ts < cutoff) processedEvents.delete(id);
+    }
+  }
+}
+
 // ── POST /api/stripe/create-checkout — start a subscription ──
 router.post('/create-checkout', requireAuth, async (req, res) => {
   try {
@@ -126,6 +147,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     return res.json({ received: true });
   }
 
+  if (process.env.NODE_ENV === 'production' && !process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET not set in production.');
+    return res.status(500).json({ error: 'Webhook secret not configured.' });
+  }
+
   let event;
   try {
     const sig = req.headers['stripe-signature'];
@@ -134,6 +160,12 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     console.error('[Stripe Webhook] Signature verification failed:', err.message);
     return res.status(400).json({ error: 'Webhook signature verification failed.' });
   }
+
+  if (isEventProcessed(event.id)) {
+    console.log(`[Stripe Webhook] Duplicate event ${event.id} — skipping.`);
+    return res.json({ received: true });
+  }
+  markEventProcessed(event.id);
 
   try {
     switch (event.type) {
