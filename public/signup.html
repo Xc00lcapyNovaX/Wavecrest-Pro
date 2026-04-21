@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/favicon.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" href="/favicon.png" />
 <title>Sign Up — Wavecrest Pro</title>
 <link rel="preload" href="/css/glass.css" as="style">
-  <link rel="stylesheet" href="/css/glass.css">
+<link rel="stylesheet" href="/css/glass.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#000;--surface:#1d1d1f;--card-border:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#86868b;--blue:#0071e3}
@@ -27,37 +28,44 @@
   .form-group label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
   .form-group input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.04);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
   .form-group input:focus{border-color:var(--blue)}
-  .btn-primary{width:100%;padding:16px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s}
-  .btn-primary:hover{opacity:.85}
+  .btn-primary{width:100%;padding:16px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .15s}
+  .btn-primary:hover:not(:disabled){opacity:.85}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
   .footer-link{text-align:center;margin-top:24px;color:var(--muted);font-size:.9rem}
   .footer-link a{color:var(--blue);text-decoration:none}
   .footer-link a:hover{text-decoration:underline}
   .error-msg{background:rgba(255,69,58,.12);color:#ff453a;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
   .success-msg{background:rgba(48,209,88,.12);color:#30d158;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
+  .pw-meter{margin-top:6px;display:flex;gap:4px}
+  .pw-bar{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .25s}
+  .pw-bar.weak{background:#ff453a}
+  .pw-bar.medium{background:#ff9f0a}
+  .pw-bar.strong{background:#30d158}
+  .pw-label{font-size:.72rem;color:var(--muted);margin-top:4px;min-height:1em;transition:color .25s}
 </style>
 </head>
 <body class="ambient-mesh">
 
-<a href="/" class="logo">Wavecrest <span>Pro</span></a>
+<a href="/" class="logo" aria-label="Wavecrest Pro home">Wavecrest <span>Pro</span></a>
 
 <div class="card glass-strong">
   <h1>Create your account</h1>
   <p class="subtitle">Start predicting trends for free</p>
 
-  <div id="error" class="error-msg"></div>
-  <div id="success" class="success-msg"></div>
+  <div id="error" class="error-msg" role="alert"></div>
+  <div id="success" class="success-msg" role="status"></div>
 
   <div class="oauth-buttons">
-    <button class="oauth-btn" onclick="oauthSignup('google')">
-      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    <button class="oauth-btn" onclick="oauthSignup('google')" aria-label="Sign up with Google">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Sign up with Google
     </button>
-    <button class="oauth-btn" onclick="oauthSignup('apple')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-2.11 4.45-3.74 4.25z"/></svg>
+    <button class="oauth-btn" onclick="oauthSignup('apple')" aria-label="Sign up with Apple">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-2.11 4.45-3.74 4.25z"/></svg>
       Sign up with Apple
     </button>
-    <button class="oauth-btn" onclick="oauthSignup('github')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    <button class="oauth-btn" onclick="oauthSignup('github')" aria-label="Sign up with GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
       Sign up with GitHub
     </button>
   </div>
@@ -66,18 +74,24 @@
 
   <form onsubmit="emailSignup(event)">
     <div class="form-group">
-      <label>Name</label>
-      <input type="text" id="name" placeholder="Your name" autocomplete="name">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Your name" autocomplete="name" aria-label="Your name">
     </div>
     <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" aria-label="Email address">
     </div>
     <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password" aria-label="Password" aria-describedby="pw-label" oninput="updateStrength(this.value)">
+      <div class="pw-meter" aria-hidden="true">
+        <div class="pw-bar" id="pw-bar-1"></div>
+        <div class="pw-bar" id="pw-bar-2"></div>
+        <div class="pw-bar" id="pw-bar-3"></div>
+      </div>
+      <div class="pw-label" id="pw-label" aria-live="polite"></div>
     </div>
-    <button type="submit" class="btn-primary">Create Account</button>
+    <button type="submit" id="submitBtn" class="btn-primary" aria-label="Create account">Create Account</button>
   </form>
 
   <p class="footer-link">Already have an account? <a href="/signin">Sign in</a></p>
@@ -86,12 +100,30 @@
 <script>
 const API = window.location.origin;
 
+function updateStrength(val) {
+  const bars = [1,2,3].map(i => document.getElementById('pw-bar-' + i));
+  const label = document.getElementById('pw-label');
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10 && /[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (val.length >= 12 && /[^A-Za-z0-9]/.test(val)) score++;
+  const levels = ['', 'weak', 'medium', 'strong'];
+  const labelText = ['', 'Weak', 'Medium', 'Strong'];
+  bars.forEach((b, i) => { b.className = 'pw-bar' + (i < score ? ' ' + levels[score] : ''); });
+  label.textContent = val.length ? labelText[score] || 'Weak' : '';
+  label.style.color = score === 1 ? '#ff453a' : score === 2 ? '#ff9f0a' : score === 3 ? '#30d158' : 'var(--muted)';
+}
+
 async function emailSignup(e) {
   e.preventDefault();
   hideMessages();
+  const btn = document.getElementById('submitBtn');
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
 
   try {
     const res = await fetch(API + '/api/auth/signup', {
@@ -101,17 +133,23 @@ async function emailSignup(e) {
       body: JSON.stringify({ name, email, password, ref: new URLSearchParams(window.location.search).get('ref') || undefined }),
     });
     const data = await res.json();
-    if (!res.ok) return showError(data.error);
+    if (!res.ok) {
+      showError(data.error);
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+      return;
+    }
     showSuccess('Account created! Check your email to verify your address. Redirecting...');
-    setTimeout(() => window.location.href = '/dashboard';, 1500);
+    setTimeout(() => window.location.href = '/dashboard', 1500);
   } catch (err) {
     showError('Network error. Is the server running?');
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
   }
 }
 
 function oauthSignup(provider) {
   hideMessages();
-  // Preserve ref param across OAuth round-trip via state or just redirect
   window.location.href = `/api/auth/${provider}`;
 }
 

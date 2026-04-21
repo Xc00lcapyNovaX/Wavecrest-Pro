@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" href="/favicon.png" />
   <title>Wavecrest Pro — Enterprise</title>
   <link rel="preload" href="/css/glass.css" as="style">
   <link rel="stylesheet" href="/css/glass.css">
@@ -276,10 +277,6 @@
       .logo-row{gap:28px}
     }
   
-/* Wave text hover — buttons only */
-.char{display:inline-block}
-.wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
-@keyframes wave-bounce{0%{transform:translateY(0)}30%{transform:translateY(-10px)}60%{transform:translateY(2px)}100%{transform:translateY(0)}}
 
   </style>
 </head>
@@ -465,38 +462,6 @@
 
 </div>
 
-
-<script>
-function initWaveText(){
-  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
-  document.querySelectorAll(sel).forEach(function(el){
-    if(el.classList.contains("wave-ready"))return;
-    el.classList.add("wave-ready");el.classList.add("wave-hover");
-    var orig=el.innerHTML;
-    el.addEventListener("mouseenter",function(){
-      var nodes=Array.from(el.childNodes),h="";
-      nodes.forEach(function(node){
-        if(node.nodeType===3){
-          node.textContent.split("").forEach(function(c,i){
-            h+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
-          });
-        }else{
-          var cl=node.cloneNode(true);
-          if(cl.textContent&&cl.nodeType===1){
-            var inner="";cl.textContent.split("").forEach(function(c,i){
-              inner+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
-            });cl.innerHTML=inner;
-          }
-          h+=cl.outerHTML||cl.textContent;
-        }
-      });
-      el.innerHTML=h;
-    });
-    el.addEventListener("mouseleave",function(){el.innerHTML=orig;});
-  });
-}
-initWaveText();
-</script>
 
 </body>
 </html>

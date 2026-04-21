@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" href="/favicon.png" />
   <title>Wavecrest Pro — Pro Plan</title>
   <link rel="preload" href="/css/glass.css" as="style">
   <link rel="stylesheet" href="/css/glass.css">
@@ -104,7 +105,7 @@
     .form-group input::placeholder{color:rgba(255,255,255,.18)}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .btn-pay{width:100%;height:52px;padding:0 18px;border:none;border-radius:12px;font-size:.95rem;font-weight:600;letter-spacing:-.005em;cursor:pointer;font-family:inherit;background:var(--blue);color:#fff;transition:background-color .2s}
-    .btn-pay:hover{background:var(--blue-hover)}
+    .btn-pay:hover{opacity:.85;background:var(--blue-hover)}
     .secure-note{text-align:center;margin-top:14px;font-size:.75rem;color:var(--muted);letter-spacing:.01em}
     .oauth-divider{display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:var(--muted);font-size:.72rem;letter-spacing:.02em;text-transform:uppercase}
     .oauth-divider::before,.oauth-divider::after{content:'';flex:1;height:1px;background:var(--card-border)}
@@ -128,10 +129,6 @@
       .limits,.preview,.features,.checkout-area{padding:60px 0 70px}
     }
   
-/* Wave text hover — buttons only */
-.char{display:inline-block}
-.wave-hover:hover .char{animation:wave-bounce .45s ease forwards}
-@keyframes wave-bounce{0%{transform:translateY(0)}30%{transform:translateY(-10px)}60%{transform:translateY(2px)}100%{transform:translateY(0)}}
 
   </style>
 </head>
@@ -241,15 +238,15 @@
         <h2 class="form-heading">Join the Beta</h2>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" placeholder="you@example.com" autocomplete="email">
+          <input type="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
         </div>
         <div class="form-group">
           <label>Your name (optional)</label>
-          <input type="text" id="betaName" placeholder="What should we call you?" autocomplete="name">
+          <input type="text" id="betaName" placeholder="What should we call you?" autocomplete="name" aria-label="Your name">
         </div>
         <div class="form-group">
           <label>Your niche (optional)</label>
-          <input type="text" id="betaNiche" placeholder="e.g. fitness, cooking, tech reviews">
+          <input type="text" id="betaNiche" placeholder="e.g. fitness, cooking, tech reviews" aria-label="Your content niche">
         </div>
         <div class="form-group">
           <label>Primary platform (optional)</label>
@@ -260,7 +257,7 @@
             <option value="instagram">Instagram</option>
           </select>
         </div>
-        <button class="btn-pay">Get Free Beta Access</button>
+        <button class="btn-pay" aria-label="Get beta access">Get Free Beta Access</button>
         <div class="oauth-divider">or continue with</div>
         <div class="oauth-row">
           <a class="oauth-btn" href="/api/auth/google">Google</a>
@@ -281,39 +278,6 @@
   <p style="text-align:center;padding:24px 0 40px;color:#86868b;font-size:.9rem">Already have an account? <a href="signin.html" style="color:#0071e3;text-decoration:none;font-weight:500">Sign in →</a></p>
 
 </div>
-
-<script>
-function initWaveText(){
-  var sel="a.btn-primary,a.btn-outline,a.btn-card,a.cta-sm,button.btn-pay,a.btn-pay";
-  document.querySelectorAll(sel).forEach(function(el){
-    if(el.classList.contains("wave-ready"))return;
-    el.classList.add("wave-ready");el.classList.add("wave-hover");
-    var orig=el.innerHTML;
-    el.addEventListener("mouseenter",function(){
-      var nodes=Array.from(el.childNodes),h="";
-      nodes.forEach(function(node){
-        if(node.nodeType===3){
-          node.textContent.split("").forEach(function(c,i){
-            h+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
-          });
-        }else{
-          var cl=node.cloneNode(true);
-          if(cl.textContent&&cl.nodeType===1){
-            var inner="";cl.textContent.split("").forEach(function(c,i){
-              inner+=c===" "?" ":"<span class='char' style='animation-delay:"+i*0.03+"s'>"+c+"</span>";
-            });cl.innerHTML=inner;
-          }
-          h+=cl.outerHTML||cl.textContent;
-        }
-      });
-      el.innerHTML=h;
-    });
-    el.addEventListener("mouseleave",function(){el.innerHTML=orig;});
-  });
-}
-initWaveText();
-</script>
-
 
 <script>
 // ── Trend pool ──
