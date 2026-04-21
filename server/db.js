@@ -67,6 +67,14 @@ db.updateUser = async (id, fields) => {
   return rows[0] || null;
 };
 
+db.linkProviderToUser = async (userId, provider, providerId) => {
+  const { rows } = await pool.query(
+    `UPDATE users SET provider = $1, provider_id = $2 WHERE id = $3 RETURNING *`,
+    [provider, providerId, userId]
+  );
+  return rows[0] || null;
+};
+
 // ── Subscriptions ──────────────────────────────────
 db.createSubscription = async ({ userId, plan, stripeSubId, status = 'active', trialEnd, periodEnd }) => {
   const sessionId = stripeSubId || `mock_sub_${Date.now()}`;

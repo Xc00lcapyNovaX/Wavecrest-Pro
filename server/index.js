@@ -64,7 +64,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ── Signed cookie parser (must run before gatekeeper & session) ──
 // Uses ADMIN_SECRET so signed cookies cannot be forged without the secret.
-const COOKIE_SECRET = process.env.ADMIN_SECRET || 'wavecrest-dev-cookie-secret';
+const COOKIE_SECRET = process.env.COOKIE_SECRET || process.env.SESSION_SECRET || 'wavecrest-dev-cookie-secret';
 app.use(cookieParser(COOKIE_SECRET));
 
 // ── Session store (Postgres) ─────────────────────────
@@ -220,7 +220,7 @@ async function onStartup() {
     await db.ensureCacheWarmed();
     console.log(`  ✓ Trend cache warmed (${db.trends.length} trends in memory)`);
   } catch (err) {
-    console.warn('  ⚠ Startup warning:', err.message);
+    console.warn('  ⚠ Startup warning:', err.message || err);
   }
 }
 

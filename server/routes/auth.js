@@ -4,6 +4,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const makeRateLimit = require('../middleware/inMemoryRateLimit');
+const loginRateLimit  = makeRateLimit({ max: 5,  windowMs: 15 * 60 * 1000, message: 'Too many login attempts. Try again in 15 minutes.' });
+const signupRateLimit = makeRateLimit({ max: 1,  windowMs: 60 * 60 * 1000, message: 'Only one sign-up attempt per hour per IP. Try again later.' });
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
@@ -57,7 +60,8 @@ if (googleConfigured) {
     try {
       const email = profile.emails?.[0]?.value;
       if (!email) return done(new Error('No email from Google'));
-      let user = await db.findUserByEmail(email);
+      let user = await db.findUserByProvider('google', profile.id);
+      if (!user) user = await db.findUserByEmail(email);
       if (!user) {
         user = await db.createUser({
           email,
@@ -66,6 +70,8 @@ if (googleConfigured) {
           providerId: profile.id,
           avatarUrl: profile.photos?.[0]?.value,
         });
+      } else if (user.provider_id !== profile.id) {
+        await db.linkProviderToUser(user.id, 'google', profile.id);
       }
       done(null, user);
     } catch (err) {
@@ -84,7 +90,8 @@ if (githubConfigured) {
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails?.[0]?.value || `${profile.username}@github.local`;
-      let user = await db.findUserByEmail(email);
+      let user = await db.findUserByProvider('github', String(profile.id));
+      if (!user) user = await db.findUserByEmail(email);
       if (!user) {
         user = await db.createUser({
           email,
@@ -93,6 +100,8 @@ if (githubConfigured) {
           providerId: String(profile.id),
           avatarUrl: profile.photos?.[0]?.value,
         });
+      } else if (user.provider_id !== String(profile.id)) {
+        await db.linkProviderToUser(user.id, 'github', String(profile.id));
       }
       done(null, user);
     } catch (err) {
@@ -153,7 +162,7 @@ passport.deserializeUser(async (id, done) => {
   catch (err) { done(err); }
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', signupRateLimit, async (req, res) => {
   try {
     const { email, password, name } = req.body;
     if (!email || !password) {
@@ -199,7 +208,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -540,7 +549,7 @@ router.get('/unsubscribe', async (req, res) => {
     await db.setDigestEnabled(user.id, false);
     return res.redirect('/dashboard?unsubscribed=1');
   } catch (err) {
-    console.error('[Auth] Unsubscribe error:', err.message);
+    console.error('[Auth] Unsubscribe error:', err.message || err);
     res.redirect('/dashboard?error=unsubscribe_failed');
   }
 });

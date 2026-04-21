@@ -122,7 +122,7 @@ router.post('/submit', async (req, res) => {
 
 // ── GET /api/feedback — admin only ────────────────────
 router.get('/', async (req, res) => {
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  const secret = req.headers['x-admin-secret'];
   if (!secret || secret !== process.env.ADMIN_SECRET) {
     return res.status(403).json({ error: 'Forbidden.' });
   }

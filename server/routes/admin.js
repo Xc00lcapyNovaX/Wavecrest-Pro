@@ -9,9 +9,19 @@ const router = express.Router();
 
 function requireAdmin(req, res, next) {
   const secret = process.env.ADMIN_SECRET;
-  if (!secret) return res.status(503).json({ error: 'Admin access not configured. Set ADMIN_SECRET env var.' });
-  const provided = req.headers['x-admin-secret'] || req.query.secret;
-  if (provided !== secret) return res.status(401).json({ error: 'Unauthorized.' });
+  const ip     = req.ip || req.connection?.remoteAddress || 'unknown';
+  const route  = `${req.method} ${req.path}`;
+
+  if (!secret) {
+    console.warn(`[Admin] ${route} from ${ip} — ADMIN_SECRET not configured`);
+    return res.status(503).json({ error: 'Admin access not configured. Set ADMIN_SECRET env var.' });
+  }
+  const provided = req.headers['x-admin-secret'];
+  if (provided !== secret) {
+    console.warn(`[Admin] Unauthorized attempt: ${route} from ${ip}`);
+    return res.status(401).json({ error: 'Unauthorized.' });
+  }
+  console.log(`[Admin] Access granted: ${route} from ${ip}`);
   next();
 }
 
