@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 
 // ── Signed cookie parser (must run before gatekeeper & session) ──
-// Uses ADMIN_SECRET so signed cookies cannot be forged without the secret.
+// Uses COOKIE_SECRET (falls back to SESSION_SECRET) so signed cookies cannot be forged.
 const COOKIE_SECRET = process.env.COOKIE_SECRET || process.env.SESSION_SECRET || 'wavecrest-dev-cookie-secret';
 app.use(cookieParser(COOKIE_SECRET));
 
