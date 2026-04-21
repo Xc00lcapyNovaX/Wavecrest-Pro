@@ -1,15 +1,60 @@
 {
-  "date": "2026-04-20",
-  "updated_at": "2026-04-20T07:53:24.606435+00:00",
-  "count": 184,
+  "date": "2026-04-21",
+  "updated_at": "2026-04-21T07:24:03.257382+00:00",
+  "count": 270,
   "sources": {
-    "youtube_api": 159,
-    "google_trends": 10,
-    "youtube_rss": 15
+    "youtube_api": 158,
+    "google_trends": 39,
+    "youtube_rss": 73
   },
   "trends": [
     {
-      "topic": "▶️ Axel Merryl \"je t'attendrai\" Feat Santrinos Raphael (CLIP OFFICIEL)",
+      "topic": "▶️ CORTIS (코르티스) 'REDRED' Official MV",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Practical Magic 2",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Five",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Rocío Dúrcal - Como Tu Mujer",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ SUPER TROOPERS 3",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Boston Bruins at Buffalo Sabres",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Todos nos Shipean",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ We Connected The Dots After Seeing the DOOMSDAY TRAILER",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Deadline: White House",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Harry Styles - Harry Live from Funkhaus",
       "score": "hot",
       "platform": "youtube"
     },
@@ -19,92 +64,267 @@
       "platform": "youtube"
     },
     {
+      "topic": "▶️ Atlanta Braves at Philadelphia Phillies",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Lil Twist, Lil Wayne - Addict",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Boys Season 5 Episode 4 Trailer",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ This Drain Clearing Game is INCREDIBLY Satisfying",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Practical Magic 2 - Official Teaser Trailer - Warner Bros. UK & Ireland",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
       "topic": "▶️ RBC Heritage, Final Round",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Vicente Fernández - Hermoso Cariño (Letra)",
+      "topic": "▶️ Queen Naija - Ring",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Anime “Dragon Ball Super: Beerus” | SUPER GEKITOU Trailer",
+      "topic": "▶️ The Lead With Jake Tapper",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Big Weekend Show",
+      "topic": "▶️ Saii Kay - Maris Talaigu",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Louis BPM , Hades 66 ,JC reyes,Junior Caldera,Hanzel La H, Prieto Gang - Esto Es Así (Remix Oficial)",
+      "topic": "▶️ The Boys Season 5 Episode 4 Trailer: Homelander Master Plan",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ AVENGERS DOOMSDAY TRAILER: Doctor Doom & X-Men Breakdown",
+      "topic": "▶️ Montreal Canadiens at Tampa Bay Lightning",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ WWE WrestleMania 42: Sunday",
+      "topic": "▶️ Los Dos De Tamaulipas - Sola",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ DRAGON BALL XENOVERS 3 OFFICIAL REVEAL TRAILER REACTION!!",
+      "topic": "▶️ The Caribbean Tour 🏝️",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ CNN Newsroom",
+      "topic": "▶️ monday fun day",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Saii Kay - Maris Talaigu (Audio)",
+      "topic": "▶️ Rob49 - Do It",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Avengers Doomsday Trailer Debrief & CinemaCon Recap | Sneak Peek",
+      "topic": "▶️ Anime “Dragon Ball Super: Beerus",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ We Created An Abomination… (Horsey Game Part 2)",
+      "topic": "▶️ This Might Be Illegal…",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ I've Mastered The Art Of Horsey Game",
+      "topic": "▶️ Toto - Africa",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ National Treasure",
+      "topic": "▶️ Warhammer 40,000: Dawn of War 4 - Official Adeptus Mechanicus CGI Trailer",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ LIV Golf Mexico City: Round 4",
+      "topic": "▶️ Louis BPM , Hades 66 ,JC reyes,Junior Caldera,Hanzel La H, Prieto Gang -…",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ GTA5 - Murder Maze, But It's Disorganized As F****",
+      "topic": "▶️ PRACTICAL MAGIC 2 Official Trailer (2026) Sandra Bullock, Nicole Kidman",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Wiggly Finger Catalyst",
+      "topic": "▶️ The Rothman Disintegration",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Heart of Laurel",
+      "topic": "▶️ Exclusive Avengers Doomsday Trailer Recap",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Tomodachi Life: Living the Dream is Hilariously Inappropriate",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ FINGERED",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Cutting Grass for $4,893,671 in Roblox",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Mega Floette May Be the Best New Mega Evolution",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Pranked My Friends to Become RICH in Minecraft",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ THE BEST ANOMALY GAME IVE EVER PLAYED",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ And the Winner Is",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Squawk on the Street",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I went to Japan... again",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Herd With Colin Cowherd",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Crystal Palace vs. West Ham United",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I had to UP MY SWITCH AT SCHOOL in GTA 5 RP",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Why Lui Calibre is the Best GTA 5 Player",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ A Stalker Followed Us HOME at 3AM",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ GTA5 - Murder Maze, But It's Disorganized As F",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ 27 Minutes of SMii7Y Out of Context",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Made Everything in Rivals FREE",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Everything WRONG With The Guns In Highguard",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ This game f***ed me up",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The All-Time Atlanta Falcons Theme Team",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Jynxzi Vs The BEST GeoGuessr Player Ever",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ WATCHING SHORTS UNTIL I LAUGH",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Can I Win A World Series Using Only Packs",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Rebuilt The Miami Heat in NBA 2K26",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Drunk Co-Op Games Will Ruin Your Friendships",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Skittles vs Sour Patch Kids 20-0 Challenge",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Stackswopo Funny Moments #66",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ My New Staff Hate Me! Video Store Simulator PT2",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ MAX REACTS: Dragon Ball FighterZ - SS4 Daima Goku",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ It's an auspicious day",
       "score": "hot",
       "platform": "youtube"
     },
@@ -114,67 +334,72 @@
       "platform": "youtube"
     },
     {
-      "topic": "▶️ DRAGON BALL　GAMES BATTLE HOUR2026　DAY2",
+      "topic": "▶️ We Broke ALL 1,000 BONES in GTA 5 RP",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Everton vs. Liverpool",
+      "topic": "▶️ Escape From MR. MIX in ROBLOX",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Star Wars: The Force Awakens",
+      "topic": "▶️ ROBLOX KARAOKE WITH MY FAMILY",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Dirty Dancing",
+      "topic": "▶️ We Banned Randomized Starters in Pokemon Champions, Then We Fight",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ First Blood",
+      "topic": "▶️ I SPECTATED THE #1 WHITE FOX IN MARVEL RIVALS",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Philadelphia 76ers at Boston Celtics",
+      "topic": "▶️ Aphmau's FAMILY Chooses YOU",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Brawl Talk: 3 NEW Brawlers!",
+      "topic": "▶️ I Love Randomized Mario Speedruns",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Young Vacationers Buy and Renovate a Beach Home on Oak Island",
+      "topic": "▶️ POSSESSED on ONE BLOCK in Minecraft",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Pirates of the Caribbean: At World's End",
+      "topic": "▶️ Minecraft, But Every Block I Place Copies Everywhere",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Dazed and Confused",
+      "topic": "▶️ Tasmanian Tomodachi Tahini Devil",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Mega Feraligatr is a Menace",
+      "topic": "▶️ DAY 1 - SILVER I. GOLD TOMORROW",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Aphmau's FAMILY Chooses YOU!",
+      "topic": "▶️ This Game is ACTUALLY the Most Satisfying Experience Ever",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ A Greek Recipe for Romance",
+      "topic": "▶️ ROBLOX DING DONG DITCH FOR BRAINROTS",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ ROBLOX LAUNCH YOURSELF FOR BRAINROTS",
       "score": "hot",
       "platform": "youtube"
     },
@@ -184,227 +409,167 @@
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Kitchen's Family Vacation",
+      "topic": "▶️ Surviving 99 Days on ONE BLOCK in Roblox",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ THIS RAGE BAIT GAME WAS DESIGNED TO MAKE YOU QUESTION YOUR IQ(not mine tho) | Level Devil",
+      "topic": "▶️ Damian 1v1 vs EVERY Brawler",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Fix-Up",
+      "topic": "▶️ Olivia Rodrigo - drop dead",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Get FAT and SPLASH in Roblox",
+      "topic": "▶️ KATSEYE (캣츠아이) \"PINKY UP\" Official MV",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ XENOVERSE 3 IS REAL! Dragon Ball Xenoverse 3 REVEALED (REACTION)",
+      "topic": "▶️ Laufey - Madwoman",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ OpTic TEXAS vs C9 NEW YORK!! SCUMP WATCH PARTY - CDL MAJOR 3 QUALIFIERS WEEK 1",
+      "topic": "▶️ Allstar JR - Mob Untied",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ In the Kitchen With David",
+      "topic": "▶️ Los Gemelos De Sinaloa, Clave Especial, Fuerza Regida - FERRARI",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Georgia Tech at North Carolina",
+      "topic": "▶️ TEDDY AFRO - Das Tal",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Chasing Ghosts",
+      "topic": "▶️ YoungBoy Never Broke Again - Bruce Wayne [Official Video",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Proposal",
+      "topic": "▶️ Sabrina Carpenter - House Tour",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ TREES HATE YOU...",
+      "topic": "▶️ Gucci Mane - Crash Dummy [Official Audio",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Los Angeles Kings at Colorado Avalanche",
+      "topic": "▶️ Yungeen Ace - Dead Man Walking",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ I Break Game Of Thrones In CK3 with 𝘿𝙀𝙑𝙀𝙇𝙊𝙋𝙀𝙍 𝘼𝙋𝙋𝙍𝙊𝙑𝙀𝘿 𝙈𝙀𝘾𝙃𝘼𝙉𝙄𝘾𝙎",
+      "topic": "▶️ Ella Langley - Choosin' Texas",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ IEM Rio 2026 - Day 6",
+      "topic": "▶️ TEDDY AFRO - Sememene",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ 10 Seconds vs 1 Hour AIRPLANE House Build Challenge!",
+      "topic": "▶️ Los Dos De Tamaulipas - Kilos de Morena",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ ROBLOX BECOME A BRAINROT!",
+      "topic": "▶️ Allstar JR - Expensive Wristwatches",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ My Pandas are the most improved in the NBA! - Ep. 3",
+      "topic": "▶️ Oscar Maydon x Fuerza Regida - Tu Boda",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ ROBLOX JUMP TO STEAL LUCKY BLOCKS..",
+      "topic": "▶️ Finesse2Tymes ''2FithyRicky'' - Who Do You Think You Are ''J Prince Jr Diss",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ I BECAME THE WORLD'S BEST STICKMAN | The Henry Stickmin",
+      "topic": "▶️ Hardnard - Butta B [Dir By Kharkee",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ SCRATCH OFF SIMULATOR? | Joe Bartolozzi",
+      "topic": "▶️ Justin Bieber - YUKON",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ 🔴LIVE | RUST | PEANUTS WASTELAND | THE MEETING OF THE GREAT HOUSES | ENEMY TO THE NORTH | #BUNGULATE",
+      "topic": "▶️ Hurricane Wisdom - Enough",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The GREATEST Rust duo that never lived...",
+      "topic": "▶️ TEDDY AFRO - Merema",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Minecraft’s Greatest Video Got a Sequel. It's even better.",
+      "topic": "▶️ BEBESHITO ❌ REY TONY & HELABUSADOR - Sin Pena 😈 (Prod. Dj Honda) [Video by…",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ BLACK OPS 3 CAMO GRINDING is a brand new experience for me",
+      "topic": "▶️ BTS (방탄소년단) 'Hooligan' Official MV",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ ANNOYING ADMIN FOR 32 MINUTES in GTA 5 RP",
+      "topic": "▶️ Fabolous - WYFL Freestyle - Brooklyn Badness",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ 100T vs SEN - VCT Americas Stage 1 - Week 2 Day 3",
+      "topic": "▶️ Moy Bobadilla - Tus Mentiras",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Modern Warfare For 1 Hour Straight (HACKERS EVERYWHERE)",
+      "topic": "▶️ Romeo Santos - Llévame Contigo",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ putting CRUZ in my game.. 💀",
+      "topic": "▶️ Skrilla - Free 40 ft. YoungBoy Never Broke Again",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Choose Your Starter, BUT They Get ANY Move & Ability!",
+      "topic": "▶️ YFG Fatso - Mental [Official Music Video",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Knowing the Unknown | Pokemon Grumplocke [20]",
+      "topic": "▶️ Jay Wheeler - De Lejitos",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ RAGE BAIT GAMES ARE GETTING OUT OF HAND",
+      "topic": "▶️ Speed Made His Day❤️‍🩹 #ishowspeed #wholesome #edit",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ I Completed Plants vs. Zombies 2",
+      "topic": "▶️ pov: your brothers are filming your first date with your (now husband) 😭…",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The NEW 1V1 MODE IS AWESOME",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Dragonball FighterZ NEW DLC is HERE!! | SSJ4 Daima Goku",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Having a COUPLES ONLY Pool Party in Minecraft!",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Brook and Bash Keep THROWING UP, They're Very SICK..(Brookhaven)",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ WATCHING PRO TOKES 🏆 CLIX vs. PETE AT WONKEE IN GRANDS 😬 FREE PC !GIVEAWAY 🔥",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ NEW LR God Vegeta, Sparking Zero Expansion, XV2 FINAL DLC, & Legends REVEAL Reaction!",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Balance Changes, New Buffies & Skins, + ODDITIES SHOP!",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ MOODA GOT BANNED FROM SIEGE (MORE SIEGE DRAMA WITH OHNEPIXEL)",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Dont Look For HOUSE HEAD in Gorilla Tag...",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ I Tried to Become A Famous IRL Streamer… but Got CANCELLED Immediately",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ CDL WATCH PARTY // THE FLANK! // USE CODE ZOOMAA | !theflank // !community !discord",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ YFG Fatso - Mental [Official Music Video]",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ POV: Different Character Arcs…🫥 #theboys #viral #shorts",
+      "topic": "▶️ Bro Is A Lost Cause",
       "score": "hot",
       "platform": "youtube"
     },
@@ -414,433 +579,728 @@
       "platform": "youtube"
     },
     {
+      "topic": "▶️ Key & Peele S04E02",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ POV: Different Character Arcs…🫥 #theboys #viral #shorts",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
       "topic": "▶️ What happened in there? 💀 #usa",
       "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Proof Older Siblings Had it Worse!",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ It Was Going Perfect…",
-      "score": "hot",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ ZOO or OOF",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ The \"Happiest\" Scary Place - Subliminal [Full Game]",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Olivia Rodrigo - drop dead (Official Music Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ KATSEYE (캣츠아이) \"PINKY UP\" Official MV",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Laufey - Madwoman (Official Music Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Allstar JR - Mob Untied",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ TEDDY AFRO  - ዳስ ጣል (አንሳው)  - Das Tal (Ansaw) | Track 1 (Official Lyrics Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Los Gemelos De Sinaloa, Clave Especial, Fuerza Regida - FERRARI (Official)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Sabrina Carpenter - House Tour (Official Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ YoungBoy Never Broke Again - Bruce Wayne [Official Video]",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Gucci Mane - Crash Dummy [Official Audio]",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Ella Langley - Choosin' Texas (Official Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ TEDDY AFRO  - ስምምነን (ጉሬጌ) - Sememene (GuReggae) | Track 5 (Official Lyrics Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Allstar JR - Expensive Wristwatches",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Yungeen Ace - Dead Man Walking (Official Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Finesse2Tymes ''2FithyRicky'' - Who Do You Think You Are ''J Prince Jr Diss''",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ TEDDY AFRO  - መሬማ - Merema | Track 15 (Official Lyrics Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ BTS (방탄소년단) 'Hooligan' Official MV",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Los Dos De Tamaulipas - Kilos de Morena (Visualizer)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Romeo Santos - Llévame Contigo (Letra)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Moy Bobadilla - Tus Mentiras (Letra)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Fabolous - WYFL Freestyle - Brooklyn Badness (Official Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Justin Bieber - YUKON (Live From The 68th Grammy Awards / 2026)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Skrilla - Free 40 ft. YoungBoy Never Broke Again (Visualizer)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Hurricane Wisdom - Enough (Official Music Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Oscar Maydon x Fuerza Regida - Tu Boda (Letra)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ BEBESHITO ❌ REY TONY & HELABUSADOR - Sin Pena 😈 (Prod. Dj Honda) [Video by Yoa N Dany] #Repaton",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Hardnard - Butta B (Official Music Video) [Dir By Kharkee]",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Jay Wheeler - De Lejitos (Official Video)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Don Omar - Ayer La Vi (Audio)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Grupo Frontera, Fuerza Regida - COQUETA (Letra)",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Speed Made His Day❤️‍🩹 #ishowspeed #wholesome #edit",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Bro Is A Lost Cause 💀",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
       "topic": "▶️ This job is just way too much 😮#shorts",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ When Pushing Your Older Brother Completely Backfires",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ money does buy happiness💀 | Studio C (1 millionth skit) Edit",
-      "score": "rising",
+      "topic": "▶️ He Was Solving It Like a Puzzle",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Is this genius or crazy? 💀",
-      "score": "rising",
+      "topic": "▶️ money does buy happiness",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ That Was A Crazy Trick 🔥 | How I Met Your Mother | Song - Heavenly Jumpstyle (Slowed) #edit #shorts",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ She’s Not Driving, Right? 😳",
-      "score": "rising",
+      "topic": "▶️ Gary Owen’s First Class Swap Turns Into the Coolest Mid-Flight Story",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ Chug buzz ball challenge",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The Iceskater Who Grabbed A Flag ⛸️🎌",
-      "score": "rising",
+      "topic": "▶️ She’s Not Driving, Right",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Gary Owen’s First Class Swap Turns Into the Coolest Mid-Flight Story 😂✈️ | Breakfast Club",
-      "score": "rising",
+      "topic": "▶️ Proof Older Siblings Had it Worse",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Is this genius or crazy",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How did this balloon get stuck without a cork? #shorts",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ That Was A Crazy Trick",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Villains aren't born, they are made\" - Chronicle",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Never underestimate anyone #shorts",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Tom Holland Reacts To Viral Videos part 66 #trynottolaugh",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ It Was Going Perfect",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Iceskater Who Grabbed A Flag",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Cleanest Move",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Why Brad Williams has a HOT TUB in his BEDROOM",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Everyone Saw But Didn’t Say Anything But He Refused To Let This Happen…",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ The broom prank never really gets old, long as there's still folks out there",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ POV: You just wanted a drink but the universe chose FOAM.",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ \"The Cleanest Move\" ☠️🔥 | Now You See Me | MONTAGEM ALQUIMIA (slowed) #Trending #Shorts",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ He Was Solving It Like a Puzzle… 👇",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ They All Turned Human… Just Like That😳💀#shorts #movie #film",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Why Brad Williams has a HOT TUB in his BEDROOM😭😭😭",
-      "score": "rising",
+      "topic": "▶️ POV: You just wanted a drink but the universe chose FOAM",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ Superman's Family Deal With Being Famous #shorts",
-      "score": "rising",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Tag (2018) | Disguised as Grandma – Busted in the Mall",
-      "score": "rising",
+      "topic": "▶️ The domino effect in action",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ This father was shocked by her daughter’s choice of water bottle 💦😅",
-      "score": "rising",
+      "topic": "▶️ Try Not To Laugh Challenge Pt.…",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ This Yo-Yo Trick Has Kai Cenat Terrified 😱",
-      "score": "rising",
+      "topic": "▶️ Marlon Randomly Met Actor from OuterBanks In NY",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ BB8 Toy story is SAD 😭 #roblox #relatable #robloxrants",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Try Not To Laugh Challenge Pt. 496😹🤣😂#ifyoulaughyoulose#dontlaughchallenge#ifyoulaughyourgoingtohell",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ This is what happens when you shrink#shorts",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ “The Wall You Never Saw Coming 😳” | Under the Dome | MONTAGEM ALQUIMIA (Slowed) | #trending #shorts",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Salish, Topper, Brent and Lexi choose between Levels and Doritos! #salishmatter",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ POV: Your Bestie Asks To Play With Your Squishy… 🧈🫩",
-      "score": "rising",
-      "platform": "youtube"
-    },
-    {
-      "topic": "🔥 karol g",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 patrick muldoon",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 homes",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 bigbang world tour 2026",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 colombia",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 nz vs ban",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 lyrids meteor shower",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 maluma",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 shakira",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "🔥 crimson desert game",
-      "score": "rising",
-      "platform": "general"
-    },
-    {
-      "topic": "▶️ Simone VS the secret door… @simonegiertz",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ When someone's using you:",
-      "score": "warm",
+      "topic": "▶️ This father was shocked by her daughter’s choice of water bottle",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ They Really Made It Big",
-      "score": "warm",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The GOAT Quaritch said \"drop him\" 😭",
-      "score": "warm",
+      "topic": "▶️ Simone VS the secret door… @simonegiertz",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ He Switched Speed and Mr Beast 🤯",
-      "score": "warm",
+      "topic": "▶️ Salish, Topper, Brent and Lexi choose between Levels and Doritos! #salishmatter",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ He Tapped Back 💔",
-      "score": "warm",
+      "topic": "▶️ BB8 Toy story is SAD 😭 #roblox #relatable #robloxrants",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ This Yo-Yo Trick Has Kai Cenat Terrified",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ This Giant Hid in Plain Sight… and No One Noticed",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ When someone's using you",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ This Is Crazy",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ He Switched Speed and Mr Beast",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Gotta pump those numbers up",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Just roll 🛼… then they showed everybody how it’s done",
+      "score": "hot",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The GOAT Quaritch said \"drop him",
+      "score": "hot",
       "platform": "youtube"
     },
     {
       "topic": "▶️ This Furious Dad Proved You Don't Mess With His Daughter",
-      "score": "warm",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ How Does This Crayon Magic Trick Work 🤔",
-      "score": "warm",
+      "topic": "▶️ Sometimes I have to explain this",
+      "score": "hot",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Sometimes I have to explain this 😂",
-      "score": "warm",
+      "topic": "🔥 prince",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 avis stock",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 violent soho tour tickets",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 elijah blue allman",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 nrl team lists",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 mlb standings",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 personal injury attorneys",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 winning powerball numbers",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 bunbury tornado",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 comanchero motorcycle club",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 prime video",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 motorcycle accident attorney",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 alaska airline",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 quinta brunson",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 gout gout",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 royal navy",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 glasgow weather",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 ed miliband",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 tour de france 2026",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 preston riki",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 connections",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 weather vancouver",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 blue jays game today",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 jackson lacombe",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 ferguson",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 south park",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 law and order",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 greater manchester police",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 louise thompson",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 earth day",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 rio tinto",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 campsie",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 ben hornby",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 ahpra",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 ayo dosunmu",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 donte divincenzo",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 blue jays standings",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 kevin pillar",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "🔥 lukáš dostál",
+      "score": "hot",
+      "platform": "general"
+    },
+    {
+      "topic": "▶️ Last To Leave Grocery Store",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Would You Keep Bargaining This Hard If You Only Had $800? | Married with Children",
-      "score": "warm",
+      "topic": "▶️ Can a Window Stop a Wrecking Ball",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ The domino effect in action 🙀😭",
-      "score": "warm",
+      "topic": "▶️ 1 or Mystery Vial",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Never Do This With Animals (4 Deadly Mistakes)",
-      "score": "warm",
+      "topic": "▶️ 50 Streamers Fight for $1,000,000",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ When John Cena Asked a Kid \"Are You Sure About That?\" 🤔💪",
-      "score": "warm",
+      "topic": "▶️ Evals: Stop guessing, start testing your AI features",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Speed Running Scientology Is Wild",
-      "score": "warm",
+      "topic": "▶️ What's new in Chrome DevTools 145-147",
+      "score": "rising",
       "platform": "youtube"
     },
     {
-      "topic": "▶️ When she's too proud to admit her mistake #marriage #couple #relationships #dating #funny #reels",
-      "score": "warm",
+      "topic": "▶️ Modernizing the Pinterest carousel: 90% less code with native CSS",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Fixed YouTube",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ am I in trouble for this",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Spent 24 Hours Drawing at an Anime Studio",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ QSMP2: Estacion de TREN y AVIONES",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Castillo FINALIZADO al 100% en MINECRAFT",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Mi primera vez en WE GOTTA GO",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Pika-donald's",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Ikea Meatballs",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The IKEA Experience",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Chicago Fishpocalypse",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ What's His Name",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Most Radioactive Place On Earth",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Exposing the flaw in tap to pay",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Can something go faster than it’s pushed",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Why is CERN really making antimatter",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Bizarre Behaviour Of Rotating Bodies",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Secret Spy Tech Inside Every Credit Card",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How American Tanks are being Destroyed in Ukraine",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Tank Engines are Weird",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How NASA Discovered a Military Base under Greenland",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Why America’s Tank Failed in Ukraine",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The ISS would be uninhabitable without this",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Dude where’s my space station",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Tim Cook as executive chairman #Vergecast",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Apple announces new CEO",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Apple CEO Tim Cook steps down",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Humanoid ‘Lightning’ robot smashes the half-marathon record",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How Gen Z feels about AI #Vergecast",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ People don’t like tech CEOs #Vergecast",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ 3 PEENS IN A SPACE POD",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Review Snacks from Thailand",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Girl PULLS Out All Her Hair",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Most Oddly Satisfying Video to Watch Before Sleep",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ TikToks That Are Actually Relatable",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Cool Things You've Probably Never Seen Before",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ 2 Enemies Fall in Love in Video Game",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ TikToks That Will Overstimulate You",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ The Unreleased Rollable Smartphone",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Every Google Phone Ever. Same Picture",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Every Samsung Phone. SAME Photo",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Bluey Phone Review",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ So This is Peak Foldable",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Every iPhone Camera vs LOW Light",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Can I remake those SH*TTY mobile games in 1 HOUR? ...again",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ A.I. Learns To Play HAPPY WHEELS",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Paid 5 Game Developers $1,000 to Make the Same Game",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ I Made the Same Game in 10 Mins vs 1 Hour vs 10 Hours",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Snake But Eating Deletes A Random System 32 File",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Using A.I. to DESTROY Minesweeper",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How Companies Like Walmart And Target Could Get Back Billions In Tariffs Refunds",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ Lowe's bets on kids, creators and Gen Z as Americans delay homebuying",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How Fed Chair Nominee Kevin Warsh Made His Fortune",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How Europe’s Jet Fuel Crisis Threatens Summer Travel Plans",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ How Nvidia Left Gamers Broken Hearted In The Era Of AI",
+      "score": "rising",
+      "platform": "youtube"
+    },
+    {
+      "topic": "▶️ What The U.S. Blockade Of Iranian Ports Means for Iran",
+      "score": "rising",
       "platform": "youtube"
     },
     {
@@ -849,27 +1309,7 @@
       "platform": "youtube"
     },
     {
-      "topic": "▶️ Lost his job but got the last laugh 😂 💯",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Last To Leave Grocery Store, Wins $250,000",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Can a Window Stop a Wrecking Ball?",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
       "topic": "▶️ Don’t Eat The Spicy Yoshi Egg",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ What are evals and how they help test AI features",
       "score": "warm",
       "platform": "youtube"
     },
@@ -894,11 +1334,6 @@
       "platform": "youtube"
     },
     {
-      "topic": "▶️ I Fixed YouTube !",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
       "topic": "▶️ I Trained My Own AI... It beat ChatGPT",
       "score": "warm",
       "platform": "youtube"
@@ -915,11 +1350,6 @@
     },
     {
       "topic": "▶️ PRAGMATA: La Niña MISTERIOSA #2",
-      "score": "warm",
-      "platform": "youtube"
-    },
-    {
-      "topic": "▶️ Castillo FINALIZADO al 100% en MINECRAFT (Luego QSMP2)",
       "score": "warm",
       "platform": "youtube"
     },
