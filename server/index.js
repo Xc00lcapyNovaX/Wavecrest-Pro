@@ -175,13 +175,22 @@ app.get('/terms',   pub('terms'));
 app.get('/verify',  pub('verify'));
 
 // ── Checkout — open to all, pre-selects plan via ?plan= ──
-app.get('/checkout', view('checkout'));
+app.get('/checkout',            view('checkout'));
+app.get('/checkout-free',       pub('checkout-free'));
+app.get('/checkout-plus',       pub('checkout-plus'));
+app.get('/checkout-pro',        pub('checkout-pro'));
+app.get('/checkout-max',        pub('checkout-max'));
+app.get('/checkout-teams',      pub('checkout-teams'));
+app.get('/checkout-enterprise', pub('checkout-enterprise'));
 
 // ── Auth-gated pages ─────────────────────────────────
 // requireAuth redirects to /signin?next=<url> for HTML requests
 app.get('/dashboard', requireAuth, view('dashboard'));
 app.get('/calendar',  requireAuth, view('calendar'));
 app.get('/analytics', requireAuth, view('analytics'));
+
+// ── API docs ─────────────────────────────────────────
+app.get('/api-docs', pub('api-docs'));
 
 // ── Admin — has its own client-side password gate ────
 app.get('/admin', view('admin'));
