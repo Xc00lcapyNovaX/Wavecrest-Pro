@@ -320,7 +320,7 @@ db.ensureReferralCode = async (userId) => {
   const { rows } = await pool.query(`SELECT referral_code FROM users WHERE id = $1`, [userId]);
   if (rows[0]?.referral_code) return rows[0].referral_code;
   // Generate a short readable code
-  const code = require('crypto').randomBytes(4).toString('hex').toUpperCase();
+  const code = require('crypto').randomBytes(8).toString('hex').toUpperCase();
   await pool.query(`UPDATE users SET referral_code = $1 WHERE id = $2`, [code, userId]);
   return code;
 };

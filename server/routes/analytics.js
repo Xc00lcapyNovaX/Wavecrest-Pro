@@ -5,6 +5,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/requireAuth');
+const { assertPlatform } = require('../middleware/validate');
 const router = express.Router();
 
 const PRO_PLANS = ['pro', 'max', 'teams', 'enterprise'];
@@ -33,6 +34,8 @@ async function ensureCache() {
 // ── GET /api/analytics/velocity ─────────────────────────────────────────────
 router.get('/velocity', requireAuth, requirePro, async (req, res) => {
   try {
+    const platformErr = assertPlatform(req.query.platform);
+    if (platformErr) return res.status(400).json({ error: platformErr });
     await ensureCache();
     const numDays = Math.min(Math.max(parseInt(req.query.days, 10) || 7, 1), 90);
 
@@ -99,6 +102,8 @@ router.get('/platforms', requireAuth, requirePro, async (req, res) => {
 // ── GET /api/analytics/top-trends ───────────────────────────────────────────
 router.get('/top-trends', requireAuth, requirePro, async (req, res) => {
   try {
+    const platformErr = assertPlatform(req.query.platform);
+    if (platformErr) return res.status(400).json({ error: platformErr });
     await ensureCache();
     const numDays = Math.min(Math.max(parseInt(req.query.days, 10) || 7, 1), 90);
     const since = new Date();

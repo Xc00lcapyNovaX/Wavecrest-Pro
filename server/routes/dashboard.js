@@ -5,6 +5,7 @@ const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/requireAuth');
 const { getCurrentTier, PLAN_RANK } = require('../middleware/gatekeeper');
+const { assertNumericId } = require('../middleware/validate');
 const router = express.Router();
 
 // ── GET /api/dashboard — main dashboard data ──────
@@ -92,8 +93,9 @@ router.get('/', requireAuth, async (req, res) => {
 router.get('/export', requireAuth, async (req, res) => {
   try {
     const user = await db.findUserById(req.session.userId);
-    if (!user || user.plan === 'free') {
-      return res.status(403).json({ error: 'CSV export requires Plus plan or higher.' });
+    const CSV_PLANS = ['plus', 'pro', 'max', 'teams', 'enterprise'];
+    if (!user || !CSV_PLANS.includes(user.plan)) {
+      return res.status(403).json({ error: 'CSV export requires a Plus plan or higher.' });
     }
 
     const today = new Date().toISOString().slice(0, 10);
@@ -140,6 +142,8 @@ router.post('/saved', requireAuth, async (req, res) => {
     if (!trend_id || !topic) {
       return res.status(400).json({ error: 'trend_id and topic required.' });
     }
+    const idErr = assertNumericId(trend_id, 'trend_id');
+    if (idErr) return res.status(400).json({ error: idErr });
     const saved = await db.saveTrend(req.session.userId, {
       trendId: trend_id, topic, platform, score,
     });
@@ -168,7 +172,8 @@ router.delete('/saved/:id', requireAuth, async (req, res) => {
 router.post('/discord-webhook', requireAuth, async (req, res) => {
   try {
     const { url } = req.body;
-    if (url && !url.startsWith('https://discord.com/api/webhooks/') && !url.startsWith('https://discordapp.com/api/webhooks/')) {
+    const DISCORD_WEBHOOK_RE = /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[\w-]+$/;
+    if (url && !DISCORD_WEBHOOK_RE.test(url)) {
       return res.status(400).json({ error: 'Invalid Discord webhook URL.' });
     }
     await db.setDiscordWebhook(req.session.userId, url || null);
@@ -198,15 +203,25 @@ router.post('/discord-webhook/test', requireAuth, async (req, res) => {
 });
 
 async function sendDiscordMessage(webhookUrl, payload) {
-  const res = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Discord error ${res.status}: ${text}`);
+  let lastErr;
+  for (let i = 0; i < 3; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i - 1)));
+    try {
+      const r = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (r.ok) return;
+      const text = await r.text();
+      lastErr = new Error(`Discord error ${r.status}: ${text}`);
+      if (r.status === 400 || r.status === 404) break;
+    } catch (err) {
+      lastErr = err;
+    }
   }
+  throw lastErr;
 }
 
 // ── BYOAK routes ───────────────────────────────────

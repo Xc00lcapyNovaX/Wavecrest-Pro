@@ -8,22 +8,35 @@
 const express = require('express');
 const db      = require('../db');
 const { requireAuth } = require('../middleware/requireAuth');
+const makeRateLimit = require('../middleware/inMemoryRateLimit');
+const { assertPageUrl, assertNumericId } = require('../middleware/validate');
 const router  = express.Router();
+
+const feedbackRateLimit = makeRateLimit({ max: 5, windowMs: 60 * 60 * 1000, message: 'Too many feedback submissions. Try again in an hour.' });
 
 // ── Discord embed helper ──────────────────────────────
 async function sendAdminEmbed(payload) {
   const url = process.env.DISCORD_ADMIN_WEBHOOK;
-  if (!url) return; // No webhook configured — silent skip
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) console.warn('[Discord admin webhook]', res.status, await res.text());
-  } catch (err) {
-    console.warn('[Discord admin webhook] failed:', err.message);
+  if (!url) return;
+  let lastErr;
+  for (let i = 0; i < 3; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i - 1)));
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (r.ok) return;
+      const text = await r.text();
+      lastErr = new Error(`Discord error ${r.status}: ${text}`);
+      if (r.status === 400 || r.status === 404) break;
+    } catch (err) {
+      lastErr = err;
+    }
   }
+  if (lastErr) console.warn('[Discord admin webhook] failed after retries:', lastErr.message);
 }
 
 const TYPE_COLOR  = { bug: 0xff453a, feature: 0x2997ff, other: 0x86868b };
@@ -38,6 +51,8 @@ router.post('/vote', requireAuth, async (req, res) => {
     if (!trend_id || !vote || !['hot', 'cold'].includes(vote)) {
       return res.status(400).json({ error: 'trend_id and vote (hot|cold) required.' });
     }
+    const idErr = assertNumericId(trend_id, 'trend_id');
+    if (idErr) return res.status(400).json({ error: idErr });
 
     const result = await db.castVote(req.session.userId, trend_id, topic || '', vote);
     res.json(result);
@@ -65,9 +80,12 @@ router.get('/votes', requireAuth, async (req, res) => {
 });
 
 // ── POST /api/feedback/submit ─────────────────────────
-router.post('/submit', async (req, res) => {
+router.post('/submit', feedbackRateLimit, async (req, res) => {
   try {
     const { type, title, body, page_url } = req.body;
+
+    const urlErr = assertPageUrl(page_url);
+    if (urlErr) return res.status(400).json({ error: urlErr });
 
     if (!type || !['bug', 'feature', 'other'].includes(type)) {
       return res.status(400).json({ error: 'type must be bug, feature, or other.' });
