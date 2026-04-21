@@ -273,10 +273,10 @@ router.get('/google/callback', (req, res, next) => {
   if (!googleConfigured) {
     return res.redirect('/signin?error=google_not_configured');
   }
-  passport.authenticate('google', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
+  passport.authenticate('google', { failureRedirect: '/signin?error=oauth_failed&provider=google' })(req, res, (err) => {
     if (err) {
       console.error('[Auth] Google OAuth callback error:', err.message);
-      return res.redirect('/signin?error=oauth_failed');
+      return res.redirect('/signin?error=oauth_failed&provider=google');
     }
     req.session.userId = req.user.id;
     const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
@@ -294,10 +294,10 @@ router.get('/github', (req, res, next) => {
 
 router.get('/github/callback', (req, res, next) => {
   if (githubConfigured) {
-    passport.authenticate('github', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
+    passport.authenticate('github', { failureRedirect: '/signin?error=oauth_failed&provider=github' })(req, res, (err) => {
       if (err) {
         console.error('[Auth] GitHub OAuth callback error:', err.message);
-        return res.redirect('/signin?error=oauth_failed');
+        return res.redirect('/signin?error=oauth_failed&provider=github');
       }
       req.session.userId = req.user.id;
       const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
@@ -317,10 +317,10 @@ router.get('/apple', (req, res, next) => {
 
 router.post('/apple/callback', (req, res, next) => {
   if (!appleConfigured) return res.redirect('/signin?error=oauth_not_configured');
-  passport.authenticate('apple', { failureRedirect: '/signin?error=oauth_failed' })(req, res, (err) => {
+  passport.authenticate('apple', { failureRedirect: '/signin?error=oauth_failed&provider=apple' })(req, res, (err) => {
     if (err) {
       console.error('[Auth] Apple OAuth callback error:', err.message);
-      return res.redirect('/signin?error=oauth_failed');
+      return res.redirect('/signin?error=oauth_failed&provider=apple');
     }
     req.session.userId = req.user.id;
     const dest = req.user.is_beta ? '/dashboard?beta_login=true' : '/dashboard';
