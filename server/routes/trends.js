@@ -13,6 +13,16 @@ const router = express.Router();
 
 const datesRateLimit = makeRateLimit({ max: 60, windowMs: 60 * 1000, message: 'Too many requests. Slow down.' });
 
+// ── GET /api/trends/preview — public sample for landing page ──
+const previewRateLimit = makeRateLimit({ max: 20, windowMs: 60 * 1000, message: 'Too many requests.' });
+router.get('/preview', previewRateLimit, (req, res) => {
+  const pool = db.trends.length ? db.trends : [];
+  const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 60);
+  const trends = shuffled.map(t => ({ topic: t.topic, score: t.score, platform: t.platform }));
+  res.set('Cache-Control', 'public, max-age=180, stale-while-revalidate=60');
+  res.json({ trends, count: trends.length, source: 'live' });
+});
+
 // ── GET /api/trends — list today's trends ──────────
 router.get('/', requireAuth, rateLimiter, async (req, res) => {
   try {

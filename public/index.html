@@ -900,15 +900,20 @@ const FALLBACK = [
 ];
 
 (function(){
-  fetch('trends.json')
-    .then(r=>r.ok?r.json():Promise.reject())
-    .then(d=>{
-      if(d&&d.trends&&d.trends.length){
-        trendPool=d.trends.map(t=>({topic:t.topic,score:t.score||'warm',platform:t.platform||'General'}));
-        buildTicker();buildDashboard();
-      } else { trendPool=FALLBACK; }
-    })
-    .catch(()=>{trendPool=FALLBACK;});
+  function applyPool(trends){
+    trendPool=trends.map(t=>({topic:t.topic,score:t.score||'warm',platform:t.platform||'General'}));
+    buildTicker();buildDashboard();populateBadges();
+  }
+  // Try live API first, fall back to static file, then hardcoded
+  fetch('/api/trends/preview')
+    .then(r=>r.ok?r.json():Promise.reject('api'))
+    .then(d=>{ if(d&&d.trends&&d.trends.length){ applyPool(d.trends); } else { return Promise.reject('empty'); } })
+    .catch(()=>
+      fetch('trends.json')
+        .then(r=>r.ok?r.json():Promise.reject())
+        .then(d=>{ if(d&&d.trends&&d.trends.length){ applyPool(d.trends); } else { trendPool=FALLBACK; } })
+        .catch(()=>{ trendPool=FALLBACK; })
+    );
   trendPool=FALLBACK;
 })();
 
