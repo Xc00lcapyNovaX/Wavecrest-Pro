@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing — Wavecrest Pro</title>
+  <meta name="description" content="One free creator analysis to try it. Credits unlock more — one-time, no expiry. No subscription." />
+  <meta name="theme-color" content="#F7F3EC" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --bg: #F7F3EC; --bg-warm: #EDE8DF; --bg-card: #FFFFFF; --bg-dark: #0D0C0A;
+      --ink: #111008; --ink-mid: #6B6356; --ink-light: #9C9284;
+      --accent: #C4501A; --accent-warm: #E8724A; --green: #2D9E6B;
+      --border: #D4CCBA; --border-mid: #BDB3A0;
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3 { font-family: 'Fraunces', serif; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .editorial-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mid); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-warm); }
+    ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+
+    /* Layout */
+    .section { padding: 88px 32px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .container-sm { max-width: 760px; margin: 0 auto; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .reveal { opacity: 0; transform: translateY(24px); }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 56px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; transition: box-shadow .3s; }
+    nav.scrolled { box-shadow: 0 1px 12px rgba(17,16,8,.07); }
+    .nav-logo { text-decoration: none; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .nav-logo span { color: var(--accent); }
+    .nav-links-wrap { display: flex; gap: 32px; }
+    .nav-links-wrap a { font-size: 13.5px; color: var(--ink-mid); text-decoration: none; transition: color .2s; }
+    .nav-links-wrap a:hover, .nav-links-wrap a.active { color: var(--ink); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    @media (max-width: 768px) { .nav-right > .btn { display: none; } }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 4px; padding: 6px; width: 44px; height: 44px; align-items: center; justify-content: center; }
+    .nav-hamburger span { display: block; width: 20px; height: 1.5px; background: var(--ink); transition: transform .25s ease, opacity .2s ease; transform-origin: center; }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+    .nav-mobile { display: none; position: fixed; inset: 56px 0 0 0; background: var(--bg); border-top: 1px solid var(--border); flex-direction: column; padding: 24px 32px; gap: 18px; z-index: 99; }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a { font-size: 1.1rem; color: var(--ink); text-decoration: none; padding: 8px 0; border-bottom: 1px solid var(--border); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13.5px; padding: 10px 22px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; transition: all .2s; white-space: nowrap; }
+    .btn-primary { background: var(--ink); color: var(--bg); }
+    .btn-primary:hover { background: #2A2820; }
+    .btn-ghost { background: transparent; color: var(--ink-mid); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--ink); border-color: var(--border-mid); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #B04216; }
+
+    /* Card */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+
+    /* Pill */
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 4px; font-size: 11.5px; font-weight: 500; border: 1px solid var(--border); background: var(--bg-card); color: var(--ink-mid); font-family: 'IBM Plex Mono', monospace; letter-spacing: .04em; }
+
+    /* Checklist */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .checklist li { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--ink-mid); }
+    .checklist li.off { opacity: .35; text-decoration: line-through; }
+
+    /* Pricing */
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .pricing-pop { background: var(--ink) !important; border-color: var(--ink) !important; }
+    .pricing-pop .checklist li { color: rgba(255,255,255,.6); }
+    .pricing-pop .checklist li.off { opacity: .22; }
+    .price-num { font-family: 'Fraunces', serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+
+    /* Comparison table */
+    .compare-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .compare-grid > div { padding: 14px 18px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); font-size: 13px; display: flex; align-items: center; }
+    .compare-grid > div:nth-child(4n) { border-right: none; }
+    .compare-grid > div:nth-last-child(-n+4) { border-bottom: none; }
+    .compare-head { background: var(--bg-warm); font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mid); }
+    .compare-label { color: var(--ink-mid); }
+    .compare-check { color: var(--green); font-weight: 600; justify-content: center; }
+    .compare-dash { color: var(--border-mid); justify-content: center; }
+    .compare-val { color: var(--ink); font-weight: 500; justify-content: center; }
+
+    /* FAQ */
+    .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
+    .faq-q { font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.05rem; color: var(--ink); margin-bottom: 10px; }
+    .faq-a { font-size: 13.5px; color: var(--ink-mid); line-height: 1.72; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links-wrap { display: none; }
+      .nav-hamburger { display: flex; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr 1fr; }
+      .compare-grid > div:nth-child(2n) { border-right: none; }
+      .compare-grid > div:nth-child(4n) { border-right: 1px solid var(--border); }
+      .footer-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-links-wrap" role="navigation" aria-label="Main">
+    <a href="/#how">How it works</a>
+    <a href="/pricing" class="active">Pricing</a>
+    <a href="/changelog">Changelog</a>
+    <a href="/about">About</a>
+  </div>
+  <div class="nav-right">
+    <a href="/login" class="btn btn-ghost" style="padding:8px 16px;font-size:13px">Sign in</a>
+    <a href="/pricing" class="btn btn-primary" style="padding:8px 16px;font-size:13px">Start free →</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="Open menu" aria-expanded="false" aria-controls="navMobile">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="/#how" onclick="toggleNav()">How it works</a>
+  <a href="/pricing" onclick="toggleNav()">Pricing</a>
+  <a href="/changelog" onclick="toggleNav()">Changelog</a>
+  <a href="/about" onclick="toggleNav()">About</a>
+  <a href="/pricing" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="toggleNav()">Start free →</a>
+</div>
+
+<!-- HERO -->
+<section style="padding:140px 32px 80px;background:var(--bg)">
+  <div class="container-sm" style="text-align:center">
+    <div class="pill" style="margin-bottom:20px">Pricing</div>
+    <h1 style="font-size:clamp(2.6rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-top:16px;margin-bottom:16px">
+      Start free.<br/>Get the playbook.
+    </h1>
+    <p style="font-size:1.05rem;line-height:1.78;color:var(--ink-mid);max-width:500px;margin:0 auto">
+      One free creator analysis to try it. Credits unlock more — one-time, no expiry. No subscription required.
+    </p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- PRICING CARDS -->
+<section class="section reveal">
+  <div class="container">
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="card" style="padding:28px;border-radius:14px;display:flex;flex-direction:column">
+        <p class="editorial-label" style="margin-bottom:10px">Free</p>
+        <p class="price-num" style="margin-bottom:3px">$0</p>
+        <p style="font-size:13px;color:var(--ink-light);margin-bottom:24px">Forever. No card.</p>
+        <ul class="checklist" style="margin-bottom:28px;flex:1">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1 creator analysis free</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>All 7 dimensions decoded</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>PDF export</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Shareable link</li>
+          <li class="off"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--border-mid)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Report history</li>
+          <li class="off"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--border-mid)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Compare multiple creators</li>
+          <li class="off"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--border-mid)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>API access</li>
+        </ul>
+        <a href="/login" class="btn btn-ghost" style="width:100%;padding:12px;border-radius:8px;text-align:center;text-decoration:none">Try it free</a>
+      </div>
+
+      <!-- Credit Packs -->
+      <div class="card pricing-pop" style="padding:28px;border-radius:14px;display:flex;flex-direction:column;position:relative">
+        <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:10.5px;font-weight:700;padding:4px 14px;border-radius:4px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em">MOST POPULAR</div>
+        <p class="editorial-label" style="margin-bottom:14px;color:rgba(255,255,255,.35)">Credit Packs · one-time, no expiry</p>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:8px;border:1px solid rgba(255,255,255,.08)">
+            <div><p style="font-size:13px;font-weight:600;color:white">Starter</p><p style="font-size:11px;color:rgba(255,255,255,.35)">10 analyses · $0.90 each</p></div>
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.3rem;color:white">$9</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(196,80,26,.14);border-radius:8px;border:1px solid rgba(196,80,26,.3)">
+            <div><p style="font-size:13px;font-weight:600;color:white">Growth <span style="font-size:10px;color:var(--accent-warm);font-family:'IBM Plex Mono',monospace">BEST VALUE</span></p><p style="font-size:11px;color:rgba(255,255,255,.35)">40 analyses · $0.73 each</p></div>
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.3rem;color:white">$29</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:8px;border:1px solid rgba(255,255,255,.08)">
+            <div><p style="font-size:13px;font-weight:600;color:white">Pro</p><p style="font-size:11px;color:rgba(255,255,255,.35)">150 analyses · $0.59 each</p></div>
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.3rem;color:white">$89</p>
+          </div>
+        </div>
+        <ul class="checklist" style="margin-bottom:22px;flex:1">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5DD4A0" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Free</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5DD4A0" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Full report history saved</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5DD4A0" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Compare multiple creators side-by-side</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5DD4A0" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Credits never expire</li>
+        </ul>
+        <a href="/login" class="btn btn-accent" style="width:100%;padding:12px;border-radius:8px;text-align:center;text-decoration:none">Buy a pack</a>
+      </div>
+
+      <!-- Agency -->
+      <div class="card" style="padding:28px;border-radius:14px;display:flex;flex-direction:column">
+        <p class="editorial-label" style="margin-bottom:10px">Agency</p>
+        <p class="price-num" style="margin-bottom:3px">$99<span style="font-size:1.1rem;font-weight:400;color:var(--ink-light);font-family:'Inter',sans-serif">/mo</span></p>
+        <p style="font-size:13px;color:var(--ink-light);margin-bottom:24px">Unlimited everything</p>
+        <ul class="checklist" style="margin-bottom:28px;flex:1">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><strong>Unlimited</strong> analyses</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Team seats included</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>White-label PDF reports</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>REST API access</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>TikTok + Instagram early access</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+        </ul>
+        <a href="mailto:hello@wavecrest.pro" class="btn btn-ghost" style="width:100%;padding:12px;border-radius:8px;text-align:center;text-decoration:none">Talk to us</a>
+      </div>
+    </div>
+
+    <!-- Founder note -->
+    <div class="card" style="margin-top:20px;padding:22px 26px;border-radius:12px;display:flex;gap:14px;align-items:start">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:13px;color:var(--bg);flex-shrink:0">E</div>
+      <div>
+        <p style="font-size:13.5px;color:var(--ink-mid);line-height:1.72;font-style:italic">"Run the free analysis on a creator you've been watching for months. If you learn something in 90 seconds that you hadn't noticed in hours of watching — that's the product." — <a href="mailto:hello@wavecrest.pro" style="color:var(--ink);font-style:normal;font-weight:500">hello@wavecrest.pro</a> if you have questions.</p>
+        <p style="font-size:11.5px;color:var(--ink-light);margin-top:7px;font-family:'IBM Plex Mono',monospace">— Efe, founder</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- COMPARISON -->
+<section class="section reveal" style="background:var(--bg-warm)">
+  <div class="container">
+    <div style="margin-bottom:40px">
+      <p class="editorial-label" style="margin-bottom:14px">Feature breakdown</p>
+      <h2 style="font-size:clamp(1.8rem,3vw,2.4rem);font-weight:800;letter-spacing:-.035em;line-height:1.1">What's included at each tier</h2>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-head" style="border-right:1px solid var(--border)"></div>
+      <div class="compare-head" style="justify-content:center">Free</div>
+      <div class="compare-head" style="justify-content:center;background:var(--ink);color:rgba(255,255,255,.5)">Credits</div>
+      <div class="compare-head" style="justify-content:center">Agency</div>
+
+      <div class="compare-label">Creator analyses</div>
+      <div class="compare-val">1</div>
+      <div class="compare-val" style="background:rgba(17,16,8,.03)">Per pack</div>
+      <div class="compare-val">Unlimited</div>
+
+      <div class="compare-label">7 dimensions decoded</div>
+      <div class="compare-check">✓</div>
+      <div class="compare-check" style="background:rgba(17,16,8,.03)">✓</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">PDF export</div>
+      <div class="compare-check">✓</div>
+      <div class="compare-check" style="background:rgba(17,16,8,.03)">✓</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">Shareable report link</div>
+      <div class="compare-check">✓</div>
+      <div class="compare-check" style="background:rgba(17,16,8,.03)">✓</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">Report history saved</div>
+      <div class="compare-dash">—</div>
+      <div class="compare-check" style="background:rgba(17,16,8,.03)">✓</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">Compare creators side-by-side</div>
+      <div class="compare-dash">—</div>
+      <div class="compare-check" style="background:rgba(17,16,8,.03)">✓</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">Team seats</div>
+      <div class="compare-dash">—</div>
+      <div class="compare-dash" style="background:rgba(17,16,8,.03)">—</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">White-label PDF reports</div>
+      <div class="compare-dash">—</div>
+      <div class="compare-dash" style="background:rgba(17,16,8,.03)">—</div>
+      <div class="compare-check">✓</div>
+
+      <div class="compare-label">REST API access</div>
+      <div class="compare-dash">—</div>
+      <div class="compare-dash" style="background:rgba(17,16,8,.03)">—</div>
+      <div class="compare-check">✓</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- FAQ -->
+<section class="section reveal">
+  <div class="container-sm">
+    <p class="editorial-label" style="margin-bottom:14px">Common questions</p>
+    <h2 style="font-size:clamp(1.8rem,3vw,2.4rem);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-bottom:40px">FAQ</h2>
+
+    <div class="faq-item">
+      <p class="faq-q">Do credits expire?</p>
+      <p class="faq-a">Never. Credits stay in your account until you use them. Buy a pack today, use it six months from now — it works exactly the same.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">What counts as one analysis?</p>
+      <p class="faq-a">One creator channel, fully decoded: up to 200 videos scanned, 7 dimensions surfaced, a full playbook generated with PDF export and shareable link. Each credit = one of those.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Which platforms are supported?</p>
+      <p class="faq-a">YouTube is live now — paste a channel URL, a video URL, or an @handle. TikTok and Instagram are next and Agency plan users get early access when they launch.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">How long does an analysis take?</p>
+      <p class="faq-a">Under 90 seconds for most channels. Channels with 1,000+ videos may take a couple of minutes — we cap analysis at the 200 most recent videos so the focus stays on what's working now.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can I share reports with clients or my team?</p>
+      <p class="faq-a">Every report gets a shareable link anyone can view without an account. Agency plan users also get white-label PDFs with your branding instead of ours.</p>
+    </div>
+    <div class="faq-item" style="border-bottom:none">
+      <p class="faq-q">Is there a trial for the Agency plan?</p>
+      <p class="faq-a">Email <a href="mailto:hello@wavecrest.pro" style="color:var(--accent)">hello@wavecrest.pro</a> — we'll set up a 2-week trial for your team, no card needed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section reveal" style="background:var(--bg-dark)">
+  <div class="container-sm" style="text-align:center">
+    <p class="editorial-label" style="margin-bottom:22px;color:rgba(255,255,255,.25)">Get started</p>
+    <h2 style="font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.04em;line-height:1.06;color:white;margin-bottom:16px">
+      One free analysis. No card.
+    </h2>
+    <p style="font-size:1rem;color:rgba(255,255,255,.4);line-height:1.78;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto">Paste any YouTube channel URL and get the full playbook in 90 seconds. See what you've been missing.</p>
+    <a href="/login" class="btn btn-accent" style="font-size:15px;padding:13px 32px">Try it free →</a>
+    <p class="editorial-label" style="margin-top:16px;color:rgba(255,255,255,.18)">1,200+ creators and agencies on the early access list</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(255,255,255,.07);padding:44px 32px;background:var(--bg-dark)">
+  <div class="container">
+    <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px">
+      <div>
+        <p style="font-family:'Fraunces',serif;font-weight:700;font-size:.95rem;color:white;margin-bottom:14px">Wavecrest <span style="color:var(--accent)">Pro</span></p>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.72;max-width:260px">Decode any creator's playbook. YouTube first — TikTok & Instagram coming.</p>
+      </div>
+      <div>
+        <p class="editorial-label" style="margin-bottom:14px;color:rgba(255,255,255,.2)">Product</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="/#how" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">How it works</a>
+          <a href="/pricing" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Pricing</a>
+          <a href="/changelog" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Changelog</a>
+        </div>
+      </div>
+      <div>
+        <p class="editorial-label" style="margin-bottom:14px;color:rgba(255,255,255,.2)">Company</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="/about" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">About</a>
+          <a href="mailto:hello@wavecrest.pro" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Contact</a>
+        </div>
+      </div>
+      <div>
+        <p class="editorial-label" style="margin-bottom:14px;color:rgba(255,255,255,.2)">Legal</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Privacy</a>
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:22px;border-top:1px solid rgba(255,255,255,.07)">
+      <p style="font-size:11.5px;color:rgba(255,255,255,.18);font-family:'IBM Plex Mono',monospace">© 2026 Wavecrest Pro, Inc.</p>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite;display:inline-block"></span>
+        <span style="font-size:11.5px;color:rgba(255,255,255,.18);font-family:'IBM Plex Mono',monospace">All systems operational</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+  function toggleNav() {
+    const panel = document.getElementById('navMobile');
+    const btn = document.querySelector('.nav-hamburger');
+    const isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', String(isOpen));
+    btn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.fromTo(el, { opacity:0, y:28 }, { opacity:1, y:0, duration:.7, ease:'power2.out', scrollTrigger: { trigger:el, start:'top 87%', toggleActions:'play none none none' } });
+    });
+  }
+  ScrollTrigger.create({ start:40, onEnter:() => document.getElementById('nav').classList.add('scrolled'), onLeaveBack:() => document.getElementById('nav').classList.remove('scrolled') });
+</script>
+</body>
+</html>

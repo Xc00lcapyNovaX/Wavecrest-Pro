@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#F7F3EC"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#D4CCBA" stroke-width="0.5" opacity="0.5"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#D4CCBA" stroke-width="0.5" opacity="0.5"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#D4CCBA" stroke-width="0.5" opacity="0.5"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#D4CCBA" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Left accent bar -->
+  <rect x="80" y="140" width="3" height="160" fill="#C4501A"/>
+
+  <!-- Wordmark -->
+  <text x="100" y="195" font-family="Georgia, 'Times New Roman', serif"
+        font-size="22" fill="#9C9284" letter-spacing="3">WAVECREST PRO</text>
+
+  <!-- Main headline -->
+  <text x="100" y="268" font-family="Georgia, 'Times New Roman', serif"
+        font-size="62" font-weight="700" fill="#111008" letter-spacing="-2">Understand your</text>
+  <text x="100" y="342" font-family="Georgia, 'Times New Roman', serif"
+        font-size="62" font-weight="700" fill="#111008" letter-spacing="-2">competitor's <tspan fill="#C4501A">playbook</tspan></text>
+  <text x="100" y="416" font-family="Georgia, 'Times New Roman', serif"
+        font-size="62" font-weight="700" fill="#111008" letter-spacing="-2">in 2 minutes.</text>
+
+  <!-- Divider -->
+  <line x1="100" y1="460" x2="520" y2="460" stroke="#D4CCBA" stroke-width="1"/>
+
+  <!-- Subtext -->
+  <text x="100" y="494" font-family="Georgia, 'Times New Roman', serif"
+        font-size="19" fill="#6B6356">Pricing · Positioning · Gaps · Competitive Angles</text>
+
+  <!-- Right side — decorative wave card -->
+  <rect x="760" y="80" width="360" height="470" rx="16"
+        fill="#111008" opacity="0.96"/>
+
+  <!-- Card header -->
+  <text x="792" y="134" font-family="'Courier New', monospace"
+        font-size="11" fill="#9C9284" letter-spacing="2">TEARDOWN REPORT</text>
+  <line x1="792" y1="148" x2="1088" y2="148" stroke="#ffffff" stroke-width="0.5" opacity="0.1"/>
+
+  <!-- Wave icon in card -->
+  <path d="M792 175 Q806 163 820 175 Q834 187 848 175 Q862 163 876 175 Q890 187 904 175"
+        stroke="#C4501A" stroke-width="2" fill="none"
+        stroke-linecap="round"/>
+
+  <!-- Mock rows -->
+  <rect x="792" y="210" width="276" height="36" rx="6" fill="#ffffff" opacity="0.04"/>
+  <text x="808" y="231" font-family="'Courier New', monospace" font-size="10" fill="#6B6356">PRICING</text>
+  <text x="808" y="244" font-family="Georgia, serif" font-size="12" fill="#F7F3EC">Decoy tier anchoring detected</text>
+  <rect x="1034" y="215" width="22" height="22" rx="4" fill="#C4501A" opacity="0.2"/>
+  <text x="1040" y="230" font-family="'Courier New', monospace" font-size="9" fill="#C4501A">HOT</text>
+
+  <rect x="792" y="256" width="276" height="36" rx="6" fill="#ffffff" opacity="0.04"/>
+  <text x="808" y="277" font-family="'Courier New', monospace" font-size="10" fill="#6B6356">POSITIONING</text>
+  <text x="808" y="290" font-family="Georgia, serif" font-size="12" fill="#F7F3EC">SMB segment unaddressed</text>
+  <rect x="1020" y="261" width="36" height="22" rx="4" fill="#2D9E6B" opacity="0.18"/>
+  <text x="1026" y="276" font-family="'Courier New', monospace" font-size="9" fill="#2D9E6B">RISE</text>
+
+  <rect x="792" y="302" width="276" height="36" rx="6" fill="#ffffff" opacity="0.04"/>
+  <text x="808" y="323" font-family="'Courier New', monospace" font-size="10" fill="#6B6356">MESSAGING</text>
+  <text x="808" y="336" font-family="Georgia, serif" font-size="12" fill="#F7F3EC">3 objections left unanswered</text>
+  <rect x="1034" y="307" width="22" height="22" rx="4" fill="#C4501A" opacity="0.2"/>
+  <text x="1040" y="322" font-family="'Courier New', monospace" font-size="9" fill="#C4501A">HOT</text>
+
+  <rect x="792" y="348" width="276" height="36" rx="6" fill="#ffffff" opacity="0.04"/>
+  <text x="808" y="369" font-family="'Courier New', monospace" font-size="10" fill="#6B6356">FEATURES</text>
+  <text x="808" y="382" font-family="Georgia, serif" font-size="12" fill="#F7F3EC">No async flow, no API docs</text>
+  <rect x="1020" y="353" width="36" height="22" rx="4" fill="#2D9E6B" opacity="0.18"/>
+  <text x="1026" y="368" font-family="'Courier New', monospace" font-size="9" fill="#2D9E6B">RISE</text>
+
+  <rect x="792" y="394" width="276" height="36" rx="6" fill="#ffffff" opacity="0.04"/>
+  <text x="808" y="415" font-family="'Courier New', monospace" font-size="10" fill="#6B6356">ANGLES</text>
+  <text x="808" y="428" font-family="Georgia, serif" font-size="12" fill="#F7F3EC">Lead with speed vs complexity</text>
+  <rect x="1034" y="399" width="22" height="22" rx="4" fill="#C4501A" opacity="0.2"/>
+  <text x="1040" y="414" font-family="'Courier New', monospace" font-size="9" fill="#C4501A">HOT</text>
+
+  <!-- Card footer -->
+  <line x1="792" y1="450" x2="1088" y2="450" stroke="#ffffff" stroke-width="0.5" opacity="0.1"/>
+  <text x="792" y="476" font-family="'Courier New', monospace"
+        font-size="10" fill="#6B6356">Generated in 94 seconds · wavecrest.pro</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="614" width="1200" height="16" fill="#C4501A" opacity="0.08"/>
+  <rect x="0" y="614" width="1200" height="1" fill="#D4CCBA"/>
+</svg>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Wavecrest Pro</title>
+  <meta name="description" content="We built the tool we kept wishing existed. The story behind Wavecrest Pro — creator intelligence for YouTube." />
+  <meta name="theme-color" content="#F7F3EC" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --bg: #F7F3EC; --bg-warm: #EDE8DF; --bg-card: #FFFFFF; --bg-dark: #0D0C0A;
+      --ink: #111008; --ink-mid: #6B6356; --ink-light: #9C9284;
+      --accent: #C4501A; --accent-warm: #E8724A; --green: #2D9E6B;
+      --border: #D4CCBA; --border-mid: #BDB3A0;
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3 { font-family: 'Fraunces', serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-warm); }
+    ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+    .editorial-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mid); }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .container-sm { max-width: 680px; margin: 0 auto; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .reveal { opacity: 0; transform: translateY(20px); }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 56px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; transition: box-shadow .3s; }
+    nav.scrolled { box-shadow: 0 1px 12px rgba(17,16,8,.07); }
+    .nav-logo { text-decoration: none; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .nav-logo span { color: var(--accent); }
+    .nav-links-wrap { display: flex; gap: 32px; }
+    .nav-links-wrap a { font-size: 13.5px; color: var(--ink-mid); text-decoration: none; transition: color .2s; }
+    .nav-links-wrap a:hover, .nav-links-wrap a.active { color: var(--ink); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    @media (max-width: 768px) { .nav-right > .btn { display: none; } }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 4px; padding: 6px; width: 44px; height: 44px; align-items: center; justify-content: center; }
+    .nav-hamburger span { display: block; width: 20px; height: 1.5px; background: var(--ink); transition: transform .25s ease, opacity .2s ease; transform-origin: center; }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+    .nav-mobile { display: none; position: fixed; inset: 56px 0 0 0; background: var(--bg); border-top: 1px solid var(--border); flex-direction: column; padding: 24px 32px; gap: 18px; z-index: 99; }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a { font-size: 1.1rem; color: var(--ink); text-decoration: none; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13.5px; padding: 10px 22px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; transition: all .2s; white-space: nowrap; }
+    .btn-primary { background: var(--ink); color: var(--bg); }
+    .btn-primary:hover { background: #2A2820; }
+    .btn-ghost { background: transparent; color: var(--ink-mid); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--ink); border-color: var(--border-mid); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #B04216; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+
+    /* About-specific */
+    .prose p { font-size: 1.05rem; line-height: 1.82; color: var(--ink-mid); margin-bottom: 22px; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--ink); font-weight: 600; }
+    .prose a { color: var(--accent); text-decoration: none; }
+    .prose a:hover { text-decoration: underline; }
+    .principle { padding: 28px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 48px 1fr; gap: 20px; align-items: start; }
+    .principle:last-child { border-bottom: none; }
+    .principle-n { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 800; color: var(--border-mid); letter-spacing: -.04em; line-height: 1; margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      .nav-links-wrap { display: none; }
+      .nav-hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr !important; }
+      .footer-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-links-wrap" role="navigation" aria-label="Main">
+    <a href="/#how">How it works</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/changelog">Changelog</a>
+    <a href="/about" class="active">About</a>
+  </div>
+  <div class="nav-right">
+    <a href="/login" class="btn btn-ghost" style="padding:8px 16px;font-size:13px">Sign in</a>
+    <a href="/pricing" class="btn btn-primary" style="padding:8px 16px;font-size:13px">Start free →</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="Open menu" aria-expanded="false" aria-controls="navMobile">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="/#how" onclick="toggleNav()">How it works</a>
+  <a href="/pricing" onclick="toggleNav()">Pricing</a>
+  <a href="/changelog" onclick="toggleNav()">Changelog</a>
+  <a href="/about" onclick="toggleNav()">About</a>
+  <a href="/pricing" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="toggleNav()">Start free →</a>
+</div>
+
+<!-- HERO -->
+<section style="padding:140px 32px 88px;background:var(--bg)">
+  <div class="container-sm">
+    <p class="editorial-label" style="margin-bottom:18px">About Wavecrest Pro</p>
+    <h1 style="font-size:clamp(2.6rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-bottom:28px">
+      We built the tool<br/>we kept wishing existed.
+    </h1>
+    <p style="font-size:1.15rem;line-height:1.82;color:var(--ink-mid)">
+      Wavecrest started with a frustration: hours spent watching successful creators, still unable to articulate <em>why</em> they were winning. We built the tool that reads 200 videos at once and tells you in 90 seconds.
+    </p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- STORY -->
+<section style="padding:88px 32px;background:var(--bg-warm)" class="reveal">
+  <div class="container">
+    <div class="about-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+      <div class="prose">
+        <p>
+          I kept studying the same creators over and over — watching videos, reading comments, checking upload schedules. I could feel there was a pattern. I just couldn't see it.
+        </p>
+        <p>
+          The problem isn't attention. It's bandwidth. A single person can hold maybe 5–10 videos in working memory at once. A creator's playbook is built across <strong>hundreds of them</strong> — the hook that gets tested and doubled down on, the thumbnail formula that emerged after 30 flops, the posting cadence optimized through months of trial. You can't see any of that by watching.
+        </p>
+        <p>
+          So I built Wavecrest. Paste a YouTube channel URL, and it reads up to 200 videos at once — scanning for hook patterns, thumbnail formulas, posting cadence, audience signals, content pillars, monetization angles, and competitive gaps. The full playbook surfaces in 90 seconds.
+        </p>
+        <p>
+          It's for creators who want to understand what's actually working in their niche, and for brands and agencies that need to decode competitors fast. YouTube first — TikTok and Instagram are next.
+        </p>
+      </div>
+      <div>
+        <div class="card" style="padding:28px;border-radius:14px;margin-bottom:16px">
+          <p style="font-size:14px;color:var(--ink-mid);line-height:1.72;font-style:italic;margin-bottom:20px">"A creator's playbook is built across hundreds of videos. You can't see it by watching — you need to read all of them at once."</p>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--bg);flex-shrink:0">E</div>
+            <div>
+              <p style="font-size:14px;font-weight:600;color:var(--ink)">Efe</p>
+              <p style="font-size:11.5px;color:var(--ink-light);font-family:'IBM Plex Mono',monospace">Founder</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="card" style="padding:20px;border-radius:12px;text-align:center">
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:2rem;color:var(--accent);letter-spacing:-.04em;line-height:1">1,200+</p>
+            <p style="font-size:12px;color:var(--ink-mid);margin-top:6px">On the waitlist</p>
+          </div>
+          <div class="card" style="padding:20px;border-radius:12px;text-align:center">
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:2rem;color:var(--ink);letter-spacing:-.04em;line-height:1">94s</p>
+            <p style="font-size:12px;color:var(--ink-mid);margin-top:6px">Avg. analysis time</p>
+          </div>
+          <div class="card" style="padding:20px;border-radius:12px;text-align:center">
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:2rem;color:var(--green);letter-spacing:-.04em;line-height:1">7</p>
+            <p style="font-size:12px;color:var(--ink-mid);margin-top:6px">Dimensions decoded</p>
+          </div>
+          <div class="card" style="padding:20px;border-radius:12px;text-align:center">
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:2rem;color:var(--ink);letter-spacing:-.04em;line-height:1">Apr '26</p>
+            <p style="font-size:12px;color:var(--ink-mid);margin-top:6px">Founded</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- PRINCIPLES -->
+<section style="padding:88px 32px" class="reveal">
+  <div class="container-sm">
+    <p class="editorial-label" style="margin-bottom:14px">How we think</p>
+    <h2 style="font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:48px">Principles</h2>
+
+    <div class="principle">
+      <p class="principle-n">01</p>
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">Patterns over impressions</h3>
+        <p style="font-size:14px;color:var(--ink-mid);line-height:1.72">Watching a creator once gives you an impression. Reading 200 videos gives you a pattern. The whole product is built around the latter — because impressions mislead, patterns don't.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <p class="principle-n">02</p>
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">90 seconds, not 5 hours</h3>
+        <p style="font-size:14px;color:var(--ink-mid);line-height:1.72">The best tools collapse the time between question and answer. Creator research used to take a workday. If Wavecrest isn't delivering that in under two minutes, we've failed at the core problem.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <p class="principle-n">03</p>
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">No subscription pressure</h3>
+        <p style="font-size:14px;color:var(--ink-mid);line-height:1.72">Creator research isn't a daily need for everyone. The free tier lets you try it once for real. Credits give you more when you need them — on your terms, not a billing cycle that charges you for months you didn't use.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <p class="principle-n">04</p>
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">Ship first, scale second</h3>
+        <p style="font-size:14px;color:var(--ink-mid);line-height:1.72">We move fast, we're honest about what's not built yet, and we'd rather talk to users than build in assumptions. The changelog is real — we update it when things ship.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- TEAM -->
+<section style="padding:88px 32px;background:var(--bg-warm)" class="reveal">
+  <div class="container">
+    <p class="editorial-label" style="margin-bottom:14px">The team</p>
+    <h2 style="font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:48px">Small on purpose.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;max-width:860px">
+      <div class="card" style="padding:26px;border-radius:14px">
+        <div style="width:52px;height:52px;border-radius:12px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:20px;color:var(--bg);margin-bottom:16px">E</div>
+        <p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px">Efe</p>
+        <p style="font-size:11.5px;color:var(--ink-light);font-family:'IBM Plex Mono',monospace;margin-bottom:14px">Founder</p>
+        <p style="font-size:13px;color:var(--ink-mid);line-height:1.65">Built Wavecrest because spending hours studying creators and still not seeing the pattern felt like a solvable problem. It was.</p>
+      </div>
+      <div class="card" style="padding:26px;border-radius:14px;border-style:dashed;background:transparent">
+        <div style="width:52px;height:52px;border-radius:12px;background:var(--bg-warm);border:1px dashed var(--border-mid);display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--border-mid)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <p style="font-size:15px;font-weight:600;color:var(--ink-mid);margin-bottom:3px">Building something?</p>
+        <p style="font-size:11.5px;color:var(--ink-light);font-family:'IBM Plex Mono',monospace;margin-bottom:14px">Say hi</p>
+        <p style="font-size:13px;color:var(--ink-mid);line-height:1.65">If you're a creator, agency, or just curious — <a href="mailto:hello@wavecrest.pro" style="color:var(--accent)">hello@wavecrest.pro</a>. I read everything.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:88px 32px;background:var(--bg-dark)" class="reveal">
+  <div class="container-sm" style="text-align:center">
+    <p class="editorial-label" style="margin-bottom:22px;color:rgba(255,255,255,.25)">Get started</p>
+    <h2 style="font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.04em;line-height:1.06;color:white;margin-bottom:16px">
+      Try it for free.<br/><em style="color:var(--accent)">No card required.</em>
+    </h2>
+    <p style="font-size:1rem;color:rgba(255,255,255,.4);line-height:1.78;margin-bottom:32px">Questions? <a href="mailto:hello@wavecrest.pro" style="color:rgba(255,255,255,.55);text-decoration:none">Email us directly</a> — you'll get a real reply.</p>
+    <a href="/pricing" class="btn btn-accent" style="font-size:15px;padding:13px 32px">Start free →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(255,255,255,.07);padding:44px 32px;background:var(--bg-dark)">
+  <div class="container">
+    <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px">
+      <div>
+        <p style="font-family:'Fraunces',serif;font-weight:700;font-size:.95rem;color:white;margin-bottom:14px">Wavecrest <span style="color:var(--accent)">Pro</span></p>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.72;max-width:260px">Decode any creator's playbook. YouTube first — TikTok & Instagram coming.</p>
+      </div>
+      <div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:14px">Product</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="/#how" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">How it works</a>
+          <a href="/pricing" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Pricing</a>
+          <a href="/changelog" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Changelog</a>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:14px">Company</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="/about" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">About</a>
+          <a href="mailto:hello@wavecrest.pro" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Contact</a>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:14px">Legal</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Privacy</a>
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.32);text-decoration:none">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div style="padding-top:22px;border-top:1px solid rgba(255,255,255,.07)">
+      <p style="font-size:11.5px;color:rgba(255,255,255,.18);font-family:'IBM Plex Mono',monospace">© 2026 Wavecrest Pro, Inc.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+  function toggleNav() {
+    const panel = document.getElementById('navMobile');
+    const btn = document.querySelector('.nav-hamburger');
+    const isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', String(isOpen));
+    btn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.fromTo(el, { opacity:0, y:20 }, { opacity:1, y:0, duration:.7, ease:'power2.out', scrollTrigger: { trigger:el, start:'top 87%', toggleActions:'play none none none' } });
+    });
+  }
+  ScrollTrigger.create({ start:40, onEnter:() => document.getElementById('nav').classList.add('scrolled'), onLeaveBack:() => document.getElementById('nav').classList.remove('scrolled') });
+</script>
+</body>
+</html>

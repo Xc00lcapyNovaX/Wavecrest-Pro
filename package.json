@@ -1,0 +1,14 @@
+{
+  "name": "wavecrest-pro",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Wavecrest Pro — Creator intelligence. Decode any creator's playbook.",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "pg": "^8.13.3"
+  }
+}

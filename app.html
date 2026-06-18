@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analyze — Wavecrest Pro</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --bg: #F7F3EC; --bg-warm: #EDE8DF; --bg-card: #FFFFFF; --bg-dark: #0D0C0A;
+      --ink: #111008; --ink-mid: #6B6356; --ink-light: #9C9284;
+      --accent: #C4501A; --accent-warm: #E8724A; --green: #2D9E6B;
+      --border: #D4CCBA; --border-mid: #BDB3A0;
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Fraunces', serif; }
+
+    /* Nav */
+    nav { position: sticky; top: 0; z-index: 100; padding: 0 24px; height: 52px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { text-decoration: none; font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .nav-logo span { color: var(--accent); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap; }
+    .btn-ghost { background: transparent; color: var(--ink-mid); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--ink); border-color: var(--border-mid); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #B04216; }
+    .btn-accent:disabled { background: var(--border-mid); cursor: not-allowed; }
+
+    /* Views */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── INPUT VIEW ── */
+    #view-input { padding: 80px 24px 40px; max-width: 640px; margin: 0 auto; }
+    .input-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mid); margin-bottom: 18px; }
+    #view-input h1 { font-size: clamp(2rem,5vw,3rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.08; margin-bottom: 14px; }
+    #view-input h1 em { color: var(--accent); font-style: italic; }
+    #view-input p { font-size: 15px; color: var(--ink-mid); line-height: 1.7; margin-bottom: 40px; }
+    .url-form { display: flex; flex-direction: column; gap: 12px; }
+    .url-input-wrap { position: relative; }
+    #url-input {
+      width: 100%; padding: 14px 18px; font-family: 'Inter', sans-serif; font-size: 15px;
+      border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg-card);
+      color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    #url-input::placeholder { color: var(--ink-light); }
+    #url-input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17,16,8,.06); }
+    #url-input.error { border-color: #E05540; }
+    .url-error { font-size: 12.5px; color: #E05540; margin-top: 4px; display: none; }
+    .url-error.visible { display: block; }
+    #analyze-btn { padding: 14px 28px; font-size: 15px; border-radius: 10px; align-self: flex-start; }
+    .input-hint { font-size: 12px; color: var(--ink-light); font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+
+    /* ── LOADING VIEW ── */
+    #view-loading { padding: 100px 24px; max-width: 440px; margin: 0 auto; text-align: center; }
+    .loading-wave { display: flex; justify-content: center; gap: 5px; margin-bottom: 40px; }
+    .loading-wave span {
+      width: 4px; height: 24px; background: var(--accent); border-radius: 2px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .loading-wave span:nth-child(1) { animation-delay: 0s; }
+    .loading-wave span:nth-child(2) { animation-delay: .1s; }
+    .loading-wave span:nth-child(3) { animation-delay: .2s; }
+    .loading-wave span:nth-child(4) { animation-delay: .3s; }
+    .loading-wave span:nth-child(5) { animation-delay: .4s; }
+    @keyframes wave { 0%,100%{transform:scaleY(.4);opacity:.4} 50%{transform:scaleY(1);opacity:1} }
+    #loading-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 10px; }
+    #loading-step { font-size: 14px; color: var(--ink-mid); min-height: 22px; transition: opacity .3s; }
+    .loading-steps-list { margin-top: 32px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+    .step-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-light); padding: 8px 14px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border); }
+    .step-item.done { color: var(--green); border-color: rgba(45,158,107,.2); background: rgba(45,158,107,.05); }
+    .step-item.active { color: var(--ink); border-color: var(--border-mid); }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; }
+    .step-item.done .step-dot { background: var(--green); }
+    .step-item.active .step-dot { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── REPORT VIEW ── */
+    #view-report { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+    .report-header { padding: 36px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 16px; }
+    .channel-meta { display: flex; gap: 14px; align-items: center; }
+    .channel-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: var(--bg-warm); border: 1px solid var(--border); }
+    .channel-avatar-fallback { width: 52px; height: 52px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--bg); flex-shrink: 0; }
+    .channel-name { font-family: 'Fraunces', serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -.03em; }
+    .channel-stats { font-size: 12.5px; color: var(--ink-mid); font-family: 'IBM Plex Mono', monospace; margin-top: 4px; }
+    .report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stat-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+    .stat-chip { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 30px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+    .stat-chip strong { color: var(--ink); }
+
+    /* Dimension cards */
+    .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 680px) { .dim-grid { grid-template-columns: 1fr; } }
+    .dim-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+    .dim-card.full { grid-column: 1 / -1; }
+    .dim-label { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+    .dim-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .dim-card h3 { font-size: 1rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
+    .dim-body { font-size: 13.5px; color: var(--ink-mid); line-height: 1.7; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+    .tag-dark { background: var(--ink); color: var(--bg-warm); }
+    .tag-accent { background: rgba(196,80,26,.1); color: var(--accent); }
+    .tag-green { background: rgba(45,158,107,.1); color: var(--green); }
+    .tag-muted { background: var(--bg-warm); color: var(--ink-mid); border: 1px solid var(--border); }
+    .example-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .example-list li { font-size: 13px; color: var(--ink-mid); padding: 8px 12px; background: var(--bg-warm); border-radius: 6px; border-left: 2px solid var(--accent); line-height: 1.5; }
+    .pillar-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .pillar-row { display: grid; grid-template-columns: 120px 1fr 36px; gap: 12px; align-items: center; }
+    .pillar-name { font-size: 12.5px; color: var(--ink); font-weight: 500; }
+    .pillar-track { height: 6px; background: var(--bg-warm); border-radius: 3px; overflow: hidden; }
+    .pillar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 1s ease; }
+    .pillar-pct { font-size: 11px; color: var(--ink-light); font-family: 'IBM Plex Mono', monospace; text-align: right; }
+    .gap-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .gap-item { padding: 12px 16px; background: rgba(45,158,107,.05); border: 1px solid rgba(45,158,107,.18); border-radius: 8px; }
+    .gap-item strong { font-size: 13px; color: var(--ink); display: block; margin-bottom: 4px; }
+    .gap-item p { font-size: 12.5px; color: var(--ink-mid); line-height: 1.6; }
+
+    /* New analysis CTA */
+    .new-analysis-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg-dark); color: white; padding: 12px 20px; border-radius: 40px; display: flex; align-items: center; gap: 12px; font-size: 13.5px; box-shadow: 0 4px 24px rgba(0,0,0,.25); z-index: 50; white-space: nowrap; }
+    .new-analysis-bar a { color: var(--accent-warm); text-decoration: none; font-weight: 600; cursor: pointer; }
+
+    /* Copy toast */
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 200; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Wavecrest <span>Pro</span></a>
+  <a href="/pricing" class="btn btn-ghost">Pricing</a>
+</nav>
+
+<!-- ── INPUT VIEW ── -->
+<div id="view-input" class="view active">
+  <p class="input-label">Creator intelligence</p>
+  <h1>Decode any creator's<br/><em>playbook.</em></h1>
+  <p>Paste a YouTube channel URL and get a 7-dimension analysis in under 90 seconds — hooks, thumbnail formula, cadence, audience, content pillars, monetization, and competitive gaps.</p>
+  <div class="url-form">
+    <div>
+      <div class="url-input-wrap">
+        <input
+          type="url"
+          id="url-input"
+          placeholder="youtube.com/@MrBeast or youtube.com/channel/..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <p class="url-error" id="url-error"></p>
+    </div>
+    <button id="analyze-btn" class="btn btn-accent" onclick="startAnalysis()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Analyze
+    </button>
+    <p class="input-hint">
+      Accepts: youtube.com/@handle · youtube.com/channel/UCxxx · youtu.be/videoId<br/>
+      YouTube first · TikTok & Instagram coming · Free to try
+    </p>
+  </div>
+</div>
+
+<!-- ── LOADING VIEW ── -->
+<div id="view-loading" class="view">
+  <div class="loading-wave">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <h2 id="loading-title">Reading the channel…</h2>
+  <p id="loading-step">Fetching channel info</p>
+  <div class="loading-steps-list">
+    <div class="step-item active" id="step-1">
+      <span class="step-dot"></span> Fetching channel info
+    </div>
+    <div class="step-item" id="step-2">
+      <span class="step-dot"></span> Loading recent videos
+    </div>
+    <div class="step-item" id="step-3">
+      <span class="step-dot"></span> Analyzing 7 dimensions
+    </div>
+    <div class="step-item" id="step-4">
+      <span class="step-dot"></span> Building your playbook
+    </div>
+  </div>
+</div>
+
+<!-- ── REPORT VIEW ── -->
+<div id="view-report" class="view">
+  <div class="report-header">
+    <div class="channel-meta">
+      <div id="channel-avatar-wrap"></div>
+      <div>
+        <div class="channel-name" id="report-channel-name">Channel</div>
+        <div class="channel-stats" id="report-channel-stats"></div>
+      </div>
+    </div>
+    <div class="report-actions">
+      <button class="btn btn-ghost" onclick="copyLink()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy link
+      </button>
+      <button class="btn btn-ghost" onclick="downloadReport()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="stat-chips" id="stat-chips"></div>
+
+  <div class="dim-grid" id="dim-grid"></div>
+</div>
+
+<!-- Floating bar -->
+<div class="new-analysis-bar" id="new-bar" style="display:none">
+  <span>Analyze another creator?</span>
+  <a onclick="resetToInput()">Start new →</a>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentReport = null;
+let currentReportId = null;
+
+// ─── Init: check for ?r= param ───────────────────────────────────────────────
+(async function init() {
+  const params = new URLSearchParams(location.search);
+  const reportId = params.get('r');
+  if (reportId) {
+    showLoading();
+    try {
+      const res = await fetch(`/api/report/${reportId}`);
+      if (!res.ok) throw new Error('Report not found');
+      const data = await res.json();
+      showReport(data, reportId);
+    } catch (err) {
+      showInput();
+      showError(err.message || 'Could not load report');
+    }
+  }
+})();
+
+// ─── Views ───────────────────────────────────────────────────────────────────
+function showInput() {
+  setView('view-input');
+  document.getElementById('new-bar').style.display = 'none';
+  document.title = 'Analyze — Wavecrest Pro';
+}
+
+function showLoading() {
+  setView('view-loading');
+  document.getElementById('new-bar').style.display = 'none';
+  resetSteps();
+}
+
+function showReport(data, reportId) {
+  currentReport = data;
+  currentReportId = reportId;
+  renderReport(data);
+  setView('view-report');
+  document.getElementById('new-bar').style.display = 'flex';
+  if (reportId) {
+    const url = new URL(location.href);
+    url.searchParams.set('r', reportId);
+    history.replaceState(null, '', url.toString());
+  }
+  document.title = `${data.channel?.name || 'Creator'} — Wavecrest Pro`;
+}
+
+function setView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function resetToInput() {
+  showInput();
+  document.getElementById('url-input').value = '';
+  const url = new URL(location.href);
+  url.searchParams.delete('r');
+  history.replaceState(null, '', url.toString());
+}
+
+// ─── Analysis ────────────────────────────────────────────────────────────────
+async function startAnalysis() {
+  const input = document.getElementById('url-input');
+  const url = input.value.trim();
+
+  if (!url) {
+    showError('Paste a YouTube channel URL to analyze');
+    input.classList.add('error');
+    return;
+  }
+
+  input.classList.remove('error');
+  hideError();
+
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+
+  showLoading();
+  advanceSteps();
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showInput();
+      showError(data.error || 'Analysis failed — try again');
+      btn.disabled = false;
+      return;
+    }
+
+    // Mark all steps done
+    [1,2,3,4].forEach(i => {
+      const el = document.getElementById(`step-${i}`);
+      el.classList.remove('active');
+      el.classList.add('done');
+    });
+
+    await sleep(400);
+    showReport(data, data.reportId);
+  } catch (err) {
+    showInput();
+    showError(err.message || 'Network error — check your connection');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function resetSteps() {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(`step-${i}`);
+    el.classList.remove('done', 'active');
+    if (i === 1) el.classList.add('active');
+  });
+}
+
+function advanceSteps() {
+  const delays = [0, 3000, 10000, 45000]; // rough timing
+  const labels = ['Fetching channel info', 'Loading recent videos', 'Analyzing 7 dimensions', 'Building your playbook'];
+  delays.forEach((delay, i) => {
+    setTimeout(() => {
+      const prev = document.getElementById(`step-${i}`);
+      const curr = document.getElementById(`step-${i + 1}`);
+      if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
+      if (curr) { curr.classList.add('active'); }
+      const stepEl = document.getElementById('loading-step');
+      if (stepEl && labels[i + 1]) stepEl.textContent = labels[i + 1];
+    }, delay);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ─── Error helpers ────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('url-error');
+  el.textContent = msg;
+  el.classList.add('visible');
+  document.getElementById('url-input').classList.add('error');
+}
+
+function hideError() {
+  const el = document.getElementById('url-error');
+  el.classList.remove('visible');
+}
+
+// ─── Render report ────────────────────────────────────────────────────────────
+function renderReport(data) {
+  const { channel, videoCount, analysis, createdAt } = data;
+
+  // Avatar
+  const avatarWrap = document.getElementById('channel-avatar-wrap');
+  if (channel.thumbnailUrl) {
+    const img = document.createElement('img');
+    img.src = channel.thumbnailUrl;
+    img.className = 'channel-avatar';
+    img.alt = channel.name;
+    img.onerror = () => {
+      avatarWrap.innerHTML = `<div class="channel-avatar-fallback">${(channel.name || '?')[0]}</div>`;
+    };
+    avatarWrap.appendChild(img);
+  } else {
+    avatarWrap.innerHTML = `<div class="channel-avatar-fallback">${(channel.name || '?')[0]}</div>`;
+  }
+
+  document.getElementById('report-channel-name').textContent = channel.name || '';
+  document.getElementById('report-channel-stats').textContent =
+    `${fmtNum(channel.subscriberCount)} subscribers · ${channel.handle || ''}`;
+
+  // Stat chips
+  const chips = document.getElementById('stat-chips');
+  chips.innerHTML = [
+    { icon: '📊', label: 'Videos analyzed', val: videoCount },
+    { icon: '⏱', label: 'Avg length', val: `${analysis.cadence?.avgDurationMinutes || '—'}min` },
+    { icon: '📅', label: 'Posts', val: `${analysis.cadence?.videosPerMonth || '—'}/month` },
+    { icon: '📅', label: 'Peak day', val: analysis.cadence?.peakDay || '—' },
+  ].map(c => `
+    <div class="stat-chip">
+      <span>${c.icon}</span>
+      <span style="color:var(--ink-mid)">${c.label}:</span>
+      <strong>${c.val}</strong>
+    </div>
+  `).join('');
+
+  // Dimension cards
+  const grid = document.getElementById('dim-grid');
+  grid.innerHTML = '';
+
+  // HOOKS
+  grid.appendChild(makeCard({
+    label: 'Hook patterns', labelColor: '#C4501A', full: true,
+    content: `
+      <h3>${esc(analysis.hooks?.primaryPattern || '')}</h3>
+      <p class="dim-body" style="margin-bottom:12px">${esc(analysis.hooks?.frequency || '')}</p>
+      <ul class="example-list">
+        ${(analysis.hooks?.examples || []).map(e => `<li>"${esc(e)}"</li>`).join('')}
+      </ul>
+      ${analysis.hooks?.secondaryPatterns?.length ? `
+        <div class="tag-list" style="margin-top:16px">
+          ${analysis.hooks.secondaryPatterns.map(p => `<span class="tag tag-muted">${esc(p)}</span>`).join('')}
+        </div>` : ''}
+    `
+  }));
+
+  // CADENCE
+  grid.appendChild(makeCard({
+    label: 'Posting cadence', labelColor: '#6B6356',
+    content: `
+      <h3>${esc(analysis.cadence?.schedule || '')}</h3>
+      <p class="dim-body">${esc(analysis.cadence?.consistency || '')}</p>
+      <p class="dim-body" style="margin-top:8px">${esc(analysis.cadence?.durationStrategy || '')}</p>
+    `
+  }));
+
+  // AUDIENCE
+  grid.appendChild(makeCard({
+    label: 'Audience profile', labelColor: '#4B8BCC',
+    content: `
+      <div class="tag-list" style="margin-bottom:12px">
+        <span class="tag tag-muted">${esc(analysis.audience?.estimatedAge || '')}</span>
+        <span class="tag tag-muted">${esc(analysis.audience?.viewerIntent || '')}</span>
+      </div>
+      <p class="dim-body">${esc(analysis.audience?.primaryProfile || '')}</p>
+      ${analysis.audience?.loyaltySignal ? `<p class="dim-body" style="margin-top:8px;font-size:12.5px">${esc(analysis.audience.loyaltySignal)}</p>` : ''}
+    `
+  }));
+
+  // THUMBNAILS
+  grid.appendChild(makeCard({
+    label: 'Thumbnail formula', labelColor: '#9B6DAF',
+    content: `
+      <h3>${esc(analysis.thumbnails?.formula || '')}</h3>
+      <div class="tag-list" style="margin-top:12px">
+        ${(analysis.thumbnails?.characteristics || []).map(c => `<span class="tag tag-muted">${esc(c)}</span>`).join('')}
+      </div>
+      ${analysis.thumbnails?.textOverlayStyle ? `<p class="dim-body" style="margin-top:12px;font-size:12.5px">${esc(analysis.thumbnails.textOverlayStyle)}</p>` : ''}
+    `
+  }));
+
+  // CONTENT PILLARS
+  grid.appendChild(makeCard({
+    label: 'Content pillars', labelColor: '#C4501A',
+    content: `
+      <div class="pillar-bars">
+        ${(analysis.pillars || []).map(p => `
+          <div class="pillar-row">
+            <span class="pillar-name">${esc(p.name)}</span>
+            <div class="pillar-track"><div class="pillar-fill" style="width:0%" data-width="${p.percentage}%"></div></div>
+            <span class="pillar-pct">${p.percentage}%</span>
+          </div>
+          ${p.description ? `<p style="font-size:12px;color:var(--ink-light);margin-bottom:8px;padding-left:0;line-height:1.5">${esc(p.description)}</p>` : ''}
+        `).join('')}
+      </div>
+    `
+  }));
+
+  // MONETIZATION
+  grid.appendChild(makeCard({
+    label: 'Monetization', labelColor: '#2D9E6B',
+    content: `
+      <h3>${esc(analysis.monetization?.primaryApproach || '')}</h3>
+      <div class="tag-list" style="margin-top:12px;margin-bottom:12px">
+        ${(analysis.monetization?.signals || []).map(s => `<span class="tag tag-accent">${esc(s)}</span>`).join('')}
+      </div>
+      ${analysis.monetization?.brandAffinities ? `<p class="dim-body" style="font-size:12.5px">${esc(analysis.monetization.brandAffinities)}</p>` : ''}
+    `
+  }));
+
+  // GAPS
+  grid.appendChild(makeCard({
+    label: 'Competitive gaps', labelColor: '#2D9E6B', full: true,
+    content: `
+      <p class="dim-body" style="margin-bottom:16px">Opportunities this creator is leaving on the table.</p>
+      <div class="gap-list">
+        ${(analysis.gaps || []).map(g => `
+          <div class="gap-item">
+            <strong>${esc(g.opportunity)}</strong>
+            <p>${esc(g.rationale)}</p>
+          </div>
+        `).join('')}
+      </div>
+    `
+  }));
+
+  // Animate pillar bars
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.pillar-fill').forEach(el => {
+      el.style.width = el.dataset.width;
+    });
+  });
+}
+
+function makeCard({ label, labelColor, content, full = false }) {
+  const div = document.createElement('div');
+  div.className = `dim-card${full ? ' full' : ''}`;
+  div.innerHTML = `
+    <div class="dim-label" style="color:${labelColor}">
+      <span class="dim-dot" style="background:${labelColor}"></span>
+      ${label}
+    </div>
+    ${content}
+  `;
+  return div;
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+function copyLink() {
+  const url = currentReportId
+    ? `${location.origin}/app?r=${currentReportId}`
+    : location.href;
+  navigator.clipboard.writeText(url).then(() => toast('Link copied!'));
+}
+
+function downloadReport() {
+  if (!currentReport) return;
+  const { channel, analysis, videoCount } = currentReport;
+
+  // Build a text version (PDF generation without a library — we'll open print dialog)
+  const win = window.open('', '_blank');
+  const name = channel?.name || 'Creator';
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<title>${name} — Creator Playbook · Wavecrest Pro</title>
+<style>
+body { font-family: Georgia, serif; max-width: 720px; margin: 40px auto; color: #111; line-height: 1.7; padding: 0 20px; }
+h1 { font-size: 2rem; margin-bottom: 6px; }
+h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: .08em; color: #C4501A; margin: 28px 0 8px; font-family: monospace; }
+p { margin-bottom: 10px; color: #444; }
+ul { padding-left: 20px; color: #444; }
+li { margin-bottom: 6px; }
+.meta { font-family: monospace; font-size: 13px; color: #888; margin-bottom: 32px; }
+.divider { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+@media print { body { margin: 20px; } }
+</style>
+</head>
+<body>
+<h1>${name}</h1>
+<p class="meta">${channel?.handle ? channel.handle + ' · ' : ''}${fmtNum(channel?.subscriberCount || 0)} subscribers · ${videoCount} videos analyzed · wavecrest.pro</p>
+
+<h2>Hook Patterns</h2>
+<p>${analysis?.hooks?.primaryPattern || ''}</p>
+<p><em>${analysis?.hooks?.frequency || ''}</em></p>
+<ul>${(analysis?.hooks?.examples || []).map(e => `<li>"${e}"</li>`).join('')}</ul>
+
+<hr class="divider"/>
+<h2>Posting Cadence</h2>
+<p>${analysis?.cadence?.schedule || ''}</p>
+<p>${analysis?.cadence?.consistency || ''}</p>
+<p>${analysis?.cadence?.durationStrategy || ''}</p>
+
+<hr class="divider"/>
+<h2>Thumbnail Formula</h2>
+<p>${analysis?.thumbnails?.formula || ''}</p>
+<ul>${(analysis?.thumbnails?.characteristics || []).map(c => `<li>${c}</li>`).join('')}</ul>
+
+<hr class="divider"/>
+<h2>Audience Profile</h2>
+<p>${analysis?.audience?.primaryProfile || ''}</p>
+<p>Age range: ${analysis?.audience?.estimatedAge || '—'} · Intent: ${analysis?.audience?.viewerIntent || '—'}</p>
+<p>${analysis?.audience?.loyaltySignal || ''}</p>
+
+<hr class="divider"/>
+<h2>Content Pillars</h2>
+${(analysis?.pillars || []).map(p => `<p><strong>${p.name} (${p.percentage}%)</strong> — ${p.description}</p>`).join('')}
+
+<hr class="divider"/>
+<h2>Monetization</h2>
+<p>${analysis?.monetization?.primaryApproach || ''}</p>
+<ul>${(analysis?.monetization?.signals || []).map(s => `<li>${s}</li>`).join('')}</ul>
+<p>${analysis?.monetization?.brandAffinities || ''}</p>
+
+<hr class="divider"/>
+<h2>Competitive Gaps</h2>
+${(analysis?.gaps || []).map(g => `<p><strong>${g.opportunity}</strong><br/>${g.rationale}</p>`).join('')}
+
+<hr class="divider"/>
+<p style="font-size:12px;color:#aaa">Generated by Wavecrest Pro · wavecrest.pro · ${new Date().toLocaleDateString()}</p>
+</body>
+</html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 500);
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtNum(n) {
+  n = parseInt(n || 0);
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+  return String(n);
+}
+
+// Enter key on URL input
+document.getElementById('url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startAnalysis();
+});
+</script>
+</body>
+</html>
