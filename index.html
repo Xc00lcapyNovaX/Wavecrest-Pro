@@ -898,14 +898,14 @@
     gsap.utils.toArray('.reveal').forEach(el => {
       gsap.fromTo(el, { opacity:0, y:28 }, {
         opacity:1, y:0, duration:.7, ease:'power2.out',
-        scrollTrigger: { trigger:el, start:'top 87%', toggleActions:'play none none none' }
+        scrollTrigger: { trigger:el, start:'top 87%', toggleActions:'restart none none reverse' }
       });
     });
 
     gsap.utils.toArray('.bento > *').forEach((el, i) => {
       gsap.fromTo(el, { opacity:0, y:22 }, {
         opacity:1, y:0, duration:.6, ease:'power2.out', delay: i * .07,
-        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' }
+        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'restart none none reverse' }
       });
     });
 
@@ -915,14 +915,14 @@
     gsap.utils.toArray('.testi-grid > .card').forEach((el, i) => {
       gsap.fromTo(el, { opacity:0, y:20 }, {
         opacity:1, y:0, duration:.55, ease:'power2.out', delay: i * .1,
-        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' }
+        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'restart none none reverse' }
       });
     });
 
     gsap.utils.toArray('.pricing-grid > .card').forEach((el, i) => {
       gsap.fromTo(el, { opacity:0, y:20 }, {
         opacity:1, y:0, duration:.55, ease:'power2.out', delay: i * .1,
-        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' }
+        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'restart none none reverse' }
       });
     });
   }

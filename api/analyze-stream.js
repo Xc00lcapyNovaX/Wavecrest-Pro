@@ -1,18 +1,8 @@
-// api/analyze-stream.js — GET /api/analyze-stream?url=...
-// Server-Sent Events: streams progress then final result
-import pg from 'pg';
-const { Pool } = pg;
+import { resolveChannel, fetchVideos } from '../lib/youtube.js';
+import { runAnalysis } from '../lib/analysis.js';
+import { saveReport } from '../lib/db.js';
 
 export const config = { maxDuration: 60 };
-
-const YOUTUBE_API = 'https://www.googleapis.com/youtube/v3';
-const GROQ_API = 'https://api.groq.com/openai/v1/chat/completions';
-
-let pool;
-function getPool() {
-  if (!pool) pool = new Pool({ connectionString: process.env.DB_URL, ssl: { rejectUnauthorized: false } });
-  return pool;
-}
 
 export default async function handler(req, res) {
   const url = (req.query.url || '').trim();
@@ -21,30 +11,28 @@ export default async function handler(req, res) {
   const { YOUTUBE_API_KEY, GROQ_API_KEY } = process.env;
   if (!YOUTUBE_API_KEY || !GROQ_API_KEY) { res.status(500).end('Missing env vars'); return; }
 
-  // SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.flushHeaders();
 
-  const send = (event, data) => {
-    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-  };
+  const send = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 
   try {
     send('progress', { step: 1, label: 'Fetching channel info' });
     const channel = await resolveChannel(url, YOUTUBE_API_KEY);
-    send('progress', { step: 2, label: `Found ${channel.name} · fetching videos` });
 
+    send('progress', { step: 2, label: `Found ${channel.name} · fetching videos` });
     const videos = await fetchVideos(channel.uploadsPlaylistId, YOUTUBE_API_KEY, 100);
     if (videos.length < 3) { send('error', { message: 'Too few public videos (need 3+)' }); res.end(); return; }
+
     send('progress', { step: 3, label: `${videos.length} videos loaded · running AI analysis` });
-
     const analysis = await runAnalysis(channel, videos, GROQ_API_KEY);
-    send('progress', { step: 4, label: 'Saving report' });
 
+    send('progress', { step: 4, label: 'Saving report' });
     const reportId = await saveReport(channel, videos.length, analysis);
+
     send('done', {
       reportId,
       channel: { id: channel.id, name: channel.name, handle: channel.handle, subscriberCount: channel.subscriberCount, thumbnailUrl: channel.thumbnailUrl, publishedAt: channel.publishedAt },
@@ -57,212 +45,4 @@ export default async function handler(req, res) {
   }
 
   res.end();
-}
-
-async function ytFetch(endpoint, apiKey) {
-  const r = await fetch(`${YOUTUBE_API}/${endpoint}&key=${apiKey}`);
-  if (!r.ok) {
-    const text = await r.text().catch(() => '');
-    let msg = `YouTube API error (${r.status})`;
-    try { const json = JSON.parse(text); msg = json.error?.message || msg; } catch {}
-    throw new Error(msg);
-  }
-  return r.json();
-}
-
-async function resolveChannel(url, apiKey) {
-  url = url.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/^m\./i, '');
-  if (!/[./]/.test(url)) url = '@' + url.replace(/^@/, '');
-  const handleMatch = url.match(/(?:youtube\.com\/)?@([\w.-]+)/);
-  const channelIdMatch = url.match(/youtube\.com\/channel\/(UC[\w-]+)/);
-  const videoMatch = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/);
-  const legacyUserMatch = url.match(/youtube\.com\/(?:user|c)\/([\w.-]+)/);
-  if (channelIdMatch) {
-    const r = await ytFetch(`channels?part=snippet,statistics,contentDetails&id=${channelIdMatch[1]}`, apiKey);
-    if (!r.items?.length) throw new Error('Channel not found');
-    return extractChannelInfo(r.items[0]);
-  }
-  if (handleMatch) {
-    const r = await ytFetch(`channels?part=snippet,statistics,contentDetails&forHandle=@${handleMatch[1]}`, apiKey);
-    if (!r.items?.length) throw new Error(`No channel found for @${handleMatch[1]}`);
-    return extractChannelInfo(r.items[0]);
-  }
-  if (videoMatch) {
-    const vr = await ytFetch(`videos?part=snippet&id=${videoMatch[1]}`, apiKey);
-    if (!vr.items?.length) throw new Error('Video not found');
-    const cr = await ytFetch(`channels?part=snippet,statistics,contentDetails&id=${vr.items[0].snippet.channelId}`, apiKey);
-    if (!cr.items?.length) throw new Error('Channel not found');
-    return extractChannelInfo(cr.items[0]);
-  }
-  if (legacyUserMatch) {
-    const r = await ytFetch(`channels?part=snippet,statistics,contentDetails&forUsername=${legacyUserMatch[1]}`, apiKey);
-    if (r.items?.length) return extractChannelInfo(r.items[0]);
-  }
-  throw new Error('Could not parse that URL. Try: youtube.com/@handle or a video URL');
-}
-
-function extractChannelInfo(item) {
-  return {
-    id: item.id, name: item.snippet?.title || '', handle: item.snippet?.customUrl || '',
-    description: (item.snippet?.description || '').slice(0, 500),
-    subscriberCount: parseInt(item.statistics?.subscriberCount || 0),
-    videoCountTotal: parseInt(item.statistics?.videoCount || 0),
-    viewCountTotal: parseInt(item.statistics?.viewCount || 0),
-    thumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || '',
-    uploadsPlaylistId: item.contentDetails?.relatedPlaylists?.uploads || '',
-    publishedAt: item.snippet?.publishedAt || ''
-  };
-}
-
-async function fetchVideos(playlistId, apiKey, maxVideos = 100) {
-  if (!playlistId) throw new Error('Could not find channel uploads playlist');
-  const videoIds = [];
-  let pageToken = '';
-  while (videoIds.length < maxVideos) {
-    const perPage = Math.min(50, maxVideos - videoIds.length);
-    let endpoint = `playlistItems?part=snippet&playlistId=${playlistId}&maxResults=${perPage}`;
-    if (pageToken) endpoint += `&pageToken=${pageToken}`;
-    const r = await ytFetch(endpoint, apiKey);
-    if (!r.items?.length) break;
-    for (const item of r.items) { const vid = item.snippet?.resourceId?.videoId; if (vid) videoIds.push(vid); }
-    pageToken = r.nextPageToken || '';
-    if (!pageToken || videoIds.length >= maxVideos) break;
-  }
-  const videos = [];
-  for (let i = 0; i < videoIds.length; i += 50) {
-    const ids = videoIds.slice(i, i + 50).join(',');
-    const r = await ytFetch(`videos?part=snippet,statistics,contentDetails&id=${ids}`, apiKey);
-    if (r.items) videos.push(...r.items);
-  }
-  return videos.map(v => ({
-    id: v.id, title: v.snippet?.title || '',
-    description: (v.snippet?.description || '').slice(0, 400),
-    publishedAt: v.snippet?.publishedAt || '',
-    viewCount: parseInt(v.statistics?.viewCount || 0),
-    likeCount: parseInt(v.statistics?.likeCount || 0),
-    commentCount: parseInt(v.statistics?.commentCount || 0),
-    duration: parseDuration(v.contentDetails?.duration || 'PT0S'),
-    thumbnailUrl: v.snippet?.thumbnails?.maxres?.url || v.snippet?.thumbnails?.high?.url || ''
-  }));
-}
-
-function parseDuration(iso) {
-  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!m) return 0;
-  return (parseInt(m[1] || 0) * 3600) + (parseInt(m[2] || 0) * 60) + parseInt(m[3] || 0);
-}
-
-function computeCadence(videos) {
-  if (videos.length < 2) return {};
-  const dates = videos.map(v => new Date(v.publishedAt)).filter(d => !isNaN(d)).sort((a, b) => a - b);
-  const gaps = [];
-  for (let i = 1; i < dates.length; i++) gaps.push((dates[i] - dates[i - 1]) / 86400000);
-  const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const dayCount = new Array(7).fill(0);
-  dates.slice(-60).forEach(d => dayCount[d.getDay()]++);
-  const peakDay = dayNames[dayCount.indexOf(Math.max(...dayCount))];
-  const durations = videos.map(v => v.duration).filter(d => d > 0);
-  const avgDurationSec = durations.reduce((a, b) => a + b, 0) / (durations.length || 1);
-  return {
-    avgDaysBetweenVideos: Math.round(avgGap * 10) / 10,
-    videosPerMonth: Math.round((30 / avgGap) * 10) / 10,
-    peakDay,
-    avgDurationMinutes: Math.round(avgDurationSec / 60 * 10) / 10,
-    shortestMinutes: Math.round(Math.min(...durations) / 60 * 10) / 10,
-    longestMinutes: Math.round(Math.max(...durations) / 60 * 10) / 10
-  };
-}
-
-async function runAnalysis(channel, videos, groqKey) {
-  const cadence = computeCadence(videos);
-  const byViews = [...videos].sort((a, b) => b.viewCount - a.viewCount);
-  const top20 = byViews.slice(0, 20);
-  const recent = videos.slice(0, 30);
-  const videoList = (arr, includeStats = true) =>
-    arr.map((v, i) => {
-      const stats = includeStats ? ` | ${fmtNum(v.viewCount)} views | ${Math.round(v.duration / 60)}min` : ` | ${v.publishedAt.slice(0, 10)}`;
-      return `${i + 1}. "${v.title}"${stats}`;
-    }).join('\n');
-  const topViewsAvg = top20.reduce((a, v) => a + v.viewCount, 0) / top20.length;
-  const allViewsAvg = videos.reduce((a, v) => a + v.viewCount, 0) / videos.length;
-  const outperformers = top20.filter(v => v.viewCount > topViewsAvg * 1.5);
-  const channelAgeMonths = channel.publishedAt ? Math.max(1, (Date.now() - new Date(channel.publishedAt)) / (1000 * 60 * 60 * 24 * 30)) : 12;
-  const estimatedMonthlyViews = Math.round(channel.viewCountTotal / channelAgeMonths);
-
-  const prompt = `You are a creator intelligence analyst. Study the video titles and stats below. Return ONLY a JSON object — no other text.
-
-CRITICAL RULES:
-1. CITE SPECIFIC TITLES by number (e.g. "video #3", "top performer #1"). Never make generic statements.
-2. GAPS must be topics appearing ZERO times in the title list. No generic advice.
-3. MONETIZATION SIGNALS must be exact observations from titles/descriptions, not guesses.
-4. HOOK PATTERNS must include verbatim word structures from actual titles.
-5. Never state things obvious from the channel name alone.
-
-CHANNEL: ${channel.name}${channel.handle ? ' (' + channel.handle + ')' : ''}
-Subscribers: ${fmtNum(channel.subscriberCount)} | Total views: ${fmtNum(channel.viewCountTotal)}
-Channel avg views: ${fmtNum(Math.round(allViewsAvg))} | Top 20 avg: ${fmtNum(Math.round(topViewsAvg))}
-Description: ${channel.description}
-
-TOP 20 VIDEOS BY VIEWS:
-${videoList(top20)}
-
-OUTPERFORMERS (>${fmtNum(Math.round(topViewsAvg * 1.5))} views):
-${outperformers.map(v => `"${v.title}" | ${fmtNum(v.viewCount)} views`).join('\n') || 'None significantly above average'}
-
-RECENT 30 VIDEOS:
-${videoList(recent, false)}
-
-CADENCE:
-- Avg ${cadence.avgDaysBetweenVideos} days between uploads (~${cadence.videosPerMonth}/month)
-- Peak day: ${cadence.peakDay} | Avg duration: ${cadence.avgDurationMinutes}min (range: ${cadence.shortestMinutes}–${cadence.longestMinutes}min)
-- Estimated monthly views: ~${fmtNum(estimatedMonthlyViews)}
-
-Return JSON with exactly these keys:
-hooks: { primaryPattern: "Verbatim structural formula from actual titles", examples: ["3 real titles"], frequency: "X of top 20", secondaryPatterns: ["2nd", "3rd"] }
-thumbnails: { formula: "Specific visual approach", characteristics: ["3 elements"], textOverlayStyle: "Text style" }
-cadence: { schedule: "Specific pattern with numbers", consistency: "Erratic or clockwork", durationStrategy: "What the range reveals", peakPerformanceWindow: "When outperformers cluster" }
-audience: { primaryProfile: "Specific psychographic", estimatedAge: "Range", viewerIntent: "One sentence", loyaltySignal: "Engagement observation" }
-pillars: [3: { name: "Label", percentage: number, description: "Which videos + performance" }]
-monetization: { primaryApproach: "Model with evidence or 'No clear signals — likely AdSense'", signals: ["Evidence from titles only"], brandAffinities: "Specific brands/categories" }
-gaps: [3: { opportunity: "Topic appearing ZERO times in titles", rationale: "Cite video numbers" }]
-earningsEstimate: { monthlyViewsEstimate: ${estimatedMonthlyViews}, cpmRPM: "Pick: Finance $5-17 | Insurance $7-17 | Legal $5-15 | Real Estate $5-13 | Health/Medical $7-22 | Crypto $5-13 | AI/Tech $4-10 | B2B SaaS $4-12 | Marketing $4-9 | Education $3-8 | Consumer Tech $2-10 | Automotive $4-9 | Food/Cooking $2-5 | Beauty $2-5 | Travel $2-6 | DIY $2-6 | Parenting $3-6 | Gaming $1-5 | Entertainment $1-4 | Music $0.5-1.5. State niche and RPM range.", estimatedMonthlyAdRevenue: "low = ${estimatedMonthlyViews} x RPM_low/1000, high = ${estimatedMonthlyViews} x RPM_high/1000", otherRevenue: "Evidence-based or 'unclear from data'", totalEstimate: "'$X,000–$Y,000/month'" }
-videoIdeas: [5: { title: "Ready-to-publish title in creator's style", rationale: "Cite top performers", estimatedPerformance: "vs ${fmtNum(Math.round(allViewsAvg))} avg" }]`;
-
-  const r = await fetch(GROQ_API, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: 'You are a creator intelligence analyst. Always respond with valid JSON only.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.2, max_tokens: 4000, response_format: { type: 'json_object' }
-    })
-  });
-  if (!r.ok) { const err = await r.text().catch(() => ''); throw new Error(`AI failed (${r.status}): ${err.slice(0, 200)}`); }
-  const data = await r.json();
-  const text = data.choices?.[0]?.message?.content;
-  if (!text) throw new Error('AI returned empty response');
-  const aiAnalysis = JSON.parse(text);
-  return { ...aiAnalysis, cadence: { ...aiAnalysis.cadence, avgDaysBetweenVideos: cadence.avgDaysBetweenVideos, videosPerMonth: cadence.videosPerMonth, peakDay: cadence.peakDay, avgDurationMinutes: cadence.avgDurationMinutes } };
-}
-
-async function saveReport(channel, videoCount, analysis) {
-  try {
-    const db = getPool();
-    await db.query(`CREATE TABLE IF NOT EXISTS reports (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), channel_id text NOT NULL, channel_name text NOT NULL, channel_handle text, channel_thumbnail text, subscriber_count bigint, video_count int, analysis jsonb NOT NULL, created_at timestamptz DEFAULT now())`);
-    const result = await db.query(
-      `INSERT INTO reports (channel_id, channel_name, channel_handle, channel_thumbnail, subscriber_count, video_count, analysis) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
-      [channel.id, channel.name, channel.handle, channel.thumbnailUrl, channel.subscriberCount, videoCount, JSON.stringify(analysis)]
-    );
-    return result.rows[0].id;
-  } catch (err) { console.error('[saveReport]', err.message); return null; }
-}
-
-function fmtNum(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
-  return String(n);
 }

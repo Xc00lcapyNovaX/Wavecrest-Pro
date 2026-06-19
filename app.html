@@ -393,20 +393,6 @@ function resetSteps() {
   });
 }
 
-function advanceSteps() {
-  const delays = [0, 3000, 10000, 45000]; // rough timing
-  const labels = ['Fetching channel info', 'Loading recent videos', 'Analyzing 7 dimensions', 'Building your playbook'];
-  delays.forEach((delay, i) => {
-    setTimeout(() => {
-      const prev = document.getElementById(`step-${i}`);
-      const curr = document.getElementById(`step-${i + 1}`);
-      if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
-      if (curr) { curr.classList.add('active'); }
-      const stepEl = document.getElementById('loading-step');
-      if (stepEl && labels[i + 1]) stepEl.textContent = labels[i + 1];
-    }, delay);
-  });
-}
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 

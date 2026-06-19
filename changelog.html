@@ -298,7 +298,7 @@
   document.getElementById('log-date').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     gsap.utils.toArray('.reveal').forEach(el => {
-      gsap.fromTo(el, { opacity:0, y:20 }, { opacity:1, y:0, duration:.6, ease:'power2.out', scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+      gsap.fromTo(el, { opacity:0, y:20 }, { opacity:1, y:0, duration:.6, ease:'power2.out', scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'restart none none reverse' } });
     });
   }
   ScrollTrigger.create({ start:40, onEnter:() => document.getElementById('nav').classList.add('scrolled'), onLeaveBack:() => document.getElementById('nav').classList.remove('scrolled') });
