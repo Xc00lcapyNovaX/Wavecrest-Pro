@@ -129,6 +129,21 @@
     /* Copy toast */
     .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 200; }
     .toast.show { opacity: 1; }
+
+    .earnings-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .earnings-row:last-child { border-bottom: none; }
+    .earnings-label { font-size: 12.5px; color: var(--ink-mid); }
+    .earnings-val { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+    .earnings-total { background: rgba(45,158,107,.06); border: 1px solid rgba(45,158,107,.18); border-radius: 8px; padding: 10px 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .earnings-total-label { font-size: 12px; color: var(--green); font-weight: 600; }
+    .earnings-total-val { font-size: 15px; font-weight: 700; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+    .signal-list { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+    .signal-list li { font-size: 12.5px; color: var(--ink-mid); padding: 6px 10px 6px 14px; border-left: 2px solid rgba(196,80,26,.3); line-height: 1.5; }
+    .idea-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .idea-item { padding: 11px 14px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: 8px; }
+    .idea-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.4; }
+    .idea-meta { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+    .idea-perf { display: inline-block; margin-top: 5px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; padding: 2px 7px; border-radius: 3px; background: rgba(196,80,26,.08); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -495,9 +510,9 @@ function renderReport(data) {
     label: 'Monetization', labelColor: '#2D9E6B',
     content: `
       <h3>${esc(analysis.monetization?.primaryApproach || '')}</h3>
-      <div class="tag-list" style="margin-top:12px;margin-bottom:12px">
-        ${(analysis.monetization?.signals || []).map(s => `<span class="tag tag-accent">${esc(s)}</span>`).join('')}
-      </div>
+      <ul class="signal-list">
+        ${(analysis.monetization?.signals || []).map(s => `<li>${esc(s)}</li>`).join('')}
+      </ul>
       ${analysis.monetization?.brandAffinities ? `<p class="dim-body" style="font-size:12.5px">${esc(analysis.monetization.brandAffinities)}</p>` : ''}
     `
   }));
@@ -517,6 +532,59 @@ function renderReport(data) {
       </div>
     `
   }));
+
+  // EARNINGS
+  const e = analysis.earningsEstimate;
+  if (e) {
+    grid.appendChild(makeCard({
+      label: 'Earnings estimate', labelColor: '#6B6356',
+      content: `
+        <div>
+          <div class="earnings-row">
+            <span class="earnings-label">Est. monthly views</span>
+            <span class="earnings-val">${fmtNum(e.monthlyViewsEstimate || 0)}</span>
+          </div>
+          <div class="earnings-row">
+            <span class="earnings-label">CPM range</span>
+            <span class="earnings-val">${esc(e.cpmRange?.match(/\$[\d.,–-]+/)?.[0] || e.cpmRange || '—')}</span>
+          </div>
+          <div class="earnings-row">
+            <span class="earnings-label">Ad revenue / month</span>
+            <span class="earnings-val">${esc(e.estimatedMonthlyAdRevenue || '—')}</span>
+          </div>
+          ${e.otherRevenue && !e.otherRevenue.includes('unclear') ? `
+          <div class="earnings-row">
+            <span class="earnings-label">Other streams</span>
+            <span class="earnings-val" style="font-size:11.5px;font-family:Inter,sans-serif;font-weight:400;color:var(--ink-mid)">${esc(e.otherRevenue)}</span>
+          </div>` : ''}
+        </div>
+        ${e.totalEstimate ? `
+        <div class="earnings-total">
+          <span class="earnings-total-label">Est. monthly total</span>
+          <span class="earnings-total-val">${esc(e.totalEstimate)}</span>
+        </div>` : ''}
+        <p style="font-size:11px;color:var(--ink-light);margin-top:8px;line-height:1.5">Rough estimate. Actual earnings vary by geography and monetization setup.</p>
+      `
+    }));
+  }
+
+  // VIDEO IDEAS
+  if (analysis.videoIdeas?.length) {
+    grid.appendChild(makeCard({
+      label: 'Videos to make', labelColor: '#4B8BCC', full: true,
+      content: `
+        <div class="idea-list">
+          ${(analysis.videoIdeas || []).map(v => `
+            <div class="idea-item">
+              <div class="idea-title">${esc(v.title)}</div>
+              <div class="idea-meta">${esc(v.rationale)}</div>
+              ${v.estimatedPerformance ? `<span class="idea-perf">${esc(v.estimatedPerformance)}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `
+    }));
+  }
 
   // Animate pillar bars
   requestAnimationFrame(() => {
