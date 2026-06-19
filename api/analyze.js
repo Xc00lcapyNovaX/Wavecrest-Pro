@@ -5,7 +5,7 @@
 //
 // Required env vars:
 //   YOUTUBE_API_KEY — from Google Cloud Console (YouTube Data API v3)
-//   GEMINI_API_KEY  — from https://aistudio.google.com/app/apikey (free)
+//   GROQ_API_KEY    — from https://console.groq.com (free)
 //   DB_URL          — Postgres connection string
 
 import pg from 'pg';
@@ -14,7 +14,7 @@ const { Pool } = pg;
 export const config = { maxDuration: 60 };
 
 const YOUTUBE_API = 'https://www.googleapis.com/youtube/v3';
-const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GROQ_API = 'https://api.groq.com/openai/v1/chat/completions';
 
 // Reuse DB pool across warm invocations
 let pool;
@@ -50,9 +50,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Paste a YouTube channel URL, @handle, or video URL' });
   }
 
-  const { YOUTUBE_API_KEY, GEMINI_API_KEY } = process.env;
+  const { YOUTUBE_API_KEY, GROQ_API_KEY } = process.env;
   if (!YOUTUBE_API_KEY) return res.status(500).json({ error: 'YOUTUBE_API_KEY not configured' });
-  if (!GEMINI_API_KEY) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+  if (!GROQ_API_KEY) return res.status(500).json({ error: 'GROQ_API_KEY not configured' });
 
   try {
     // 1. Resolve URL → channel info
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
     }
 
     // 3. Run 7-dimension AI analysis
-    const analysis = await runAnalysis(channel, videos, GEMINI_API_KEY);
+    const analysis = await runAnalysis(channel, videos, GROQ_API_KEY);
 
     // 4. Persist to DB (best-effort — don't fail if DB is down)
     const reportId = await saveReport(channel, videos.length, analysis);
@@ -267,7 +267,7 @@ function computeCadence(videos) {
   };
 }
 
-async function runAnalysis(channel, videos, geminiKey) {
+async function runAnalysis(channel, videos, groqKey) {
   const cadence = computeCadence(videos);
 
   const byViews = [...videos].sort((a, b) => b.viewCount - a.viewCount);
@@ -307,16 +307,24 @@ Return a JSON object with exactly these keys:
 - monetization: object with primaryApproach (string), signals (array of 3 strings), brandAffinities (string)
 - gaps: array of 3 objects each with opportunity (string) and rationale (string)`;
 
-  const r = await fetch(`${GEMINI_API}?key=${geminiKey}`, {
+  const r = await fetch(GROQ_API, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-        maxOutputTokens: 2048
-      }
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a creator intelligence analyst. Always respond with valid JSON only — no markdown, no explanation, just the JSON object.'
+        },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 2048,
+      response_format: { type: 'json_object' }
     })
   });
 
@@ -326,10 +334,10 @@ Return a JSON object with exactly these keys:
   }
 
   const data = await r.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  const text = data.choices?.[0]?.message?.content;
   if (!text) throw new Error('AI returned an empty response — try again');
 
-  // responseMimeType guarantees valid JSON — no regex needed
+  // response_format: json_object guarantees valid JSON
   const aiAnalysis = JSON.parse(text);
 
   return {
