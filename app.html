@@ -95,32 +95,46 @@
     .stat-chip strong { color: var(--ink); }
 
     /* Dimension cards */
-    .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 680px) { .dim-grid { grid-template-columns: 1fr; } }
-    .dim-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+    .dim-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
     .dim-card.full { grid-column: 1 / -1; }
-    .dim-label { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+    .dim-label { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
     .dim-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .dim-card h3 { font-size: 1rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
-    .dim-body { font-size: 13.5px; color: var(--ink-mid); line-height: 1.7; }
-    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-    .tag { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+    .dim-card h3 { font-size: .95rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; line-height: 1.4; }
+    .dim-body { font-size: 13px; color: var(--ink-mid); line-height: 1.65; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .tag { padding: 3px 9px; border-radius: 4px; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; }
     .tag-dark { background: var(--ink); color: var(--bg-warm); }
     .tag-accent { background: rgba(196,80,26,.1); color: var(--accent); }
     .tag-green { background: rgba(45,158,107,.1); color: var(--green); }
     .tag-muted { background: var(--bg-warm); color: var(--ink-mid); border: 1px solid var(--border); }
-    .example-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-    .example-list li { font-size: 13px; color: var(--ink-mid); padding: 8px 12px; background: var(--bg-warm); border-radius: 6px; border-left: 2px solid var(--accent); line-height: 1.5; }
-    .pillar-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-    .pillar-row { display: grid; grid-template-columns: 120px 1fr 36px; gap: 12px; align-items: center; }
-    .pillar-name { font-size: 12.5px; color: var(--ink); font-weight: 500; }
-    .pillar-track { height: 6px; background: var(--bg-warm); border-radius: 3px; overflow: hidden; }
+    .example-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .example-list li { font-size: 12.5px; color: var(--ink-mid); padding: 7px 11px; background: var(--bg-warm); border-radius: 6px; border-left: 2px solid var(--accent); line-height: 1.5; }
+    .signal-list { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+    .signal-list li { font-size: 12.5px; color: var(--ink-mid); padding: 6px 10px 6px 14px; border-left: 2px solid rgba(196,80,26,.3); line-height: 1.5; }
+    .pillar-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .pillar-row { display: grid; grid-template-columns: 110px 1fr 32px; gap: 10px; align-items: center; }
+    .pillar-name { font-size: 12px; color: var(--ink); font-weight: 500; }
+    .pillar-track { height: 5px; background: var(--bg-warm); border-radius: 3px; overflow: hidden; }
     .pillar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 1s ease; }
     .pillar-pct { font-size: 11px; color: var(--ink-light); font-family: 'IBM Plex Mono', monospace; text-align: right; }
-    .gap-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-    .gap-item { padding: 12px 16px; background: rgba(45,158,107,.05); border: 1px solid rgba(45,158,107,.18); border-radius: 8px; }
-    .gap-item strong { font-size: 13px; color: var(--ink); display: block; margin-bottom: 4px; }
+    .gap-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .gap-item { padding: 10px 14px; background: rgba(45,158,107,.05); border: 1px solid rgba(45,158,107,.18); border-radius: 8px; }
+    .gap-item strong { font-size: 13px; color: var(--ink); display: block; margin-bottom: 3px; }
     .gap-item p { font-size: 12.5px; color: var(--ink-mid); line-height: 1.6; }
+    .earnings-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .earnings-row:last-child { border-bottom: none; }
+    .earnings-label { font-size: 12.5px; color: var(--ink-mid); }
+    .earnings-val { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+    .earnings-total { background: rgba(45,158,107,.06); border: 1px solid rgba(45,158,107,.18); border-radius: 8px; padding: 10px 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .earnings-total-label { font-size: 12px; color: var(--green); font-weight: 600; }
+    .earnings-total-val { font-size: 15px; font-weight: 700; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+    .idea-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .idea-item { padding: 11px 14px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: 8px; }
+    .idea-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.4; }
+    .idea-meta { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+    .idea-perf { display: inline-block; margin-top: 5px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; padding: 2px 7px; border-radius: 3px; background: rgba(196,80,26,.08); color: var(--accent); }
 
     /* New analysis CTA */
     .new-analysis-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg-dark); color: white; padding: 12px 20px; border-radius: 40px; display: flex; align-items: center; gap: 12px; font-size: 13.5px; box-shadow: 0 4px 24px rgba(0,0,0,.25); z-index: 50; white-space: nowrap; }
@@ -495,10 +509,10 @@ function renderReport(data) {
     label: 'Monetization', labelColor: '#2D9E6B',
     content: `
       <h3>${esc(analysis.monetization?.primaryApproach || '')}</h3>
-      <div class="tag-list" style="margin-top:12px;margin-bottom:12px">
-        ${(analysis.monetization?.signals || []).map(s => `<span class="tag tag-accent">${esc(s)}</span>`).join('')}
-      </div>
-      ${analysis.monetization?.brandAffinities ? `<p class="dim-body" style="font-size:12.5px">${esc(analysis.monetization.brandAffinities)}</p>` : ''}
+      <ul class="signal-list">
+        ${(analysis.monetization?.signals || []).map(s => `<li>${esc(s)}</li>`).join('')}
+      </ul>
+      ${analysis.monetization?.brandAffinities ? `<p class="dim-body" style="margin-top:10px;font-size:12.5px">${esc(analysis.monetization.brandAffinities)}</p>` : ''}
     `
   }));
 
@@ -506,7 +520,6 @@ function renderReport(data) {
   grid.appendChild(makeCard({
     label: 'Competitive gaps', labelColor: '#2D9E6B', full: true,
     content: `
-      <p class="dim-body" style="margin-bottom:16px">Opportunities this creator is leaving on the table.</p>
       <div class="gap-list">
         ${(analysis.gaps || []).map(g => `
           <div class="gap-item">
@@ -517,6 +530,60 @@ function renderReport(data) {
       </div>
     `
   }));
+
+  // EARNINGS
+  const e = analysis.earningsEstimate;
+  if (e) {
+    grid.appendChild(makeCard({
+      label: 'Earnings estimate', labelColor: '#6B6356',
+      content: `
+        <div>
+          <div class="earnings-row">
+            <span class="earnings-label">Est. monthly views</span>
+            <span class="earnings-val">${fmtNum(e.monthlyViewsEstimate || 0)}</span>
+          </div>
+          <div class="earnings-row">
+            <span class="earnings-label">CPM range (${esc(e.cpmRange?.split(' ')[0] || 'this niche')})</span>
+            <span class="earnings-val">${esc(e.cpmRange?.match(/\$[\d.–]+/)?.[0] || '—')}</span>
+          </div>
+          <div class="earnings-row">
+            <span class="earnings-label">Ad revenue</span>
+            <span class="earnings-val">${esc(e.estimatedMonthlyAdRevenue?.match(/\$[\d,–K]+\/mo|\$[\d,–K]+/)?.[0] || e.estimatedMonthlyAdRevenue || '—')}</span>
+          </div>
+          ${e.otherRevenue && e.otherRevenue !== 'unclear from data' ? `
+          <div class="earnings-row">
+            <span class="earnings-label">Other streams</span>
+            <span class="earnings-val" style="font-size:11.5px;font-family:Inter,sans-serif;font-weight:400;color:var(--ink-mid)">${esc(e.otherRevenue)}</span>
+          </div>` : ''}
+        </div>
+        ${e.totalEstimate ? `
+        <div class="earnings-total">
+          <span class="earnings-total-label">Est. monthly total</span>
+          <span class="earnings-total-val">${esc(e.totalEstimate)}</span>
+        </div>` : ''}
+        <p style="font-size:11px;color:var(--ink-light);margin-top:8px;line-height:1.5">Rough estimate. Actual earnings vary widely by audience geography, monetization setup, and sponsor rates.</p>
+      `
+    }));
+  }
+
+  // VIDEO IDEAS
+  const ideas = analysis.videoIdeas;
+  if (ideas?.length) {
+    grid.appendChild(makeCard({
+      label: 'Videos to make', labelColor: '#4B8BCC', full: true,
+      content: `
+        <div class="idea-list">
+          ${ideas.map(idea => `
+            <div class="idea-item">
+              <div class="idea-title">${esc(idea.title)}</div>
+              <div class="idea-meta">${esc(idea.rationale)}</div>
+              ${idea.estimatedPerformance ? `<span class="idea-perf">${esc(idea.estimatedPerformance)}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `
+    }));
+  }
 
   // Animate pillar bars
   requestAnimationFrame(() => {
@@ -609,6 +676,21 @@ ${(analysis?.pillars || []).map(p => `<p><strong>${p.name} (${p.percentage}%)</s
 <hr class="divider"/>
 <h2>Competitive Gaps</h2>
 ${(analysis?.gaps || []).map(g => `<p><strong>${g.opportunity}</strong><br/>${g.rationale}</p>`).join('')}
+
+<hr class="divider"/>
+<h2>Earnings Estimate</h2>
+${analysis?.earningsEstimate ? `
+<p>Est. monthly views: <strong>${fmtNum(analysis.earningsEstimate.monthlyViewsEstimate || 0)}</strong></p>
+<p>CPM range: ${analysis.earningsEstimate.cpmRange || '—'}</p>
+<p>Ad revenue: ${analysis.earningsEstimate.estimatedMonthlyAdRevenue || '—'}</p>
+<p>Other streams: ${analysis.earningsEstimate.otherRevenue || '—'}</p>
+<p><strong>Total estimate: ${analysis.earningsEstimate.totalEstimate || '—'}</strong></p>
+<p style="font-size:11px;color:#aaa">Rough estimate. Actual earnings vary by geography, monetization setup, and sponsor rates.</p>
+` : '<p>Not available</p>'}
+
+<hr class="divider"/>
+<h2>Videos to Make</h2>
+${(analysis?.videoIdeas || []).map(v => `<p><strong>${v.title}</strong><br/>${v.rationale}<br/><em>${v.estimatedPerformance || ''}</em></p>`).join('')}
 
 <hr class="divider"/>
 <p style="font-size:12px;color:#aaa">Generated by Wavecrest Pro · wavecrest.pro · ${new Date().toLocaleDateString()}</p>

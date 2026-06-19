@@ -107,6 +107,17 @@ async function ytFetch(endpoint, apiKey) {
 }
 
 async function resolveChannel(url, apiKey) {
+  // Normalise input
+  url = url.trim()
+    .replace(/^https?:\/\//i, '')   // strip protocol
+    .replace(/^www\./i, '')          // strip www.
+    .replace(/^m\./i, '');           // strip m. (mobile)
+
+  // Bare handle (no dots or slashes) → treat as @handle
+  if (!/[./]/.test(url)) {
+    url = '@' + url.replace(/^@/, '');
+  }
+
   // Detect URL type
   const handleMatch = url.match(/(?:youtube\.com\/)?@([\w.-]+)/);
   const channelIdMatch = url.match(/youtube\.com\/channel\/(UC[\w-]+)/);
@@ -287,42 +298,100 @@ async function runAnalysis(channel, videos, groqKey) {
   const allViewsAvg = videos.reduce((a, v) => a + v.viewCount, 0) / videos.length;
   const outperformers = top20.filter(v => v.viewCount > topViewsAvg * 1.5);
 
-  const prompt = `You are a brutal, specific creator intelligence analyst. Your job is to surface NON-OBVIOUS insights that a viewer who casually watches this channel would NOT already know.
+  // Estimated monthly views for earnings calc
+  const channelAgeMonths = channel.publishedAt
+    ? Math.max(1, (Date.now() - new Date(channel.publishedAt)) / (1000 * 60 * 60 * 24 * 30))
+    : 12;
+  const estimatedMonthlyViews = Math.round(cadence.videosPerMonth * allViewsAvg) ||
+    Math.round(channel.viewCountTotal / channelAgeMonths);
 
-RULES:
-- Never say anything that is obvious from the channel topic (e.g. "food channel posts food content")
-- Every insight must be specific and data-backed from the video titles/stats provided
-- Gaps must be topics this creator has NOT covered based on the title data — not generic suggestions
-- Hook patterns must include the EXACT formula with specific words/structures from the titles
-- Percentages must be estimated from the actual data, not made up
+  const prompt = `You are a creator intelligence analyst. Study the video titles and stats below. Return ONLY a JSON object — no other text.
+
+CRITICAL RULES — violating these makes the output useless:
+1. CITE SPECIFIC TITLES. Every insight must reference actual titles from the numbered list (e.g. "video #3", "the top performer"). Never make generic statements.
+2. GAPS must be topics that appear ZERO times in the title list. Scan every title. Do not suggest "collaborations" or "analytics" or other universal advice — find what THIS creator specifically never touches.
+3. MONETIZATION SIGNALS must be exact observations from the titles/descriptions ("video #7 ends with a brand name", "8 of top 20 titles contain [Sponsored]") — not category-level guesses.
+4. HOOK PATTERNS must include verbatim word structures lifted from actual titles, not descriptions of them.
+5. Never say things a casual viewer would already know from the channel name alone.
 
 CHANNEL: ${channel.name}${channel.handle ? ' (' + channel.handle + ')' : ''}
 Subscribers: ${fmtNum(channel.subscriberCount)} | Total views: ${fmtNum(channel.viewCountTotal)}
 Channel avg views: ${fmtNum(Math.round(allViewsAvg))} | Top 20 avg: ${fmtNum(Math.round(topViewsAvg))}
 Description: ${channel.description}
 
-TOP 20 VIDEOS BY VIEWS (these are the outliers — what's the pattern that makes them outperform?):
+TOP 20 VIDEOS BY VIEWS:
 ${videoList(top20)}
 
-OUTPERFORMERS (${fmtNum(Math.round(topViewsAvg * 1.5))}+ views):
+OUTPERFORMERS (>${fmtNum(Math.round(topViewsAvg * 1.5))} views — these are the signal):
 ${outperformers.map(v => `"${v.title}" | ${fmtNum(v.viewCount)} views`).join('\n') || 'None significantly above average'}
 
-RECENT 30 VIDEOS (chronological — what is this creator doing NOW vs before?):
+RECENT 30 VIDEOS:
 ${videoList(recent, false)}
 
-CADENCE:
+CADENCE DATA:
 - Avg ${cadence.avgDaysBetweenVideos} days between uploads (~${cadence.videosPerMonth}/month)
-- Peak upload day: ${cadence.peakDay} | Avg duration: ${cadence.avgDurationMinutes}min
-- Range: ${cadence.shortestMinutes}–${cadence.longestMinutes}min
+- Peak day: ${cadence.peakDay} | Avg duration: ${cadence.avgDurationMinutes}min (range: ${cadence.shortestMinutes}–${cadence.longestMinutes}min)
+- Estimated monthly views: ~${fmtNum(estimatedMonthlyViews)}
 
-Return a JSON object with exactly these keys:
-- hooks: { primaryPattern: "the EXACT title formula with specific words/structure e.g. '[adjective] [food] that [unexpected outcome]'", examples: ["3 real titles from the data"], frequency: "X of top 20 videos use this", secondaryPatterns: ["second specific pattern", "third specific pattern"] }
-- thumbnails: { formula: "specific visual formula inferred from title patterns and channel style — be precise", characteristics: ["3 specific visual elements"], textOverlayStyle: "specific font/style/placement if inferrable" }
-- cadence: { schedule: "specific posting pattern with days/times", consistency: "specific observation about variance in their schedule", durationStrategy: "what the duration range reveals about their strategy", peakPerformanceWindow: "when their best-performing videos were published" }
-- audience: { primaryProfile: "specific psychographic description — who exactly watches this and why, not just demographics", estimatedAge: "age range", viewerIntent: "specific intent — what problem/desire brings them here", loyaltySignal: "specific observation about engagement quality from the data" }
-- pillars: array of 3 objects: { name: "specific sub-niche name", percentage: number (sum to 100), description: "what specific videos fall here and why they perform" }
-- monetization: { primaryApproach: "specific monetization model with evidence from titles/descriptions", signals: ["3 specific title/description signals that reveal this"], brandAffinities: "specific brand categories with examples of likely sponsors" }
-- gaps: array of 3 objects: { opportunity: "specific topic/format NOT in the title data", rationale: "specific evidence from what IS in the data that proves this is an open lane" }`;
+Return JSON with exactly these keys:
+
+hooks: {
+  primaryPattern: "Verbatim structural formula extracted from actual titles — e.g. 'I [past-tense verb] [specific thing] for [time period] and [unexpected result]' — not a description, the actual pattern",
+  examples: ["Copy 3 real titles from the numbered list that prove this pattern"],
+  frequency: "How many of the top 20 use this pattern (count them)",
+  secondaryPatterns: ["Second real pattern with example words", "Third real pattern"]
+}
+
+thumbnails: {
+  formula: "What the title patterns and channel topic reveal about their thumbnail approach — be specific about what emotion or contrast they create",
+  characteristics: ["3 specific visual elements inferred from the content type and top performers"],
+  textOverlayStyle: "What text style/placement the top performers likely use based on the content"
+}
+
+cadence: {
+  schedule: "Specific posting pattern with exact numbers from the cadence data",
+  consistency: "Observation about variance — are they erratic or clockwork? Use the day gap data",
+  durationStrategy: "What the ${cadence.shortestMinutes}–${cadence.longestMinutes}min range reveals about content strategy",
+  peakPerformanceWindow: "Are the outperformers from a specific time period? What changed?"
+}
+
+audience: {
+  primaryProfile: "Specific psychographic: what exact problem or desire brings this viewer here, backed by what the top-performing titles promise",
+  estimatedAge: "Age range based on content type and tone",
+  viewerIntent: "One sentence — what does the viewer want to accomplish or feel after watching",
+  loyaltySignal: "Something specific from the data (comment count, like ratio, video length engagement) that shows audience quality"
+}
+
+pillars: [3 objects: {
+  name: "Short specific sub-niche label",
+  percentage: number (sum to 100),
+  description: "Which numbered videos fall here and how they perform vs channel average"
+}]
+
+monetization: {
+  primaryApproach: "Revenue model IF there is clear evidence in the titles/descriptions. If there is no evidence, say 'No clear monetization signals in the title data — likely AdSense or unlisted sponsors'",
+  signals: ["Only include signals with actual evidence from the numbered titles. If a signal has no evidence, omit it rather than guessing. E.g. 'video #4 title ends with brand name', 'description of #1 says sponsored by X', 'none of the titles contain sponsor mentions'"],
+  brandAffinities: "Brand categories that would logically fit based on the specific content topics — be honest if this is inference not evidence"
+}
+
+gaps: [3 objects: {
+  opportunity: "A specific topic/format that appears ZERO times across all the titles above",
+  rationale: "Evidence: cite which video numbers prove the audience would want this, and confirm none of the titles cover it"
+}]
+
+earningsEstimate: {
+  monthlyViewsEstimate: ${estimatedMonthlyViews},
+  cpmRange: "Low and high CPM in USD based on this niche (e.g. gaming=$1-3, tech=$4-8, finance=$8-15, lifestyle=$2-5) — be specific about why this niche gets this CPM",
+  estimatedMonthlyAdRevenue: "Dollar range (low–high) = monthlyViews × (cpmLow/1000) to monthlyViews × (cpmHigh/1000). Show the math.",
+  otherRevenue: "Other likely income streams beyond AdSense based on what you can actually infer from the channel — be specific or say 'unclear from data'",
+  totalEstimate: "Monthly total range combining ad revenue + realistic other revenue, expressed as a range e.g. '$X,000–$Y,000/month'"
+}
+
+videoIdeas: [5 objects: {
+  title: "A complete ready-to-publish title written in this creator's exact hook style, using their proven formula",
+  rationale: "Why this specific title would outperform their average — cite which top performers it's modeled on and what gap/pattern it exploits",
+  estimatedPerformance: "Whether this would likely hit above or below their ${fmtNum(Math.round(allViewsAvg))} view average, and why"
+}]`;
 
   const r = await fetch(GROQ_API, {
     method: 'POST',
@@ -340,7 +409,7 @@ Return a JSON object with exactly these keys:
         { role: 'user', content: prompt }
       ],
       temperature: 0.2,
-      max_tokens: 2048,
+      max_tokens: 4000,
       response_format: { type: 'json_object' }
     })
   });
