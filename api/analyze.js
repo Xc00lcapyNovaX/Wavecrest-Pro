@@ -14,7 +14,7 @@ const { Pool } = pg;
 export const config = { maxDuration: 60 };
 
 const YOUTUBE_API = 'https://www.googleapis.com/youtube/v3';
-const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Reuse DB pool across warm invocations
 let pool;
