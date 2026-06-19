@@ -9,6 +9,7 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "pg": "^8.13.3"
   }
 }
