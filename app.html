@@ -336,37 +336,51 @@ async function startAnalysis() {
   btn.disabled = true;
 
   showLoading();
-  advanceSteps();
-
   try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
+    const evtSource = new EventSource(`/api/analyze-stream?url=${encodeURIComponent(url)}`);
+
+    evtSource.addEventListener('progress', e => {
+      const { step, label } = JSON.parse(e.data);
+      // Mark previous steps done, set current active
+      for (let i = 1; i < step; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) { el.classList.remove('active'); el.classList.add('done'); }
+      }
+      const curr = document.getElementById(`step-${step}`);
+      if (curr) { curr.classList.remove('done'); curr.classList.add('active'); curr.querySelector('span:last-child').textContent = ' ' + label; }
+      const stepEl = document.getElementById('loading-step');
+      if (stepEl) stepEl.textContent = label;
     });
 
-    const data = await res.json();
+    evtSource.addEventListener('done', e => {
+      evtSource.close();
+      const data = JSON.parse(e.data);
+      [1,2,3,4].forEach(i => {
+        const el = document.getElementById(`step-${i}`);
+        if (el) { el.classList.remove('active'); el.classList.add('done'); }
+      });
+      setTimeout(() => { showReport(data, data.reportId); btn.disabled = false; }, 400);
+    });
 
-    if (!res.ok) {
+    evtSource.addEventListener('error', e => {
+      evtSource.close();
+      let msg = 'Analysis failed — try again';
+      try { msg = JSON.parse(e.data).message || msg; } catch {}
       showInput();
-      showError(data.error || 'Analysis failed — try again');
+      showError(msg);
       btn.disabled = false;
-      return;
-    }
-
-    // Mark all steps done
-    [1,2,3,4].forEach(i => {
-      const el = document.getElementById(`step-${i}`);
-      el.classList.remove('active');
-      el.classList.add('done');
     });
 
-    await sleep(400);
-    showReport(data, data.reportId);
+    evtSource.onerror = () => {
+      evtSource.close();
+      showInput();
+      showError('Connection lost — try again');
+      btn.disabled = false;
+    };
+
   } catch (err) {
     showInput();
     showError(err.message || 'Network error — check your connection');
-  } finally {
     btn.disabled = false;
   }
 }
