@@ -324,51 +324,48 @@
         <div class="dossier">
           <div class="dossier-header">
             <div>
-              <p style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:rgba(255,255,255,.3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px">Creator Analysis · 94 seconds</p>
-              <p style="font-weight:600;color:rgba(255,255,255,.85);font-size:.9rem">MrBeast (Jimmy Donaldson)</p>
+              <p id="hc-time" style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:rgba(255,255,255,.3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px">Creator Analysis · live data</p>
+              <p id="hc-name" style="font-weight:600;color:rgba(255,255,255,.85);font-size:.9rem">Loading...</p>
             </div>
             <div style="display:flex;align-items:center;gap:5px;background:rgba(45,158,107,.12);border:1px solid rgba(45,158,107,.2);border-radius:4px;padding:3px 8px">
               <span class="live-dot"></span>
               <span style="font-size:10.5px;color:#5DD4A0;font-weight:500">Live</span>
             </div>
           </div>
-          <!-- Why they win -->
           <div style="margin:14px 16px;padding:12px 14px;background:rgba(196,80,26,.09);border:1px solid rgba(196,80,26,.2);border-radius:10px">
-            <p style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(196,80,26,.8);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">✦ Why they win</p>
-            <p style="font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.6">Creates <em style="color:rgba(255,255,255,.95)">events</em>, not content. Every video is a world record, a giveaway, or a cultural moment — making sharing feel obligatory, not optional.</p>
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(196,80,26,.8);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px">✦ Hook pattern</p>
+            <p id="hc-why" style="font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.6">—</p>
           </div>
-          <!-- Analysis rows -->
           <div style="display:flex;flex-direction:column;gap:6px;padding:0 16px 14px">
             <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.08em;width:68px;flex-shrink:0">HOOK</span>
-              <p style="font-size:12px;color:rgba(255,255,255,.65);flex:1">"I [survived / spent / gave away X]" — 67% of top 20 videos</p>
-              <span class="signal" style="background:rgba(196,80,26,.18);color:#F4917A;border:1px solid rgba(196,80,26,.3)">94%</span>
+              <p id="hc-hook" style="font-size:12px;color:rgba(255,255,255,.65);flex:1">—</p>
+              <span id="hc-hook-sig" class="signal" style="background:rgba(196,80,26,.18);color:#F4917A;border:1px solid rgba(196,80,26,.3)"></span>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.08em;width:68px;flex-shrink:0">THUMB</span>
-              <p style="font-size:12px;color:rgba(255,255,255,.65);flex:1">Red bg · reaction face · large number overlay</p>
-              <span class="signal" style="background:rgba(45,158,107,.12);color:#5DD4A0;border:1px solid rgba(45,158,107,.2)">Copied</span>
+              <p id="hc-thumb" style="font-size:12px;color:rgba(255,255,255,.65);flex:1">—</p>
+              <span class="signal" style="background:rgba(45,158,107,.12);color:#5DD4A0;border:1px solid rgba(45,158,107,.2)">Formula</span>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.08em;width:68px;flex-shrink:0">CADENCE</span>
-              <p style="font-size:12px;color:rgba(255,255,255,.65);flex:1">Wed 12pm EST · 1–2× per week · 15–25 min</p>
-              <span class="signal" style="background:rgba(217,119,6,.12);color:#FBBF24;border:1px solid rgba(217,119,6,.2)">Steady</span>
+              <p id="hc-cad" style="font-size:12px;color:rgba(255,255,255,.65);flex:1">—</p>
+              <span class="signal" style="background:rgba(217,119,6,.12);color:#FBBF24;border:1px solid rgba(217,119,6,.2)">Cadence</span>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.08em;width:68px;flex-shrink:0">AUDIENCE</span>
-              <p style="font-size:12px;color:rgba(255,255,255,.65);flex:1">13–24 · 68% male · US / UK / IN / BR</p>
-              <span class="signal" style="background:rgba(124,58,237,.12);color:#C4B5FD;border:1px solid rgba(124,58,237,.2)">290M</span>
+              <p id="hc-aud" style="font-size:12px;color:rgba(255,255,255,.65);flex:1">—</p>
+              <span id="hc-aud-sig" class="signal" style="background:rgba(124,58,237,.12);color:#C4B5FD;border:1px solid rgba(124,58,237,.2)"></span>
             </div>
           </div>
         </div>
-        <!-- Inline stats row -->
         <div style="display:flex;margin-top:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-card)">
           <div style="flex:1;padding:13px 16px;border-right:1px solid var(--border);text-align:center">
             <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.5rem;color:var(--green);letter-spacing:-.03em;line-height:1">94s</p>
             <p style="font-size:10.5px;color:var(--ink-light);margin-top:3px">Avg. analysis time</p>
           </div>
           <div style="flex:1;padding:13px 16px;border-right:1px solid var(--border);text-align:center">
-            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.5rem;color:var(--ink);letter-spacing:-.03em;line-height:1">7</p>
+            <p style="font-family:'Fraunces',serif;font-weight:800;font-size:1.5rem;color:var(--ink);letter-spacing:-.03em;line-height:1">9</p>
             <p style="font-size:10.5px;color:var(--ink-light);margin-top:3px">Dimensions decoded</p>
           </div>
           <div style="flex:1;padding:13px 16px;text-align:center">
@@ -1069,6 +1066,37 @@
       statEls.forEach(el => obs.observe(el));
     }).catch(() => {});
   }
+</script>
+<script>
+(async function() {
+  function fmt(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? Math.round(n/1e3)+'K' : String(n||0); }
+  function trunc(s, n) { s = s||''; return s.length > n ? s.slice(0,n).trim()+'...' : s; }
+  try {
+    const r = await fetch('/api/featured');
+    if (!r.ok) return;
+    const d = await r.json();
+    const a = d.analysis, ch = d.channel;
+    if (!a || !ch) return;
+    document.getElementById('hc-time').textContent = 'Creator Analysis · ' + d.videoCount + ' videos';
+    document.getElementById('hc-name').textContent = ch.name;
+    document.getElementById('hc-why').textContent = trunc(a.hooks?.primaryPattern || '', 140);
+    document.getElementById('hc-hook').textContent = trunc(a.hooks?.primaryPattern || '', 72);
+    document.getElementById('hc-hook-sig').textContent = a.hooks?.frequency || '';
+    document.getElementById('hc-thumb').textContent = trunc(a.thumbnails?.formula || '', 60);
+    const cad = a.cadence || {};
+    document.getElementById('hc-cad').textContent = cad.avgDaysBetweenVideos
+      ? 'Every ' + cad.avgDaysBetweenVideos + 'd · ' + (cad.peakDay||'') + ' · ' + (cad.avgDurationMinutes||'') + 'min avg'
+      : trunc(cad.schedule || '', 60);
+    document.getElementById('hc-aud').textContent = trunc(a.audience?.primaryProfile || '', 60);
+    document.getElementById('hc-aud-sig').textContent = fmt(ch.subscriberCount);
+    if (d.reportId) {
+      const card = document.getElementById('hero-card');
+      card.style.cursor = 'pointer';
+      card.title = 'View full analysis for ' + ch.name;
+      card.addEventListener('click', () => { window.location.href = '/app?report=' + d.reportId; });
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
