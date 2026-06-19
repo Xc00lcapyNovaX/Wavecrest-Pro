@@ -134,95 +134,79 @@
 <section style="padding:0 32px 88px">
   <div class="container">
     <div class="log-layout">
-      <!-- Sidebar nav -->
       <div class="log-sidebar">
         <p class="editorial-label" style="margin-bottom:14px">Releases</p>
         <a href="#v040" class="log-sidebar-link active">v0.4.0 — Jun 17</a>
-        <a href="#v032" class="log-sidebar-link">v0.3.2 — Jun 10</a>
-        <a href="#v030" class="log-sidebar-link">v0.3.0 — Jun 1</a>
-        <a href="#v025" class="log-sidebar-link">v0.2.5 — May 20</a>
-        <a href="#v020" class="log-sidebar-link">v0.2.0 — May 5</a>
+        <a href="#v032" class="log-sidebar-link">v0.3.2 — Jun 12</a>
+        <a href="#v030" class="log-sidebar-link">v0.3.0 — Jun 5</a>
+        <a href="#v025" class="log-sidebar-link">v0.2.5 — May 22</a>
+        <a href="#v020" class="log-sidebar-link">v0.2.0 — May 8</a>
         <a href="#v010" class="log-sidebar-link">v0.1.0 — Apr 21</a>
       </div>
-
-      <!-- Entries -->
       <div>
+
         <div class="log-entry reveal" id="v040">
           <p class="log-version">v0.4.0</p>
           <h2 class="log-title">Editorial redesign + Fraunces</h2>
           <p class="log-date">June 17, 2026</p>
-          <div>
-            <span class="log-tag tag-design">Design</span>
-            <span class="log-tag tag-improved">Improved</span>
-          </div>
+          <div><span class="log-tag tag-design">Design</span><span class="log-tag tag-improved">Improved</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>New font:</strong> Swapped Playfair Display for Fraunces across the site — variable optical sizing means it looks sharp at display sizes and clean at body sizes simultaneously.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>New font:</strong> Swapped Playfair Display for Fraunces — variable optical sizing looks sharp at display scale and stays clean at body size simultaneously.</p></div>
             <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Performance:</strong> Trimmed dead CSS, removed orphaned cursor JS (~200 lines), tightened animation sequencing.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Mobile nav:</strong> Hamburger-to-X morphing animation, aria-expanded wired correctly, Sign in + Start free hidden on mobile to avoid overflow.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Dossier dates:</strong> Masthead and dossier timestamps are now both driven from the same <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">new Date()</code> call — no more drift between them.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Mobile nav:</strong> Hamburger-to-X morphing animation, aria-expanded wired correctly.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Live hero card:</strong> Landing page now shows a real analysis from the most recent channel run — dynamically fetched from <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">/api/featured</code>.</p></div>
           </div>
         </div>
 
         <div class="log-entry reveal" id="v032">
           <p class="log-version">v0.3.2</p>
-          <h2 class="log-title">Copy pass + product clarity</h2>
-          <p class="log-date">June 10, 2026</p>
-          <div>
-            <span class="log-tag tag-improved">Improved</span>
-            <span class="log-tag tag-fixed">Fixed</span>
-          </div>
+          <h2 class="log-title">Code quality + rate limiting</h2>
+          <p class="log-date">June 12, 2026</p>
+          <div><span class="log-tag tag-improved">Improved</span><span class="log-tag tag-fixed">Fixed</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Positioning shift:</strong> Moved from "lead delivery" to "outbound OS with prospect memory." The core differentiator — memory that compounds — is now front and center throughout.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Hero copy:</strong> New headline "Never lose a lead again. <em>Not one.</em>" Removed the introductory pill, which felt like friction before the headline.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Step 4 added</strong> to How it works: "Wavecrest remembers everyone — re-engage when the moment is right."</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Fixed:</strong> Ghost problem numbers (6.2, 73%) were invisible on light background — color corrected.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Fixed:</strong> Floating stat badges clipping off-screen on mid-width viewports — replaced with inline stats row.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Shared lib:</strong> Extracted all YouTube fetch logic, AI analysis, and DB access into <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">lib/</code> — serverless handlers are now thin wrappers around shared modules.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Edge rate limiting:</strong> Vercel Edge Middleware + Upstash KV throttles analysis requests to 5/hour per IP. Runs before the serverless function with zero cold-start cost.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Fixed UUID validation:</strong> Report ID endpoint now uses a proper RFC 4122 regex — no more false positives on malformed IDs.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Single DB pool:</strong> Consolidated <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">pg.Pool</code> — was creating a new pool per request in some code paths.</p></div>
           </div>
         </div>
 
         <div class="log-entry reveal" id="v030">
           <p class="log-version">v0.3.0</p>
-          <h2 class="log-title">Team features + shared memory</h2>
-          <p class="log-date">June 1, 2026</p>
-          <div>
-            <span class="log-tag tag-new">New</span>
-          </div>
+          <h2 class="log-title">Earnings estimate + video ideas</h2>
+          <p class="log-date">June 5, 2026</p>
+          <div><span class="log-tag tag-new">New</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Shared prospect memory:</strong> On Team plan, all reps share one memory layer — no two AEs reach out to the same contact.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Manager view:</strong> Pipeline overview showing each rep's daily brief status, emails sent, and reply rate.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Territory splits:</strong> Segment prospects by geography, vertical, or company size — each AE gets a brief scoped to their territory.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Slack alerts:</strong> Re-engage signals fire to a Slack channel of your choice — so the whole team sees when a shared contact goes warm.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Earnings estimate:</strong> Real 2026 RPM data (Finance $5–17 down to Music $0.5–1.5) used to generate a monthly ad revenue range. Shows the math — not a black box.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Video ideas:</strong> 5 ready-to-publish titles written in the creator's actual style, each citing which top performers they're modeled on and estimated performance vs. channel average.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Monthly views fix:</strong> Was calculating views as per-video average × uploads/month, which wildly overcounted. Now uses total channel views ÷ channel age in months.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>9 dimensions total:</strong> Hooks, thumbnails, cadence, audience, pillars, monetization, gaps, earnings estimate, video ideas.</p></div>
           </div>
         </div>
 
         <div class="log-entry reveal" id="v025">
           <p class="log-version">v0.2.5</p>
-          <h2 class="log-title">Re-engage alerts + credit packs</h2>
-          <p class="log-date">May 20, 2026</p>
-          <div>
-            <span class="log-tag tag-new">New</span>
-            <span class="log-tag tag-improved">Improved</span>
-          </div>
+          <h2 class="log-title">Streaming progress + analysis accuracy</h2>
+          <p class="log-date">May 22, 2026</p>
+          <div><span class="log-tag tag-new">New</span><span class="log-tag tag-improved">Improved</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Re-engage alerts:</strong> Wavecrest now watches every contact you've ever reached out to. When they get promoted, raise a round, or revisit your pricing page — you get an alert with a one-click re-engage draft.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Credit packs launched:</strong> Starter ($9/25), Growth ($29/100), Pro ($89/400). One-time, no expiry. No subscription for individuals.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Pricing page visit tracking:</strong> Anonymous visitors to your company's pricing page can now be matched to known contacts in your memory layer and trigger a re-engage alert.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Signal labels:</strong> Each prospect in the brief now shows a clear signal tag — Funding, Hiring SDRs, New exec, Intent, Warm — so you know why they're in today's brief at a glance.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Real-time SSE streaming:</strong> Analysis progress now streams live via Server-Sent Events — each stage fires when it actually completes, not on a fake timer.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Prompt rewrite:</strong> AI must now cite specific videos by number ("video #3") for every claim. Generic statements without data backing are rejected.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Monetization honesty:</strong> If no sponsorship evidence exists in titles or descriptions, the AI returns "No clear signals — likely AdSense" instead of fabricating.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Gap quality:</strong> Content gaps must be topics appearing zero times in the title list — no more surfacing topics the channel already covers.</p></div>
           </div>
         </div>
 
         <div class="log-entry reveal" id="v020">
           <p class="log-version">v0.2.0</p>
-          <h2 class="log-title">Send from brief + CRM sync</h2>
-          <p class="log-date">May 5, 2026</p>
-          <div>
-            <span class="log-tag tag-new">New</span>
-          </div>
+          <h2 class="log-title">7 dimensions + shareable reports</h2>
+          <p class="log-date">May 8, 2026</p>
+          <div><span class="log-tag tag-new">New</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Send from brief:</strong> One click sends from your Gmail or Outlook directly inside Wavecrest. No switching tabs, no copy-pasting. Logged to CRM automatically.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>HubSpot + Salesforce sync:</strong> Every email sent from a brief creates a logged activity. Replies sync back. Your CRM stays clean without manual entry.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Follow-up timer:</strong> After sending, Wavecrest starts a follow-up countdown. Miss the window and it nudges you in tomorrow's brief.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Voice training:</strong> Paste 3–5 emails you've written. Wavecrest learns your tone — punchy, formal, direct — and writes every draft to sound like you.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>7 analysis dimensions:</strong> Hooks, thumbnails, cadence, audience profile, content pillars, monetization signals, and competitive gaps — all decoded in a single AI pass.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Shareable links:</strong> Every report is saved to Postgres and gets a permanent URL. Share a channel playbook with your team in one click.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Handle resolution:</strong> Accepts bare handles, @handles, full YouTube URLs, mobile URLs, video URLs, and legacy /user/ and /c/ formats.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Groq inference:</strong> Switched to Llama-3.3-70b via Groq API with <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">response_format: json_object</code> — guaranteed valid JSON, no markdown parsing needed.</p></div>
           </div>
         </div>
 
@@ -230,17 +214,15 @@
           <p class="log-version">v0.1.0</p>
           <h2 class="log-title">Initial launch</h2>
           <p class="log-date">April 21, 2026</p>
-          <div>
-            <span class="log-tag tag-new">New</span>
-          </div>
+          <div><span class="log-tag tag-new">New</span></div>
           <div class="log-items">
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Daily brief:</strong> Every morning at 6 AM, a curated brief of prospects matched to your ICP with real buying signals. One per day on the free tier.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>AI drafts:</strong> Each prospect comes with a ready-to-send email. Grounded in the signal, written in plain language, structured to get a reply.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>ICP setup:</strong> 4-minute onboarding — industry, company size, titles, geography. Updates take effect in the next morning's brief.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Signal sources:</strong> Job postings, funding announcements, LinkedIn activity, tech stack changes, intent signals. 47,000+ data points processed nightly per user.</p></div>
-            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Free tier:</strong> 1 prospect per day, free forever. No card required.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>YouTube channel analyzer:</strong> Paste any channel URL and get a full breakdown in under 90 seconds. Pulls the last 100 videos via YouTube Data API v3.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>5 initial dimensions:</strong> Hook patterns, thumbnail formula, posting cadence, audience profile, and content pillars decoded from public video data.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Free first analysis:</strong> No account, no card. Paste a channel, get the playbook.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Postgres persistence:</strong> Reports saved server-side with a permanent shareable URL.</p></div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -252,7 +234,7 @@
     <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px">
       <div>
         <p style="font-family:'Fraunces',serif;font-weight:700;font-size:.95rem;color:white;margin-bottom:14px">Wavecrest <span style="color:var(--accent)">Pro</span></p>
-        <p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.72;max-width:260px">The outbound OS for B2B sales teams. Every lead remembered — forever.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.72;max-width:260px">Creator intelligence for the serious creator. Decode any channel in 90 seconds.</p>
       </div>
       <div>
         <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:14px">Product</p>
