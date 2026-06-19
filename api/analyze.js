@@ -282,30 +282,47 @@ async function runAnalysis(channel, videos, groqKey) {
       return `${i + 1}. "${v.title}"${stats}`;
     }).join('\n');
 
-  const prompt = `You are a creator intelligence analyst. Analyze this YouTube channel and return a playbook as a JSON object.
+  // Build a view-count context for the top videos
+  const topViewsAvg = top20.reduce((a, v) => a + v.viewCount, 0) / top20.length;
+  const allViewsAvg = videos.reduce((a, v) => a + v.viewCount, 0) / videos.length;
+  const outperformers = top20.filter(v => v.viewCount > topViewsAvg * 1.5);
+
+  const prompt = `You are a brutal, specific creator intelligence analyst. Your job is to surface NON-OBVIOUS insights that a viewer who casually watches this channel would NOT already know.
+
+RULES:
+- Never say anything that is obvious from the channel topic (e.g. "food channel posts food content")
+- Every insight must be specific and data-backed from the video titles/stats provided
+- Gaps must be topics this creator has NOT covered based on the title data — not generic suggestions
+- Hook patterns must include the EXACT formula with specific words/structures from the titles
+- Percentages must be estimated from the actual data, not made up
 
 CHANNEL: ${channel.name}${channel.handle ? ' (' + channel.handle + ')' : ''}
 Subscribers: ${fmtNum(channel.subscriberCount)} | Total views: ${fmtNum(channel.viewCountTotal)}
+Channel avg views: ${fmtNum(Math.round(allViewsAvg))} | Top 20 avg: ${fmtNum(Math.round(topViewsAvg))}
 Description: ${channel.description}
 
-TOP 20 VIDEOS BY VIEWS:
+TOP 20 VIDEOS BY VIEWS (these are the outliers — what's the pattern that makes them outperform?):
 ${videoList(top20)}
 
-RECENT 30 VIDEOS (chronological):
+OUTPERFORMERS (${fmtNum(Math.round(topViewsAvg * 1.5))}+ views):
+${outperformers.map(v => `"${v.title}" | ${fmtNum(v.viewCount)} views`).join('\n') || 'None significantly above average'}
+
+RECENT 30 VIDEOS (chronological — what is this creator doing NOW vs before?):
 ${videoList(recent, false)}
 
 CADENCE:
 - Avg ${cadence.avgDaysBetweenVideos} days between uploads (~${cadence.videosPerMonth}/month)
 - Peak upload day: ${cadence.peakDay} | Avg duration: ${cadence.avgDurationMinutes}min
+- Range: ${cadence.shortestMinutes}–${cadence.longestMinutes}min
 
 Return a JSON object with exactly these keys:
-- hooks: object with primaryPattern (string), examples (array of 3 title strings), frequency (string), secondaryPatterns (array of 2 strings)
-- thumbnails: object with formula (string), characteristics (array of 3 strings), textOverlayStyle (string)
-- cadence: object with schedule (string), consistency (string), durationStrategy (string), peakPerformanceWindow (string)
-- audience: object with primaryProfile (string), estimatedAge (string), viewerIntent (string), loyaltySignal (string)
-- pillars: array of 3 objects each with name (string), percentage (number summing to 100), description (string)
-- monetization: object with primaryApproach (string), signals (array of 3 strings), brandAffinities (string)
-- gaps: array of 3 objects each with opportunity (string) and rationale (string)`;
+- hooks: { primaryPattern: "the EXACT title formula with specific words/structure e.g. '[adjective] [food] that [unexpected outcome]'", examples: ["3 real titles from the data"], frequency: "X of top 20 videos use this", secondaryPatterns: ["second specific pattern", "third specific pattern"] }
+- thumbnails: { formula: "specific visual formula inferred from title patterns and channel style — be precise", characteristics: ["3 specific visual elements"], textOverlayStyle: "specific font/style/placement if inferrable" }
+- cadence: { schedule: "specific posting pattern with days/times", consistency: "specific observation about variance in their schedule", durationStrategy: "what the duration range reveals about their strategy", peakPerformanceWindow: "when their best-performing videos were published" }
+- audience: { primaryProfile: "specific psychographic description — who exactly watches this and why, not just demographics", estimatedAge: "age range", viewerIntent: "specific intent — what problem/desire brings them here", loyaltySignal: "specific observation about engagement quality from the data" }
+- pillars: array of 3 objects: { name: "specific sub-niche name", percentage: number (sum to 100), description: "what specific videos fall here and why they perform" }
+- monetization: { primaryApproach: "specific monetization model with evidence from titles/descriptions", signals: ["3 specific title/description signals that reveal this"], brandAffinities: "specific brand categories with examples of likely sponsors" }
+- gaps: array of 3 objects: { opportunity: "specific topic/format NOT in the title data", rationale: "specific evidence from what IS in the data that proves this is an open lane" }`;
 
   const r = await fetch(GROQ_API, {
     method: 'POST',
