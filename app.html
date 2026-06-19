@@ -548,59 +548,6 @@ function renderReport(data) {
   }));
 
   // EARNINGS
-  const e = analysis.earningsEstimate;
-  if (e) {
-    grid.appendChild(makeCard({
-      label: 'Earnings estimate', labelColor: '#6B6356',
-      content: `
-        <div>
-          <div class="earnings-row">
-            <span class="earnings-label">Est. monthly views</span>
-            <span class="earnings-val">${fmtNum(e.monthlyViewsEstimate || 0)}</span>
-          </div>
-          <div class="earnings-row">
-            <span class="earnings-label">CPM range</span>
-            <span class="earnings-val">${esc(e.cpmRange?.match(/\$[\d.,–-]+/)?.[0] || e.cpmRange || '—')}</span>
-          </div>
-          <div class="earnings-row">
-            <span class="earnings-label">Ad revenue / month</span>
-            <span class="earnings-val">${esc(e.estimatedMonthlyAdRevenue || '—')}</span>
-          </div>
-          ${e.otherRevenue && !e.otherRevenue.includes('unclear') ? `
-          <div class="earnings-row">
-            <span class="earnings-label">Other streams</span>
-            <span class="earnings-val" style="font-size:11.5px;font-family:Inter,sans-serif;font-weight:400;color:var(--ink-mid)">${esc(e.otherRevenue)}</span>
-          </div>` : ''}
-        </div>
-        ${e.totalEstimate ? `
-        <div class="earnings-total">
-          <span class="earnings-total-label">Est. monthly total</span>
-          <span class="earnings-total-val">${esc(e.totalEstimate)}</span>
-        </div>` : ''}
-        <p style="font-size:11px;color:var(--ink-light);margin-top:8px;line-height:1.5">Rough estimate. Actual earnings vary by geography and monetization setup.</p>
-      `
-    }));
-  }
-
-  // VIDEO IDEAS
-  if (analysis.videoIdeas?.length) {
-    grid.appendChild(makeCard({
-      label: 'Videos to make', labelColor: '#4B8BCC', full: true,
-      content: `
-        <div class="idea-list">
-          ${(analysis.videoIdeas || []).map(v => `
-            <div class="idea-item">
-              <div class="idea-title">${esc(v.title)}</div>
-              <div class="idea-meta">${esc(v.rationale)}</div>
-              ${v.estimatedPerformance ? `<span class="idea-perf">${esc(v.estimatedPerformance)}</span>` : ''}
-            </div>
-          `).join('')}
-        </div>
-      `
-    }));
-  }
-
-  // EARNINGS
   const earn = analysis.earningsEstimate;
   if (earn) {
     grid.appendChild(makeCard({
