@@ -193,8 +193,8 @@ async function runAnalysis(channel, videos, groqKey) {
   const channelAgeMonths = channel.publishedAt
     ? Math.max(1, (Date.now() - new Date(channel.publishedAt)) / (1000 * 60 * 60 * 24 * 30))
     : 12;
-  const estimatedMonthlyViews = Math.round(cadence.videosPerMonth * allViewsAvg) ||
-    Math.round(channel.viewCountTotal / channelAgeMonths);
+  // Use total views / channel age — more accurate than videosPerMonth * allTimeAvgViews
+  const estimatedMonthlyViews = Math.round(channel.viewCountTotal / channelAgeMonths);
 
   const prompt = `You are a creator intelligence analyst. Study the video titles and stats below. Return ONLY a JSON object — no other text.
 
@@ -240,7 +240,7 @@ monetization: { primaryApproach: "Revenue model with evidence. If no evidence sa
 
 gaps: [3 objects: { opportunity: "Topic appearing ZERO times in all titles above", rationale: "Cite video numbers proving audience would want this" }]
 
-earningsEstimate: { monthlyViewsEstimate: ${estimatedMonthlyViews}, cpmRPM: "Pick closest niche from: Finance $5-17 RPM | Insurance $7-17 | Legal $5-15 | Real Estate $5-13 | Health/Medical $7-22 | Crypto $5-13 | AI/Tech $4-10 | B2B SaaS $4-12 | Marketing $4-9 | Education $3-8 | Consumer Tech $2-10 | Automotive $4-9 | Beauty $2-5 | Travel $2-6 | DIY $2-6 | Parenting $3-6 | Gaming $1-5 | Entertainment $1-4 | Music $0.5-1.5. State the niche match and RPM range.", estimatedMonthlyAdRevenue: "low = ${estimatedMonthlyViews} x RPM_low/1000, high = ${estimatedMonthlyViews} x RPM_high/1000, show the math", otherRevenue: "Other streams with evidence from channel, or 'unclear from data'", totalEstimate: "Combined monthly range e.g. '$X,000–$Y,000/month'" }
+earningsEstimate: { monthlyViewsEstimate: ${estimatedMonthlyViews}, cpmRPM: "Pick closest niche from: Finance $5-17 RPM | Insurance $7-17 | Legal $5-15 | Real Estate $5-13 | Health/Medical $7-22 | Crypto $5-13 | AI/Tech $4-10 | B2B SaaS $4-12 | Marketing $4-9 | Education $3-8 | Consumer Tech $2-10 | Automotive $4-9 | Food/Cooking $2-5 | Beauty $2-5 | Travel $2-6 | DIY/Reviews $2-6 | Parenting $3-6 | Gaming $1-5 | Entertainment/Vlogs $1-4 | Music $0.5-1.5. State the niche match and RPM range.", estimatedMonthlyAdRevenue: "low = ${estimatedMonthlyViews} x RPM_low/1000, high = ${estimatedMonthlyViews} x RPM_high/1000, show the math", otherRevenue: "Other streams with evidence from channel, or 'unclear from data'", totalEstimate: "Combined monthly range e.g. '$X,000–$Y,000/month'" }
 
 videoIdeas: [5 objects: { title: "Complete ready-to-publish title in this creator's exact hook style", rationale: "Why this outperforms — cite top performer numbers it models", estimatedPerformance: "Above or below ${fmtNum(Math.round(allViewsAvg))} avg and why" }]`;
 

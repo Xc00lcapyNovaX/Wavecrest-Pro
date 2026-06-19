@@ -535,7 +535,6 @@ function renderReport(data) {
   grid.appendChild(makeCard({
     label: 'Competitive gaps', labelColor: '#2D9E6B', full: true,
     content: `
-      <p class="dim-body" style="margin-bottom:16px">Opportunities this creator is leaving on the table.</p>
       <div class="gap-list">
         ${(analysis.gaps || []).map(g => `
           <div class="gap-item">
@@ -551,7 +550,7 @@ function renderReport(data) {
   const earn = analysis.earningsEstimate;
   if (earn) {
     grid.appendChild(makeCard({
-      label: 'Earnings estimate', labelColor: '#6B6356',
+      label: 'Earnings estimate', labelColor: '#6B6356', full: true,
       content: `
         <div>
           <div class="earnings-row"><span class="earnings-label">Est. monthly views</span><span class="earnings-val">${fmtNum(earn.monthlyViewsEstimate||0)}</span></div>
