@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy — Wavecrest Pro</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F7F3EC; --bg-warm: #EDE8DF; --ink: #111008; --ink-mid: #6B6356;
+      --ink-light: #9C9284; --accent: #C4501A; --border: #D4CCBA;
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    nav { height: 56px; padding: 0 24px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { text-decoration: none; font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a { font-size: 13.5px; color: var(--ink-mid); text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--ink); }
+    main { max-width: 660px; margin: 0 auto; padding: 64px 24px 96px; }
+    .label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 18px; }
+    h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.08; margin-bottom: 10px; }
+    .updated { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-light); margin-bottom: 48px; }
+    h2 { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; margin: 40px 0 10px; }
+    p, li { font-size: 15px; color: var(--ink-mid); line-height: 1.78; }
+    p { margin-bottom: 12px; }
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: var(--bg-warm); padding: 1px 6px; border-radius: 3px; }
+    footer { text-align: center; padding: 28px 24px; border-top: 1px solid var(--border); }
+    footer p { font-size: 12.5px; color: var(--ink-light); }
+    footer a { color: var(--ink-light); }
+    footer a:hover { color: var(--ink); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Wavecrest <span>Pro</span></a>
+  <div class="nav-links">
+    <a href="/app">Analyze</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/changelog">Changelog</a>
+  </div>
+</nav>
+
+<main>
+  <p class="label">Legal</p>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: June 2026</p>
+
+  <p>Wavecrest Pro is a YouTube creator intelligence tool. This policy explains what data we collect and how we handle it. It's short because we don't collect much.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>YouTube channel URLs</strong> — submitted by you to trigger an analysis. Used to call the YouTube Data API on your behalf and not stored beyond what's needed to generate the report.</li>
+    <li><strong>Channel metadata</strong> — channel name, handle, subscriber count, video count, and thumbnail URL as returned by the YouTube Data API. No video content, comments, or private data.</li>
+    <li><strong>Analysis reports</strong> — the structured output of each analysis is saved to our database, keyed to a randomly-generated UUID. This is what powers shareable report links.</li>
+    <li><strong>IP addresses (temporarily)</strong> — used for rate limiting (5 analyses per hour per IP). Stored in Redis with a 1-hour auto-expiry. Not logged permanently and not tied to reports.</li>
+    <li><strong>Email address (waitlist only)</strong> — if you submit your email for early access, it's stored for the sole purpose of notifying you when access is ready. Not sold or used for marketing.</li>
+  </ul>
+
+  <h2>What we don't collect</h2>
+  <ul>
+    <li>No account is required to use the free tier</li>
+    <li>No third-party analytics trackers (no Google Analytics, Mixpanel, Segment, etc.)</li>
+    <li>No advertising cookies and no data sold to advertisers</li>
+    <li>No video content, transcripts, comments, or YouTube user data beyond what's listed above</li>
+  </ul>
+
+  <h2>YouTube Data API</h2>
+  <p>Wavecrest Pro uses the YouTube Data API v3 to fetch publicly-available channel and video metadata. By submitting a channel URL, that URL is sent to YouTube's API as part of the analysis. Our use of YouTube data is governed by <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube's Terms of Service</a>. We access only public data — no YouTube user accounts or private channels are involved.</p>
+
+  <h2>Report links</h2>
+  <p>Every report is stored with a UUID-based URL (e.g. <code>/app?r=uuid</code>). Anyone with the link can view the report — there is no access control on individual reports. Don't share report links if you consider the contents confidential. Reports older than 12 months may be deleted.</p>
+
+  <h2>Data retention</h2>
+  <ul>
+    <li><strong>Analysis reports:</strong> retained for up to 12 months, subject to change</li>
+    <li><strong>IP rate-limit data:</strong> auto-deleted after 1 hour</li>
+    <li><strong>Waitlist emails:</strong> retained until you request deletion</li>
+  </ul>
+
+  <h2>Your rights</h2>
+  <p>To request deletion of a specific report or your email from the waitlist, email us at <a href="mailto:efeali.bel@gmail.com">efeali.bel@gmail.com</a>. We'll handle it within 7 days.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If our data practices change meaningfully, we'll update this page and the "last updated" date above.</p>
+
+  <h2>Contact</h2>
+  <p><a href="mailto:efeali.bel@gmail.com">efeali.bel@gmail.com</a></p>
+</main>
+
+<footer>
+  <p>Wavecrest Pro &nbsp;&middot;&nbsp; <a href="/">Home</a> &nbsp;&middot;&nbsp; <a href="/changelog">Changelog</a> &nbsp;&middot;&nbsp; <a href="/privacy">Privacy</a></p>
+</footer>
+
+</body>
+</html>

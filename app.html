@@ -22,7 +22,7 @@
     h1, h2, h3 { font-family: 'Fraunces', serif; }
 
     /* Nav */
-    nav { position: sticky; top: 0; z-index: 100; padding: 0 24px; height: 52px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    nav { position: sticky; top: 0; z-index: 100; padding: 0 24px; height: 56px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .nav-logo { text-decoration: none; font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
     .nav-logo span { color: var(--accent); }
     .btn { display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap; }
@@ -85,8 +85,8 @@
     #view-report { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
     .report-header { padding: 36px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 36px; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 16px; }
     .channel-meta { display: flex; gap: 14px; align-items: center; }
-    .channel-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: var(--bg-warm); border: 1px solid var(--border); }
-    .channel-avatar-fallback { width: 52px; height: 52px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--bg); flex-shrink: 0; }
+    .channel-avatar { width: 52px; height: 56px; border-radius: 50%; object-fit: cover; background: var(--bg-warm); border: 1px solid var(--border); }
+    .channel-avatar-fallback { width: 52px; height: 56px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--bg); flex-shrink: 0; }
     .channel-name { font-family: 'Fraunces', serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -.03em; }
     .channel-stats { font-size: 12.5px; color: var(--ink-mid); font-family: 'IBM Plex Mono', monospace; margin-top: 4px; }
     .report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -164,14 +164,14 @@
 
 <nav>
   <a href="/" class="nav-logo">Wavecrest <span>Pro</span></a>
-  <a href="/pricing" class="btn btn-ghost">Pricing</a>
+  <div style="display:flex;align-items:center;gap:16px"><a href="/privacy" style="font-size:13px;color:var(--ink-mid);text-decoration:none">Privacy</a><a href="/pricing" class="btn btn-ghost">Pricing</a></div>
 </nav>
 
 <!-- ── INPUT VIEW ── -->
 <div id="view-input" class="view active">
   <p class="input-label">Creator intelligence</p>
   <h1>Decode any creator's<br/><em>playbook.</em></h1>
-  <p>Paste a YouTube channel URL and get a 7-dimension analysis in under 90 seconds — hooks, thumbnail formula, cadence, audience, content pillars, monetization, and competitive gaps.</p>
+  <p>Paste a YouTube channel URL and get a 9-dimension analysis in under 90 seconds — hooks, thumbnail formula, cadence, audience, content pillars, monetization, competitive gaps, earnings estimate, and video ideas.</p>
   <div class="url-form">
     <div>
       <div class="url-input-wrap">
@@ -211,7 +211,7 @@
       <span class="step-dot"></span> Loading recent videos
     </div>
     <div class="step-item" id="step-3">
-      <span class="step-dot"></span> Analyzing 7 dimensions
+      <span class="step-dot"></span> Analyzing 9 dimensions
     </div>
     <div class="step-item" id="step-4">
       <span class="step-dot"></span> Building your playbook
@@ -615,9 +615,8 @@ function downloadReport() {
   if (!currentReport) return;
   const { channel, analysis, videoCount } = currentReport;
 
-  // Build a text version (PDF generation without a library — we'll open print dialog)
   const win = window.open('', '_blank');
-  const name = channel?.name || 'Creator';
+  const name = esc(channel?.name || 'Creator');
   win.document.write(`<!DOCTYPE html>
 <html>
 <head>
@@ -636,43 +635,43 @@ li { margin-bottom: 6px; }
 </head>
 <body>
 <h1>${name}</h1>
-<p class="meta">${channel?.handle ? channel.handle + ' · ' : ''}${fmtNum(channel?.subscriberCount || 0)} subscribers · ${videoCount} videos analyzed · wavecrest.pro</p>
+<p class="meta">${channel?.handle ? esc(channel.handle) + ' · ' : ''}${fmtNum(channel?.subscriberCount || 0)} subscribers · ${videoCount} videos analyzed · wavecrest.pro</p>
 
 <h2>Hook Patterns</h2>
-<p>${analysis?.hooks?.primaryPattern || ''}</p>
-<p><em>${analysis?.hooks?.frequency || ''}</em></p>
-<ul>${(analysis?.hooks?.examples || []).map(e => `<li>"${e}"</li>`).join('')}</ul>
+<p>${esc(analysis?.hooks?.primaryPattern || '')}</p>
+<p><em>${esc(analysis?.hooks?.frequency || '')}</em></p>
+<ul>${(analysis?.hooks?.examples || []).map(e => `<li>"${esc(e)}"</li>`).join('')}</ul>
 
 <hr class="divider"/>
 <h2>Posting Cadence</h2>
-<p>${analysis?.cadence?.schedule || ''}</p>
-<p>${analysis?.cadence?.consistency || ''}</p>
-<p>${analysis?.cadence?.durationStrategy || ''}</p>
+<p>${esc(analysis?.cadence?.schedule || '')}</p>
+<p>${esc(analysis?.cadence?.consistency || '')}</p>
+<p>${esc(analysis?.cadence?.durationStrategy || '')}</p>
 
 <hr class="divider"/>
 <h2>Thumbnail Formula</h2>
-<p>${analysis?.thumbnails?.formula || ''}</p>
-<ul>${(analysis?.thumbnails?.characteristics || []).map(c => `<li>${c}</li>`).join('')}</ul>
+<p>${esc(analysis?.thumbnails?.formula || '')}</p>
+<ul>${(analysis?.thumbnails?.characteristics || []).map(c => `<li>${esc(c)}</li>`).join('')}</ul>
 
 <hr class="divider"/>
 <h2>Audience Profile</h2>
-<p>${analysis?.audience?.primaryProfile || ''}</p>
-<p>Age range: ${analysis?.audience?.estimatedAge || '—'} · Intent: ${analysis?.audience?.viewerIntent || '—'}</p>
-<p>${analysis?.audience?.loyaltySignal || ''}</p>
+<p>${esc(analysis?.audience?.primaryProfile || '')}</p>
+<p>Age range: ${esc(analysis?.audience?.estimatedAge || '—')} · Intent: ${esc(analysis?.audience?.viewerIntent || '—')}</p>
+<p>${esc(analysis?.audience?.loyaltySignal || '')}</p>
 
 <hr class="divider"/>
 <h2>Content Pillars</h2>
-${(analysis?.pillars || []).map(p => `<p><strong>${p.name} (${p.percentage}%)</strong> — ${p.description}</p>`).join('')}
+${(analysis?.pillars || []).map(p => `<p><strong>${esc(p.name)} (${esc(String(p.percentage ?? '—'))}%)</strong> — ${esc(p.description)}</p>`).join('')}
 
 <hr class="divider"/>
 <h2>Monetization</h2>
-<p>${analysis?.monetization?.primaryApproach || ''}</p>
-<ul>${(analysis?.monetization?.signals || []).map(s => `<li>${s}</li>`).join('')}</ul>
-<p>${analysis?.monetization?.brandAffinities || ''}</p>
+<p>${esc(analysis?.monetization?.primaryApproach || '')}</p>
+<ul>${(analysis?.monetization?.signals || []).map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+<p>${esc(analysis?.monetization?.brandAffinities || '')}</p>
 
 <hr class="divider"/>
 <h2>Competitive Gaps</h2>
-${(analysis?.gaps || []).map(g => `<p><strong>${g.opportunity}</strong><br/>${g.rationale}</p>`).join('')}
+${(analysis?.gaps || []).map(g => `<p><strong>${esc(g.opportunity)}</strong><br/>${esc(g.rationale)}</p>`).join('')}
 
 <hr class="divider"/>
 <p style="font-size:12px;color:#aaa">Generated by Wavecrest Pro · wavecrest.pro · ${new Date().toLocaleDateString()}</p>
