@@ -5,6 +5,8 @@ import { saveReport } from '../lib/db.js';
 export const config = { maxDuration: 60 };
 
 export default async function handler(req, res) {
+  if (req.method !== 'GET') { res.status(405).end('Method not allowed'); return; }
+
   const url = (req.query.url || '').trim();
   if (!url) { res.status(400).end('Missing url'); return; }
 
@@ -32,6 +34,7 @@ export default async function handler(req, res) {
 
     send('progress', { step: 4, label: 'Saving report' });
     const reportId = await saveReport(channel, videos.length, analysis);
+    if (!reportId) throw new Error('Report could not be saved — try again');
 
     send('done', {
       reportId,
