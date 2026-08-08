@@ -59,14 +59,17 @@ export default async function handler(req, res) {
     send('progress', { step: 1, label: 'Fetching channel info' });
     channel = await resolveChannel(url, YOUTUBE_API_KEY);
 
-    send('progress', { step: 2, label: `Found ${channel.name} · fetching videos` });
-    const videos = await fetchVideos(channel.uploadsPlaylistId, YOUTUBE_API_KEY, 100);
+    send('progress', { step: 2, label: `Found ${channel.name} · loading videos` });
+    const videos = await fetchVideos(channel.uploadsPlaylistId, YOUTUBE_API_KEY, 100, ({ phase, count, total }) => {
+      if (phase === 'listing') send('progress', { step: 2, label: `Found ${channel.name} · loading videos (${count})` });
+      else send('progress', { step: 3, label: `Fetching video stats (${count}/${total})` });
+    });
     if (videos.length < 3) { send('error', { message: 'Too few public videos (need 3+)', code: 'TOO_FEW_VIDEOS' }); res.end(); return; }
 
-    send('progress', { step: 3, label: `${videos.length} videos loaded · running AI analysis` });
+    send('progress', { step: 4, label: `${videos.length} videos loaded · running AI analysis` });
     const analysis = await runAnalysis(channel, videos, GROQ_API_KEY);
 
-    send('progress', { step: 4, label: 'Saving report' });
+    send('progress', { step: 5, label: 'Saving report' });
     // A failed save shouldn't discard the analysis — report just won't be shareable.
     const reportId = await saveReport(channel, videos.length, analysis, user?.id ?? null);
 
