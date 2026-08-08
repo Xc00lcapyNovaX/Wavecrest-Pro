@@ -739,13 +739,6 @@
         <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:8px">Talk to us</button>
       </div>
     </div>
-    <div class="card" style="margin-top:20px;padding:22px 26px;border-radius:12px;display:flex;gap:14px;align-items:start">
-      <div style="width:38px;height:38px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:13px;color:var(--bg);flex-shrink:0">J</div>
-      <div>
-        <p style="font-size:13.5px;color:var(--ink-mid);line-height:1.72;font-style:italic">"Start with the free analysis — paste a channel you're studying and see how deep the report goes. If it changes how you think about that creator's strategy, grab a pack and run your whole watchlist. — <span style="color:var(--ink);font-style:normal;font-weight:500">jake@wavecrestpro.com</span> if you have questions."</p>
-        <p style="font-size:11.5px;color:var(--ink-light);margin-top:7px;font-family:'IBM Plex Mono',monospace">— Jake Moreno, founder</p>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -1085,7 +1078,7 @@
       const card = document.getElementById('hero-card');
       card.style.cursor = 'pointer';
       card.title = 'View full analysis for ' + ch.name;
-      card.addEventListener('click', () => { window.location.href = '/app?report=' + d.reportId; });
+      card.addEventListener('click', () => { window.location.href = '/app?r=' + d.reportId; });
     }
   } catch(e) {}
 })();

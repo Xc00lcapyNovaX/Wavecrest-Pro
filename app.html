@@ -205,16 +205,16 @@
   <p id="loading-step">Fetching channel info</p>
   <div class="loading-steps-list">
     <div class="step-item active" id="step-1">
-      <span class="step-dot"></span> Fetching channel info
+      <span class="step-dot"></span><span class="step-label">Fetching channel info</span>
     </div>
     <div class="step-item" id="step-2">
-      <span class="step-dot"></span> Loading recent videos
+      <span class="step-dot"></span><span class="step-label">Loading recent videos</span>
     </div>
     <div class="step-item" id="step-3">
-      <span class="step-dot"></span> Analyzing 9 dimensions
+      <span class="step-dot"></span><span class="step-label">Analyzing 9 dimensions</span>
     </div>
     <div class="step-item" id="step-4">
-      <span class="step-dot"></span> Building your playbook
+      <span class="step-dot"></span><span class="step-label">Building your playbook</span>
     </div>
   </div>
 </div>
@@ -347,7 +347,7 @@ async function startAnalysis() {
         if (el) { el.classList.remove('active'); el.classList.add('done'); }
       }
       const curr = document.getElementById(`step-${step}`);
-      if (curr) { curr.classList.remove('done'); curr.classList.add('active'); curr.querySelector('span:last-child').textContent = ' ' + label; }
+      if (curr) { curr.classList.remove('done'); curr.classList.add('active'); curr.querySelector('.step-label').textContent = label; }
       const stepEl = document.getElementById('loading-step');
       if (stepEl) stepEl.textContent = label;
     });
@@ -385,12 +385,21 @@ async function startAnalysis() {
   }
 }
 
+const DEFAULT_STEP_LABELS = {
+  1: 'Fetching channel info',
+  2: 'Loading recent videos',
+  3: 'Analyzing 9 dimensions',
+  4: 'Building your playbook'
+};
+
 function resetSteps() {
   [1,2,3,4].forEach(i => {
     const el = document.getElementById(`step-${i}`);
     el.classList.remove('done', 'active');
     if (i === 1) el.classList.add('active');
+    el.querySelector('.step-label').textContent = DEFAULT_STEP_LABELS[i];
   });
+  document.getElementById('loading-step').textContent = DEFAULT_STEP_LABELS[1];
 }
 
 

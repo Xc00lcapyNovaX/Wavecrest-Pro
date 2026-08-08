@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "migrate": "node scripts/migrate.js",
+    "test": "node --test test/"
   },
   "dependencies": {
     "@upstash/redis": "^1.38.0",

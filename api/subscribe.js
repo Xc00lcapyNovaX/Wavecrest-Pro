@@ -5,7 +5,7 @@
 // Required env vars (set in Vercel dashboard → Project → Settings → Environment Variables):
 //   RESEND_API_KEY   - from resend.com/api-keys
 //   FROM_EMAIL        - must be on your verified Resend domain, e.g. "Wavecrest Pro <hello@wavecrestpro.com>"
-//   NOTIFY_EMAIL      - where new-signup alerts go, e.g. "jake@wavecrestpro.com"
+//   NOTIFY_EMAIL      - where new-signup alerts go, e.g. "hello@wavecrest.pro"
 //
 // Local testing: `vercel dev` (not the python http.server — that only serves
 // static files and has no idea this folder exists).
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     const confirmRes = await sendEmail({
       from: FROM_EMAIL,
       to: email,
-      subject: ‘You’re on the Wavecrest Pro early access list’,
+      subject: "You’re on the Wavecrest Pro early access list",
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1e293b">
           <h2 style="margin-bottom:8px">You’re in 👋</h2>
