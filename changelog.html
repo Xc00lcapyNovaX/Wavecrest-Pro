@@ -136,7 +136,8 @@
     <div class="log-layout">
       <div class="log-sidebar">
         <p class="editorial-label" style="margin-bottom:14px">Releases</p>
-        <a href="#v040" class="log-sidebar-link active">v0.4.0 — Jun 17</a>
+        <a href="#v050" class="log-sidebar-link active">v0.5.0 — Aug 8</a>
+        <a href="#v040" class="log-sidebar-link">v0.4.0 — Jun 17</a>
         <a href="#v032" class="log-sidebar-link">v0.3.2 — Jun 12</a>
         <a href="#v030" class="log-sidebar-link">v0.3.0 — Jun 5</a>
         <a href="#v025" class="log-sidebar-link">v0.2.5 — May 22</a>
@@ -144,6 +145,23 @@
         <a href="#v010" class="log-sidebar-link">v0.1.0 — Apr 21</a>
       </div>
       <div>
+
+        <div class="log-entry reveal" id="v050">
+          <p class="log-version">v0.5.0</p>
+          <h2 class="log-title">Analysis quality + honest pricing</h2>
+          <p class="log-date">August 8, 2026</p>
+          <div><span class="log-tag tag-fixed">Fixed</span><span class="log-tag tag-improved">Improved</span><span class="log-tag tag-design">Design</span></div>
+          <div class="log-items">
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Earnings math moved server-side:</strong> The AI was being asked to do arithmetic inside a text field, which occasionally leaked raw formulas like <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg-warm);padding:1px 5px;border-radius:3px">low=views*rpm/1000...</code> straight into reports. Revenue numbers are now computed in code from the AI's RPM estimate.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Gap analysis is now fact-checked:</strong> Claimed "content gaps" are checked against the channel's actual titles before being shown, instead of trusting the model's claim outright.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Fixed CPM/RPM always showing "—":</strong> A field-name mismatch between the report renderer and the backend meant this row never displayed, silently, since it shipped.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Fixed wrong error messages:</strong> An SSE event literally named "error" was colliding with the browser's native connection-error handler, so specific failures (like "channel not found") were being silently overwritten by a generic "Connection lost" message.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Removed fabricated testimonials:</strong> The homepage "What people say" section quoted customers that don't exist. Gone.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>No more dead-end buttons:</strong> Pricing CTAs either go somewhere real now, or honestly say "Coming soon" — credit pack purchases aren't wired up to a payment processor yet.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Loading screen redesign:</strong> 5 real progress stages (up from 4) with live video counts, a status rotator during the AI-analysis wait, and spring-based micro-interactions matching the rest of the site.</p></div>
+            <div class="log-item"><div class="log-item-dot"></div><p class="log-item-text"><strong>Homepage cleanup:</strong> Removed the newspaper-style masthead bar, toned down repetitive "not X, not Y" copy patterns, fixed a percentage stat rendering in a cramped serif.</p></div>
+          </div>
+        </div>
 
         <div class="log-entry reveal" id="v040">
           <p class="log-version">v0.4.0</p>

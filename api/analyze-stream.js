@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       if (phase === 'listing') send('progress', { step: 2, label: `Found ${channel.name} · loading videos (${count})` });
       else send('progress', { step: 3, label: `Fetching video stats (${count}/${total})` });
     });
-    if (videos.length < 3) { send('error', { message: 'Too few public videos (need 3+)', code: 'TOO_FEW_VIDEOS' }); res.end(); return; }
+    if (videos.length < 3) { send('fail', { message: 'Too few public videos (need 3+)', code: 'TOO_FEW_VIDEOS' }); res.end(); return; }
 
     send('progress', { step: 4, label: `${videos.length} videos loaded · running AI analysis` });
     const analysis = await runAnalysis(channel, videos, GROQ_API_KEY);
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       ytReason: err.reason,
       ytEndpoint: err.endpoint
     });
-    send('error', { message: err.message || 'Analysis failed — try again', code: 'ANALYSIS_FAILED' });
+    send('fail', { message: err.message || 'Analysis failed — try again', code: 'ANALYSIS_FAILED' });
   }
 
   res.end();

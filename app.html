@@ -397,7 +397,11 @@ async function startAnalysis() {
       setTimeout(() => { showReport(data, data.reportId); btn.disabled = false; }, 400);
     });
 
-    evtSource.addEventListener('error', e => {
+    // Named 'fail' (not 'error') — EventSource treats addEventListener('error', …) and
+    // .onerror as the SAME registration for native connection failures, so a custom
+    // named-event literally called "error" would double-fire both handlers and the
+    // generic "Connection lost" message would clobber this one.
+    evtSource.addEventListener('fail', e => {
       evtSource.close();
       stopAiSubcaption();
       let msg = 'Analysis failed — try again';
@@ -632,7 +636,7 @@ function renderReport(data) {
       content: `
         <div>
           <div class="earnings-row"><span class="earnings-label">Est. monthly views</span><span class="earnings-val">${fmtNum(earn.monthlyViewsEstimate||0)}</span></div>
-          <div class="earnings-row"><span class="earnings-label">CPM range</span><span class="earnings-val">${esc(earn.cpmRange||'—')}</span></div>
+          <div class="earnings-row"><span class="earnings-label">CPM range</span><span class="earnings-val">${esc(earn.cpmRPM||'—')}</span></div>
           <div class="earnings-row"><span class="earnings-label">Ad revenue / month</span><span class="earnings-val">${esc(earn.estimatedMonthlyAdRevenue||'—')}</span></div>
           ${earn.otherRevenue&&!earn.otherRevenue.includes('unclear')?`<div class="earnings-row"><span class="earnings-label">Other</span><span class="earnings-val" style="font-size:11.5px;font-family:Inter,sans-serif;font-weight:400;color:var(--ink-mid)">${esc(earn.otherRevenue)}</span></div>`:''}
         </div>
